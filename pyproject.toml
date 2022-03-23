@@ -2,7 +2,7 @@
 name = "postprocessing_variant_calls"
 version = "0.1.0"
 description = ""
-authors = ["yxtay <shahr2@mskcc.org>"]
+authors = ["shahr2@mskcc.org"]
 
 [tool.poetry.dependencies]
 python = "~3.8"
@@ -11,7 +11,7 @@ gunicorn = "^20.1"
 pydantic = { extras = ["dotenv"], version = "^1.8" }
 python-dotenv = "^0.14"
 python-json-logger = "^0.1"
-typer = "*" # "^0.3"
+typer = {extras = ["all"], version = "^0.4.0"} # "^0.3"
 uvicorn = "^0.14"
 
 [tool.poetry.dev-dependencies]
@@ -27,6 +27,8 @@ pre-commit-hooks = "^4.0"
 pytest = "^6.2"
 pytest-cov = "^2.11"
 
+[tool.poetry.scripts]
+vardict = "vardict.vardict:vardict"
 [tool.black]
 line-length = 88
 target-version = ["py38"]
