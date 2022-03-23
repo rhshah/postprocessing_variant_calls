@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "python-project-template"
+name = "postprocessing_variant_calls"
 version = "0.1.0"
 description = ""
-authors = ["yxtay <wyextay@gmail.com>"]
+authors = ["yxtay <shahr2@mskcc.org>"]
 
 [tool.poetry.dependencies]
 python = "~3.8"
