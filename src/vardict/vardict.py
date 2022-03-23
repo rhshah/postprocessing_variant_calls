@@ -93,19 +93,25 @@ def filter_vardict(
 
 
 def run_std_filter(args):
-    vcf_out = os.path.basename(inputVcf)
+    vcf_out = os.path.basename(args.inputVcf)
     vcf_out = os.path.splitext(vcf_out)[0]
 
     if args.outdir:
         vcf_out = os.path.join(args.outdir,vcf_out)
 
     txt_out = vcf_out + '_STDfilter.txt'
+    vcf_complex_out = vcf_out + '_complex_STDfilter.vcf'
     vcf_out = vcf_out + '_STDfilter.vcf'
 
     vcf_reader = vcf.Reader(open(args.inputVcf, 'r'))
     vcf_reader.infos['set'] = VcfInfo('set', '.', 'String', 'The variant callers that reported this event', 'mskcc/basicfiltering', 'v0.2.1')
     vcf_reader.formats['DP'] = VcfFormat('DP', '1', 'Integer', 'Total read depth at this site')
     vcf_reader.formats['AD'] = VcfFormat('AD', 'R', 'Integer', 'Allelic depths for the ref and alt alleles in the order listed')
+    # Manually add the new SHIFT3_ADJUSTED header to the reader, which will then be passed to the writer
+    shift3_line = "##INFO=<ID=SHIFT3_ADJUSTED,Number=1,Type=Integer,Description=\"No. of bases to be shifted to 5 prime for complex variants to get the preferred left alignment for proper genotyping\">"
+    meta_parser = VcfMetadataParser()
+    key, val = meta_parser.read_info(shift3_line)
+    vcf_reader.infos[key] = val
 
     allsamples = list(vcf_reader.samples)
 
@@ -124,10 +130,29 @@ def run_std_filter(args):
     nsampleName = vcf_reader.samples[1]
 
     vcf_writer = vcf.Writer(open(vcf_out, 'w'), vcf_reader)
+    vcf_complex_writer = vcf.Writer(open(vcf_complex_out, 'w'), vcf_reader)
     txt_fh = open(txt_out, "wb")
     # Iterate through rows and filter mutations
     for record in vcf_reader:
         tcall = record.genotype(args.tsampleName)
+
+        # Pad complex indels for proper genotyping
+        if (record.INFO["TYPE"] == "Complex" and 
+                len(record.REF) != len(record.ALT) and 
+                record.INFO["SHIFT3"] > 0 and 
+                record.INFO["SHIFT3"] <= len(record.INFO["LSEQ"])):
+            padding_seq = record.INFO["LSEQ"][len(record.INFO["LSEQ"])-(record.INFO["SHIFT3"]+1):]
+            record.REF = padding_seq + record.REF
+            for alt in record.ALT:
+                alt.sequence = padding_seq + alt.sequence
+            record.POS = record.POS - (record.INFO["SHIFT3"]+1)
+            # TODO: add ID=SHIFT3_ADJUSTED to vcf header
+            record.INFO["SHIFT3_ADJUSTED"] = record.INFO["SHIFT3"]
+            record.INFO["SHIFT3"] = 0
+            complex_flag = True
+        else:
+            complex_flag = False
+            record.INFO["SHIFT3_ADJUSTED"] = 0
 
         keep_based_on_status = True
         if "Somatic" not in record.INFO['STATUS'] and args.filter_germline:
@@ -183,14 +208,17 @@ def run_std_filter(args):
 
         if tvf > nvfRF:
             if keep_based_on_status & (tmq >= int(args.mq)) & (nmq >= int(args.mq)) & (tdp >= int(args.dp)) & (tad >= int(args.ad)) & (tvf >= float(args.vf)):
-                vcf_writer.write_record(record)
+                if complex_flag:
+                    vcf_complex_writer.write_record(record)
+                else:
+                    vcf_writer.write_record(record)
                 out_line = str.encode(args.tsampleName + "\t" + record.CHROM + "\t" + str(record.POS) + "\t" + str(record.REF) + "\t" + str(record.ALT[0]) + "\t" + "." + "\n")
                 txt_fh.write(out_line)
 
     vcf_writer.close()
+    vcf_complex_writer.close()
     txt_fh.close()
-
-    return vcf_out, txt_out
+    return vcf_out, vcf_complex_out, txt_out
 
 
 if __name__ == "__main__":
