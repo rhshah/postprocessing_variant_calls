@@ -105,21 +105,21 @@ def filter_vardict(
     ),
 
     tnRatio: int = typer.Option(
-        5,
+        1,
         "--tnRatio",
         "-tnr",
         help="Tumor-Normal variant fraction ratio threshold",
     ),
 
     variantFraction: float = typer.Option(
-        0.4,
+        5e-05,
         "--variantFraction",
         "-vf",
         help="Tumor variant fraction threshold",
     ),
 
     minQual: int = typer.Option(
-        20,
+        0,
         "--minQual",
         "-mq",
         help="Minimum variant call quality",
