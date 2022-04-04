@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from typing import List, Optional
 import typer
-from vcf.parser import _Info as VcfInfo, _Format as VcfFormat
+from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
