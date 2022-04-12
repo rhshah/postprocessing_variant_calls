@@ -95,6 +95,7 @@ def process_vardict(
         ..., "--outDir", "-o", help="Full Path to the output dir"
     ),
 ):
+
     '''
     @Description : This tool helps to filter vardict version 1.4.6 vcf for matched calling
     @Created : 03/23/2022
@@ -103,15 +104,28 @@ def process_vardict(
 
     Visual representation of how this module works:
 
-    tmq >= minQual and
-    tdp >= totalDepth and
-    tad >= alleleDepth and
-    tvf >= variantFraction ?
+    "Somatic" not in record['STATUS'] and filter_germline ?
+    |
+    yes --> DONT KEEP
+    |
+    no --> tumor_variant_fraction > nvfRF ?
+            |
+            no --> DONT KEEP
+            |
+            yes --> tmq >= minQual and
+                    nmq >= minQual and
+                    tdp >= totalDepth and
+                    tad >= alleleDepth and
+                    tvf >= variantFraction ?
                     |
                     no --> DONT KEEP
                     |
                     yes --> KEEP
 
+    Note: BasicFiltering VarDict's additional filters over MuTect include:
+    1. Tumor variant quality threshold
+    2. Normal variant quality threshold
+    3. Somatic filter (MuTect does not report germline events)
     '''
 
     logger.info("process_vardict: Started the run for doing standard filter.")
@@ -152,15 +166,22 @@ def process_vardict(
 
     allsamples = list(vcf_reader.samples)
 
-    if len(allsamples) != 2:
-        logger.critical(
-                "process_vardict: The VCF does not have two genotype columns. Please input a proper vcf with Tumor/Normal columns"
-            )
-        sys.exit(1)
-   
+    if_swap_sample = False
+    if len(allsamples) == 1:
+         normal_sampleName = None
+    else:
+    # If the caller reported the normal genotype column before the tumor, swap those around
+        if allsamples[1] == sampleName:
+            if_swap_sample = True
+            vcf_reader.samples[0] = allsamples[1]
+            vcf_reader.samples[1] = allsamples[0]
+
+        normal_sampleName = vcf_reader.samples[1]
+
     vcf_writer = vcf.Writer(open(vcf_out, "w"), vcf_reader)
     vcf_complex_writer = vcf.Writer(open(vcf_complex_out, "w"), vcf_reader)
     txt_fh = open(txt_out, "wb")
+
     # Iterate through rows and filter mutations
     for record in vcf_reader:
         tcall = record.genotype(sampleName)
@@ -186,10 +207,21 @@ def process_vardict(
             complex_flag = False
             record.INFO["SHIFT3_ADJUSTED"] = 0
 
-        if tcall["QUAL"] is not None:
-            tmq = int(tcall["QUAL"])
-        else:
-            tmq = 0
+        keep_based_on_status = True
+        try:
+            if "Somatic" not in record.INFO["STATUS"] and filterGermline:
+                keep_based_on_status = False
+        except KeyError:
+            keep_based_on_status = False
+        
+        try:
+            if tcall["QUAL"] is not None:
+                tmq = int(tcall["QUAL"])
+            else:
+                tmq = 0
+        except:
+            tmq = int(record.INFO["QUAL"])
+
         if tcall["DP"] is not None:
             tdp = int(tcall["DP"])
         else:
@@ -202,19 +234,55 @@ def process_vardict(
             tvf = int(tad) / float(tdp)
         else:
             tvf = 0
+        
+        if normal_sampleName == None:
+            break
+        # Read record for normal sample
+        ncall = record.genotype(normal_sampleName)
+        if ncall:
+            if ncall["QUAL"] is not None:
+                nmq = int(ncall["QUAL"])
+            else:
+                nmq = 0
+            if ncall["DP"] is not None:
+                ndp = int(ncall["DP"])
+            else:
+                ndp = 0
+            if ncall["VD"] is not None:
+                nad = int(ncall["VD"])
+            else:
+                nad = 0
+            if ndp != 0:
+                nvf = nad / ndp
+            else:
+                nvf = 0
+            nvfRF = int(tnRatio) * nvf
+        else:
+            logger.critical(
+                "process_vardict: There are no genotype values for Normal. We will exit."
+            )
             sys.exit(1)
 
         record.add_info("set", "VarDict")
 
-        if if_swap_sample:
+        if_swap_sample=False
+        if allsamples[1] == sampleName:
+            if_swap_sample = True
+            vcf_reader.samples[0] = allsamples[1]
+            vcf_reader.samples[1] = allsamples[0]
+        normal_sampleName = vcf_reader.samples[1]
+        '''
+            if if_swap_sample:
             nrm = record.samples[0]
             tum = record.samples[1]
             record.samples[0] = tum
             record.samples[1] = nrm
-
-        if tvf !=0:
+        '''
+        if tvf > nvfRF:
             if (
-                (tmq >= int(minQual))
+                keep_based_on_status
+                & (tmq >= int(minQual))
+                & (nmq >= int(minQual))
                 & (tdp >= int(totalDepth))
                 & (tad >= int(alleleDepth))
                 & (tvf >= float(variantFraction))
@@ -224,7 +292,7 @@ def process_vardict(
                 else:
                     vcf_writer.write_record(record)
                 out_line = str.encode(
-                    tsampleName
+                    sampleName
                     + "\t"
                     + record.CHROM
                     + "\t"
