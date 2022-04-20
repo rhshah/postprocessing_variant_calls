@@ -22,6 +22,177 @@ logger = logging.getLogger("process_vardict")
 app = typer.Typer()
 
 
+def filter_single(
+):
+    return 0 
+
+def filter_norm(
+    sampleName, minQual, totalDepth, alleleDepth, variantFraction, tnRatio, filterGermline,
+    vcf_out, allsamples, vcf_reader, vcf_complex_out, txt_out 
+):
+    # TODO: continue to simplify method since we are now only worried about tumor/control vcf 
+    # TODO: Potentially make this into a method for a class made up of the CL inputs? 
+    '''
+    @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
+    @Created : 04/20/2022
+    @author : Eric Buehler
+        -Inputs: 
+            -inputVcf
+            -sampleName 
+            -minQual 
+            -totalDepth 
+            -alleleDepth 
+            -variantFraction
+            -tnRatio 
+            -filterGermline
+            -outputDir
+    '''
+    if_swap_sample = False
+    if len(allsamples) == 1:
+         normal_sampleName = None
+    # If the caller reported the normal genotype column before the tumor, swap those around
+    if allsamples[1] == sampleName:
+        if_swap_sample = True
+        vcf_reader.samples[0] = allsamples[1]
+        vcf_reader.samples[1] = allsamples[0]
+
+    normal_sampleName = vcf_reader.samples[1]
+
+    vcf_writer = vcf.Writer(open(vcf_out, "w"), vcf_reader)
+    vcf_complex_writer = vcf.Writer(open(vcf_complex_out, "w"), vcf_reader)
+    txt_fh = open(txt_out, "wb")
+
+    # mutations 
+
+    # Iterate through rows and filter mutations
+    for record in vcf_reader:
+        tcall = record.genotype(sampleName)
+
+        # Pad complex indels for proper genotyping
+        if (
+            record.INFO["TYPE"] == "Complex"
+            and len(record.REF) != len(record.ALT)
+            and record.INFO["SHIFT3"] > 0
+            and record.INFO["SHIFT3"] <= len(record.INFO["LSEQ"])
+        ):
+            padding_seq = record.INFO["LSEQ"][
+                len(record.INFO["LSEQ"]) - (record.INFO["SHIFT3"] + 1) :
+            ]
+            record.REF = padding_seq + record.REF
+            for alt in record.ALT:
+                alt.sequence = padding_seq + alt.sequence
+            record.POS = record.POS - (record.INFO["SHIFT3"] + 1)
+            record.INFO["SHIFT3_ADJUSTED"] = record.INFO["SHIFT3"]
+            record.INFO["SHIFT3"] = 0
+            complex_flag = True
+        else:
+            complex_flag = False
+            record.INFO["SHIFT3_ADJUSTED"] = 0
+
+        keep_based_on_status = True
+        try:
+            if "Somatic" not in record.INFO["STATUS"] and filterGermline:
+                keep_based_on_status = False
+        except KeyError:
+            keep_based_on_status = False
+        
+        try:
+            if tcall["QUAL"] is not None:
+                tmq = int(tcall["QUAL"])
+            else:
+                tmq = 0
+        except:
+            tmq = int(record.INFO["QUAL"])
+
+        if tcall["DP"] is not None:
+            tdp = int(tcall["DP"])
+        else:
+            tdp = 0
+        if tcall["VD"] is not None:
+            tad = int(tcall["VD"])
+        else:
+            tad = 0
+        if tdp != 0:
+            tvf = int(tad) / float(tdp)
+        else:
+            tvf = 0
+        
+        #### processing normal sample 
+        # Read record for normal sample
+        ncall = record.genotype(normal_sampleName)
+        if ncall:
+            if ncall["QUAL"] is not None:
+                nmq = int(ncall["QUAL"])
+            else:
+                nmq = 0
+            if ncall["DP"] is not None:
+                ndp = int(ncall["DP"])
+            else:
+                ndp = 0
+            if ncall["VD"] is not None:
+                nad = int(ncall["VD"])
+            else:
+                nad = 0
+            if ndp != 0:
+                nvf = nad / ndp
+            else:
+                nvf = 0
+            nvfRF = int(tnRatio) * nvf
+        else:
+            logger.critical(
+                "process_vardict: There are no genotype values for Normal. We will exit."
+            )
+            sys.exit(1)
+
+        record.add_info("set", "VarDict")
+
+        if_swap_sample=False
+        if allsamples[1] == sampleName:
+            if_swap_sample = True
+            vcf_reader.samples[0] = allsamples[1]
+            vcf_reader.samples[1] = allsamples[0]
+        normal_sampleName = vcf_reader.samples[1]
+        '''
+            if if_swap_sample:
+            nrm = record.samples[0]
+            tum = record.samples[1]
+            record.samples[0] = tum
+            record.samples[1] = nrm
+        '''
+        if tvf > nvfRF:
+            if (
+                keep_based_on_status
+                & (tmq >= int(minQual))
+                & (nmq >= int(minQual))
+                & (tdp >= int(totalDepth))
+                & (tad >= int(alleleDepth))
+                & (tvf >= float(variantFraction))
+            ):
+                if complex_flag:
+                    vcf_complex_writer.write_record(record)
+                else:
+                    vcf_writer.write_record(record)
+                out_line = str.encode(
+                    sampleName
+                    + "\t"
+                    + record.CHROM
+                    + "\t"
+                    + str(record.POS)
+                    + "\t"
+                    + str(record.REF)
+                    + "\t"
+                    + str(record.ALT[0])
+                    + "\t"
+                    + "."
+                    + "\n"
+                )
+                txt_fh.write(out_line)
+
+    vcf_writer.close()
+    vcf_complex_writer.close()
+    txt_fh.close()
+    return vcf_out, vcf_complex_out, txt_out
+
 @app.command()
 def process_vardict(
     inputVcf: Path = typer.Option(
@@ -36,6 +207,11 @@ def process_vardict(
         resolve_path=True,
         help="Input vcf generated by vardict which needs to be processed",
     ),
+    normalFlag: bool = typer.Option(
+        True,
+        "--normalFlag",
+        "-n",
+    ), 
     sampleName: str = typer.Option(
         ...,
         "--tsampleName",
@@ -127,12 +303,8 @@ def process_vardict(
     2. Normal variant quality threshold
     3. Somatic filter (MuTect does not report germline events)
     '''
-
-    logger.info("process_vardict: Started the run for doing standard filter.")
-    
     vcf_out = os.path.basename(inputVcf)
     vcf_out = os.path.splitext(vcf_out)[0]
-
     if outputDir:
         vcf_out = os.path.join(outputDir, vcf_out)
 
@@ -158,6 +330,10 @@ def process_vardict(
         "Integer",
         "Allelic depths for the ref and alt alleles in the order listed",
     )
+
+    ## POTENTIAL CUT 
+
+
     # Manually add the new SHIFT3_ADJUSTED header to the reader, which will then be passed to the writer
     shift3_line = '##INFO=<ID=SHIFT3_ADJUSTED,Number=1,Type=Integer,Description="No. of bases to be shifted to 5 prime for complex variants to get the preferred left alignment for proper genotyping">'
     meta_parser = VcfMetadataParser()
@@ -166,150 +342,18 @@ def process_vardict(
 
     allsamples = list(vcf_reader.samples)
 
-    if_swap_sample = False
-    if len(allsamples) == 1:
-         normal_sampleName = None
-    else:
-    # If the caller reported the normal genotype column before the tumor, swap those around
-        if allsamples[1] == sampleName:
-            if_swap_sample = True
-            vcf_reader.samples[0] = allsamples[1]
-            vcf_reader.samples[1] = allsamples[0]
-
-        normal_sampleName = vcf_reader.samples[1]
-
-    vcf_writer = vcf.Writer(open(vcf_out, "w"), vcf_reader)
-    vcf_complex_writer = vcf.Writer(open(vcf_complex_out, "w"), vcf_reader)
-    txt_fh = open(txt_out, "wb")
-
-    # Iterate through rows and filter mutations
-    for record in vcf_reader:
-        tcall = record.genotype(sampleName)
-
-        # Pad complex indels for proper genotyping
-        if (
-            record.INFO["TYPE"] == "Complex"
-            and len(record.REF) != len(record.ALT)
-            and record.INFO["SHIFT3"] > 0
-            and record.INFO["SHIFT3"] <= len(record.INFO["LSEQ"])
-        ):
-            padding_seq = record.INFO["LSEQ"][
-                len(record.INFO["LSEQ"]) - (record.INFO["SHIFT3"] + 1) :
-            ]
-            record.REF = padding_seq + record.REF
-            for alt in record.ALT:
-                alt.sequence = padding_seq + alt.sequence
-            record.POS = record.POS - (record.INFO["SHIFT3"] + 1)
-            record.INFO["SHIFT3_ADJUSTED"] = record.INFO["SHIFT3"]
-            record.INFO["SHIFT3"] = 0
-            complex_flag = True
-        else:
-            complex_flag = False
-            record.INFO["SHIFT3_ADJUSTED"] = 0
-
-        keep_based_on_status = True
-        try:
-            if "Somatic" not in record.INFO["STATUS"] and filterGermline:
-                keep_based_on_status = False
-        except KeyError:
-            keep_based_on_status = False
-        
-        try:
-            if tcall["QUAL"] is not None:
-                tmq = int(tcall["QUAL"])
-            else:
-                tmq = 0
-        except:
-            tmq = int(record.INFO["QUAL"])
-
-        if tcall["DP"] is not None:
-            tdp = int(tcall["DP"])
-        else:
-            tdp = 0
-        if tcall["VD"] is not None:
-            tad = int(tcall["VD"])
-        else:
-            tad = 0
-        if tdp != 0:
-            tvf = int(tad) / float(tdp)
-        else:
-            tvf = 0
-        
-        if normal_sampleName == None:
-            break
-        # Read record for normal sample
-        ncall = record.genotype(normal_sampleName)
-        if ncall:
-            if ncall["QUAL"] is not None:
-                nmq = int(ncall["QUAL"])
-            else:
-                nmq = 0
-            if ncall["DP"] is not None:
-                ndp = int(ncall["DP"])
-            else:
-                ndp = 0
-            if ncall["VD"] is not None:
-                nad = int(ncall["VD"])
-            else:
-                nad = 0
-            if ndp != 0:
-                nvf = nad / ndp
-            else:
-                nvf = 0
-            nvfRF = int(tnRatio) * nvf
-        else:
-            logger.critical(
-                "process_vardict: There are no genotype values for Normal. We will exit."
-            )
-            sys.exit(1)
-
-        record.add_info("set", "VarDict")
-
-        if_swap_sample=False
-        if allsamples[1] == sampleName:
-            if_swap_sample = True
-            vcf_reader.samples[0] = allsamples[1]
-            vcf_reader.samples[1] = allsamples[0]
-        normal_sampleName = vcf_reader.samples[1]
-        '''
-            if if_swap_sample:
-            nrm = record.samples[0]
-            tum = record.samples[1]
-            record.samples[0] = tum
-            record.samples[1] = nrm
-        '''
-        if tvf > nvfRF:
-            if (
-                keep_based_on_status
-                & (tmq >= int(minQual))
-                & (nmq >= int(minQual))
-                & (tdp >= int(totalDepth))
-                & (tad >= int(alleleDepth))
-                & (tvf >= float(variantFraction))
-            ):
-                if complex_flag:
-                    vcf_complex_writer.write_record(record)
-                else:
-                    vcf_writer.write_record(record)
-                out_line = str.encode(
-                    sampleName
-                    + "\t"
-                    + record.CHROM
-                    + "\t"
-                    + str(record.POS)
-                    + "\t"
-                    + str(record.REF)
-                    + "\t"
-                    + str(record.ALT[0])
-                    + "\t"
-                    + "."
-                    + "\n"
-                )
-                txt_fh.write(out_line)
-
-    vcf_writer.close()
-    vcf_complex_writer.close()
-    txt_fh.close()
+    logger.info("process_vardict: Started the run for doing standard filter.")
+    if normalFlag: 
+        # TODO: Passing a lot of arguments here. I wonder if it might be better to make a class from the 
+        # command line inputs and make this function a method? Hopefully doesn't conflict with Typer.
+        vcf_out, vcf_complex_out, txt_out = filter_norm(
+                sampleName, minQual, totalDepth, alleleDepth, variantFraction, tnRatio, filterGermline,
+                vcf_out, allsamples, vcf_reader, vcf_complex_out, txt_out 
+        )
+    else: 
+        # TODO: need to work on this function / method. Will need to check with Karthi or Ronak to make sure 
+        # single filter is done correctly. 
+        vcf_out, vcf_complex_out, txt_out = filter_single()
     logger.info("process_vardict: Finished the run for doing vcf processing.")
     return vcf_out, vcf_complex_out, txt_out
 
