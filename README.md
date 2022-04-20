@@ -51,33 +51,33 @@ Update the project name and metadata in `pyproject.toml` and `configs/main.ini`.
 Use Conda to create a virtual environment and activate it for the project.
 
 ```bash
-PROJECT_NAME = python-project-template
-PYTHON_VERSION = 3.8
-
-conda create --name $PROJECT_NAME --yes python=$PYTHON_VERSION
-conda activate $PROJECT_NAME
+conda env create -f environment.yml
+conda activate vardict
 ```
 
+### Update Lock file 
+
+Updating lock file will ensure dependencies like Poetry and PyVcf are not removed 
+```bash 
+poetry lock --no-update
+```
 #### Install dependencies
 
-Install Poetry with pip. Then install project dependencies with Poetry.
+Then install project dependencies with Poetry.
 
 ```bash
 make deps-install
 ```
 
-Use Poetry to add project and development dependencies into `pyproject.toml`.
+#### Updating Environment
 
-NOTE: Poetry must be included as a development dependency to prevent
-Poetry from uninstalling itself and its dependencies.
+To update the environment after initial setup up run: 
 
 ```bash
-# development dependency
-poetry add --dev poetry
-
-# project dependency
-poetry add pydantic
+conda update env -f environment.yml
 ```
+
+instead of `conda create`, and then re-run `poetry lock --no-update` and `make deps-install`
 
 ### Tools
 
