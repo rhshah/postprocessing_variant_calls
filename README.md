@@ -55,9 +55,9 @@ conda env create -f environment.yml
 conda activate vardict
 ```
 
-### Update Lock file 
+#### Update Lock file 
 
-Updating lock file will ensure dependencies like Poetry and PyVcf are not removed 
+Update lock file will ensure dependencies like Poetry and PyVcf are not removed 
 ```bash 
 poetry lock --no-update
 ```
