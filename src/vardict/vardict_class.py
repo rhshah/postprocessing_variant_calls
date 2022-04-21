@@ -1,3 +1,4 @@
+# imports
 import os
 import sys
 import vcf
@@ -8,7 +9,7 @@ class vardict:
     @Description : The purpose of this class is to manage the variety of information specified about a vardict as well as 
                     manage filtering one with both single and double sample 
     @Created : 04/20/2022
-    @author : Karthi, Eric Buehler 
+    @author : Karthigayini Sivaprakasam, Eric Buehler 
     -init: 
         -inputVcf
         -sampleName 
@@ -53,7 +54,7 @@ class vardict:
         '''
         @Description : The purpose of this function is to define the output name of the vcf file 
         @Created : 04/20/2022
-        @author : Karthi, Eric Buehler 
+        @author : Karthigayini Sivaprakasam, Eric Buehler 
         -input: self 
         -ouput: a string that specifies the name of the output vcf 
         '''
@@ -69,7 +70,7 @@ class vardict:
         '''
         @Description : The purpose of this function is to define and set-up a vcf reader
         @Created : 04/20/2022
-        @author : Karthi, Eric Buehler 
+        @author : Karthigayini Sivaprakasam, Eric Buehler 
         -input: self 
         -ouput: a vcf reader
         '''
@@ -103,10 +104,11 @@ class vardict:
         '''
         @Description : The purpose of this function is to check if a normal sample is present
         @Created : 04/20/2022
-        @author : Karthi, Eric Buehler 
+        @author : Karthigayini Sivaprakasam, Eric Buehler 
         -input: self 
         -ouput: boolean representing whether a normal sample is present or not
         '''
+        #TODO there might be more checks we want to add herre 
         if len(self.allsamples) == 1:
             return False  
         else: 
@@ -118,7 +120,7 @@ class vardict:
         '''
         @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
         @Created : 04/20/2022
-        @author : Karthi, Eric Buehler 
+        @author : Karthigayini Sivaprakasam, Eric Buehler 
         -input: self 
         -ouput: 
             - self.vcf_out
@@ -193,7 +195,7 @@ class vardict:
         '''
         @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
         @Created : 04/20/2022
-        @author : Karthi, Eric Buehler 
+        @author : Karthigayini Sivaprakasam, Eric Buehler 
         -input: self 
         -ouput: 
             - self.vcf_out
@@ -338,3 +340,4 @@ class vardict:
         vcf_complex_writer.close()
         txt_fh.close()
         return self.vcf_out, self.vcf_complex_out, self.txt_out
+        
