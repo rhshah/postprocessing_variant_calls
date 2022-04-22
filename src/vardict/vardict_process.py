@@ -94,6 +94,7 @@ def process_vardict(
     outputDir: str = typer.Option(
         ..., "--outDir", "-o", help="Full Path to the output dir"
     ),
+    ## TODO: instead boolean, maybe string where you specify single vs double, maybe true or false, required
     normalFlag: bool = typer.Option(
         False,
         "--normalFlag",
@@ -144,7 +145,7 @@ def process_vardict(
         # check for normal
         if to_filter.has_normal():
             # filter vardict with tumor/normal
-            vcf_out, vcf_complex_out, txt_out = to_filter.filter_norm()
+            vcf_out, vcf_complex_out, txt_out = to_filter.filter_two()
         else: 
             logger.exception('normalFlag was set to True without a normal sample present in the vardict vcf.')
     else: 
