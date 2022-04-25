@@ -116,7 +116,6 @@ class vardict:
 
     def filter_single(self):
         # TODO: contiue work on method, check with Karthi / Ronak about single filter  
-        # TODO: continue to simplify method since we are now only worried about tumor/control vcf 
         '''
         @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
         @Created : 04/20/2022
@@ -215,8 +214,6 @@ class vardict:
             - self.vcf_complex_out
             - self.txt_out
         '''
-
-        ### TODO: No swap for single method 
         if_swap_sample = False
         # If the caller reported the normal genotype column before the tumor, swap those around
         if self.allsamples[1] == self.sampleName:
@@ -258,13 +255,11 @@ class vardict:
                 record.INFO["SHIFT3_ADJUSTED"] = 0
 
             keep_based_on_status = True
-            ## TODO: No Somatic entry for single sample 
             try:
                 if "Somatic" not in record.INFO["STATUS"] and self.filterGermline:
                     keep_based_on_status = False
             except KeyError:
                 keep_based_on_status = False
-            ## TODO: Qual comes from different columns depending on input, excepts for single
             try:
                 if tcall["QUAL"] is not None:
                     tmq = int(tcall["QUAL"])
@@ -285,7 +280,6 @@ class vardict:
                 tvf = int(tad) / float(tdp)
             else:
                 tvf = 0
-            ## TODO: skip this for single sample
             #### processing normal sample 
             # Read record for normal sample
             ncall = record.genotype(normal_sampleName)
@@ -309,7 +303,6 @@ class vardict:
                 nvfRF = int(self.tnRatio) * nvf
 
             record.add_info("set", "VarDict")
-            # TODO: skip stops here
             if_swap_sample=False
             if self.allsamples[1] == self.sampleName:
                 if_swap_sample = True
@@ -323,16 +316,14 @@ class vardict:
                 record.samples[0] = tum
                 record.samples[1] = nrm
             '''
-            if tvf > nvfRF: #TODO: get rid of this check for single 
+            if tvf > nvfRF: 
                 if (
                     keep_based_on_status
-                    # TODO: keep this part of if statement for single
                     & (tmq >= int(self.minQual))
                     & (nmq >= int(self.minQual))
                     & (tdp >= int(self.totalDepth))
                     & (tad >= int(self.alleleDepth))
                     & (tvf >= float(self.variantFraction))
-                    # TODO: keep until here for single
                 ):
                     if complex_flag:
                         vcf_complex_writer.write_record(record)
@@ -358,4 +349,3 @@ class vardict:
         vcf_complex_writer.close()
         txt_fh.close()
         return self.vcf_out, self.vcf_complex_out, self.txt_out
-        

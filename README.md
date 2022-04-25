@@ -6,6 +6,8 @@ This hosts multiple scripts necessary for filtering and processing of variant ca
 
 ### VarDictJava
 
+See `example_calls.sh` for example calls of how VarDict filtering works for single and two sample input vcfs via the command line. 
+
 ## How the repo was made
 
 Template used: https://github.com/yxtay/python-project-template
