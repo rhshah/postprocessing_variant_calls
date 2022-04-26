@@ -137,3 +137,9 @@ dmypy.json
 .git
 
 .log*
+
+# ignore test output files 
+tests/data/single/*
+!tests/data/single/blank.txt
+tests/data/two/*
+!tests/data/two/blank.txt

@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 import typer
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
-from vardict_class import vardict
+from src.vardict.vardict_class import vardict
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
