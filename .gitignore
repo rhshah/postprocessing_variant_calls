@@ -139,7 +139,7 @@ dmypy.json
 .log*
 
 # ignore test output files 
-tests/data/single/*
-!tests/data/single/blank.txt
-tests/data/two/*
-!tests/data/two/blank.txt
+data/single/*
+!data/single/blank.txt
+data/two/*
+!data/two/blank.txt

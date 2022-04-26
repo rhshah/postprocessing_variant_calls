@@ -1,4 +1,4 @@
-#! python
+#!/usr/bin/env python
 # imports 
 from __future__ import division
 import os
@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 import typer
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
-from src.vardict.vardict_class import vardict
+from postprocessing_variant_calls.src.vardict.vardict_class import vardict
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
