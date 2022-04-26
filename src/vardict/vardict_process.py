@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 import typer
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
-from postprocessing_variant_calls.src.vardict.vardict_class import vardict
+from vardict_class import var_sample
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -126,7 +126,7 @@ def process_vardict(
     # single sample case 
     if sampleType: 
         # create vardict object 
-        to_filter = vardict(
+        to_filter = var_sample(
                 inputVcf, outputDir, sampleName, minQual, totalDepth, 
                 alleleDepth, variantFraction, tnRatio, filterGermline
         )
@@ -138,7 +138,7 @@ def process_vardict(
             vcf_out, vcf_complex_out, txt_out = to_filter.filter_single()
     # two sample case 
     else:  
-        to_filter = vardict(
+        to_filter = var_sample(
                 inputVcf, outputDir, sampleName, minQual, totalDepth, 
                 alleleDepth, variantFraction, tnRatio, filterGermline
         )

@@ -5,7 +5,7 @@ import sys
 import vcf
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
 
-class vardict:
+class var_sample:
     '''
     @Description : The purpose of this class is to manage the variety of information specified about a vardict as well as 
                     manage filtering one with both single and double sample 

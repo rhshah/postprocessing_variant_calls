@@ -3,7 +3,7 @@ import pytest  # type: ignore
 import os 
 from typer.testing import CliRunner
 
-from postprocessing_variant_calls.src.vardict.vardict_process import app
+from src.vardict.vardict_process import app
 
 runner = CliRunner()
 sample = {
