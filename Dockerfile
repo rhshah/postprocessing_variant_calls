@@ -1,73 +1,53 @@
-ARG PYTHON_VERSION=3.8
+################## Base Image ##########
+FROM --platform=linux/amd64 debian:latest 
 
-##
-# dev
-##
-FROM python:${PYTHON_VERSION} AS dev
-LABEL maintainer="wyextay@gmail.com"
+################## ARGUMENTS/Environments ##########
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG LICENSE="Apache-2.0"
+ARG PYTHON_VERSION="3.8"
+ARG VCS_REF
+ENV BOOST_ROOT /usr
+ENV PATH="/root/miniconda3/bin:$PATH"
+ARG PATH="/root/miniconda3/bin:$PATH"
 
-# set up user
-ARG USER=nonroot
-RUN useradd --create-home --no-log-init --system --user-group ${USER}
-USER ${USER}
-ARG HOME=/home/${USER}
-WORKDIR ${HOME}/app
+################## METADATA ########################
+LABEL org.opencontainers.image.vendor="MSKCC"
+LABEL org.opencontainers.image.authors="Eric Buehlere (buehlere@mskcc.org)"
 
-# set up python
-ARG VIRTUAL_ENV=${HOME}/.venv
-ENV PATH=${VIRTUAL_ENV}/bin:${PATH} \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONFAULTHANDLER=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DEFAULT_TIMEOUT=60 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
-RUN python -m venv ${VIRTUAL_ENV} && \
-    pip install --upgrade pip
+LABEL org.opencontainers.image.created=${BUILD_DATE} \
+    org.opencontainers.image.version=${BUILD_VERSION} \
+    org.opencontainers.image.licenses=${LICENSE} \
+    org.opencontainers.image.version.python=${PYTHON_VERSION} \ 
+    org.opencontainers.image.vcs-ref=${VCS_REF}
 
-# install dependencies
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt && \
-    python --version && pip list
+LABEL org.opencontainers.image.description="This container uses conda/conda/miniconda3 as the base image to build"
 
-# copy project files
-COPY Makefile Makefile
-COPY configs configs
-COPY src src
+################## INSTALL ##########################
+# installing tools 
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    wget 
 
-EXPOSE 8000
-ARG ENVIRONMENT=dev
-ENV ENVIRONMENT ${ENVIRONMENT}
-CMD ["make", "run"]
+# install postprocessing_variant_calls 
+RUN cd /opt \ 
+    && git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git
 
-##
-# prod
-##
-FROM python:${PYTHON_VERSION}-slim AS prod
-LABEL maintainer="wyextay@gmail.com"
+# install miniconda and add to path 
+RUN wget \
+    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && mkdir /root/.conda \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b \
+    && rm -f Miniconda3-latest-Linux-x86_64.sh 
+# set up conda env 
+RUN cd /opt/postprocessing_variant_calls \ 
+    && conda env create -f environment.yml  
 
-RUN apt-get update && apt-get install --no-install-recommends --yes make && \
-    rm -rf /var/lib/apt/lists/*
+RUN cd /opt/postprocessing_variant_calls \  
+    && eval "$(conda shell.bash hook)"\
+    && conda activate vardict \ 
+    && make deps-install 
 
-# set up user
-ARG USER=nonroot
-RUN useradd --create-home --no-log-init --system --user-group ${USER}
-USER ${USER}
-ARG HOME=/home/${USER}
-WORKDIR ${HOME}/app
 
-ARG VIRTUAL_ENV=${HOME}/.venv
-ENV PATH=${VIRTUAL_ENV}/bin:${PATH} \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONFAULTHANDLER=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_DEFAULT_TIMEOUT=60 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
-COPY --from=dev --chown=${USER}:${USER} ${HOME} ${HOME}
-RUN python --version && pip list
 
-EXPOSE 8000
-ARG ENVIRONMENT=prod
-ENV ENVIRONMENT=${ENVIRONMENT}
-CMD ["make", "run"]
