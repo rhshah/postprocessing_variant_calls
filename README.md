@@ -76,7 +76,7 @@ make deps-install
 To update the environment after initial setup up run: 
 
 ```bash
-conda update env -f environment.yml
+conda env update -f environment.yml
 ```
 
 instead of `conda create`, and then re-run `poetry lock --no-update` and `make deps-install`
