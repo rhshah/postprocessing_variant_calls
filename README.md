@@ -57,12 +57,6 @@ conda env create -f environment.yml
 conda activate vardict
 ```
 
-#### Update Lock file 
-
-Update lock file will ensure dependencies like Poetry and PyVcf are not removed 
-```bash 
-poetry lock --no-update
-```
 #### Install dependencies
 
 Then install project dependencies with Poetry.
