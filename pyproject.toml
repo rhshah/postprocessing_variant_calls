@@ -2,7 +2,7 @@
 name = "postprocessing_variant_calls"
 version = "0.1.0"
 description = ""
-authors = ["shahr2@mskcc.org"]
+authors = ["Ronak Shaw <shahr2@mskcc.org>"]
 
 [tool.poetry.dependencies]
 python = "~3.8"
@@ -28,7 +28,7 @@ pytest = "^6.2"
 pytest-cov = "^2.11"
 
 [tool.poetry.scripts]
-vardict = "vardict.vardict:vardict"
+vardict = "vardict.vardict_process:app"
 [tool.black]
 line-length = 88
 target-version = ["py38"]
@@ -59,7 +59,7 @@ float_to_top = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = """
+addopts = """ 
     -ra
     -v
     --strict-markers
