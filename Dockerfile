@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y \
 
 # install postprocessing_variant_calls 
 RUN cd /opt \ 
-    && git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git
+    && git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git \ 
+    && cd postprocessing_variant_calls
 
 # install miniconda and add to path 
 RUN wget \
@@ -47,7 +48,4 @@ RUN cd /opt/postprocessing_variant_calls \
 RUN cd /opt/postprocessing_variant_calls \  
     && eval "$(conda shell.bash hook)"\
     && conda activate vardict \ 
-    && make deps-install 
-
-
-
+    && make deps-install  
