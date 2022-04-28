@@ -35,12 +35,13 @@ jobs:
         - name: Refresh conda env 
           run: |
             conda env update -f environment.yml
+            cd /opt/postprocessing_variant_calls_test
             make deps-install
 
         - name: Start conda env and Pytest 
           run: |
             eval "$(conda shell.bash hook)"
             conda activate vardict 
-            cd /opt/postprocessing_variant_calls
+            cd /opt/postprocessing_variant_calls_test
             pytest tests
             
