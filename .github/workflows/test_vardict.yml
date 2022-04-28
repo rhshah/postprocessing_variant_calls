@@ -24,16 +24,18 @@ jobs:
               id: extract_branch
        
         - name: Get current branch of postprocessing_variant_calls 
-          # install postprocessing_variant_calls 
-          cd /opt
-          mkdir postprocessing_variant_calls_test 
-          cd /postprocessing_variant_calls_test 
-          git clone --recursive -b ${{ steps.extract_branch.outputs.branch }} https://github.com/msk-access/postprocessing_variant_calls.git 
-          cd postprocessing_variant_calls
+          run: |
+            # install postprocessing_variant_calls 
+            cd /opt
+            mkdir postprocessing_variant_calls_test 
+            cd /postprocessing_variant_calls_test 
+            git clone --recursive -b ${{ steps.extract_branch.outputs.branch }} https://github.com/msk-access/postprocessing_variant_calls.git 
+            cd postprocessing_variant_calls
         
         - name: Refresh conda env 
-          conda env update -f environment.yml
-          make deps-install
+          run: |
+            conda env update -f environment.yml
+            make deps-install
 
         - name: Start conda env and Pytest 
           run: |
