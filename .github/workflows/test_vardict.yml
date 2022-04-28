@@ -12,7 +12,7 @@ jobs:
   test_post_processing:
     runs-on: ubuntu-latest
     container:
-        image: ghcr.io/owner/postprovessing_variant_calls
+        image: ghcr.io/msk-access/postprovessing_variant_calls:feature-add_inputs
         credentials:
           username: ${{ github.actor }}
           password: ${{ secrets.github_token }}
