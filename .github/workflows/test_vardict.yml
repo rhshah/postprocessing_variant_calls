@@ -34,8 +34,8 @@ jobs:
         
         - name: Refresh conda env 
           run: |
-            conda env update -f environment.yml
             cd /opt/postprocessing_variant_calls_test
+            conda env update -f environment.yml
             make deps-install
 
         - name: Start conda env and Pytest 
