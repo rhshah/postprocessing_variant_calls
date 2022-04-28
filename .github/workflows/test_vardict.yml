@@ -23,12 +23,12 @@ jobs:
             echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           id: extract_branch
        
-        - name: Pull current branch of postprocessing_variant_calls 
+        - name: Checkout current branch of postprocessing_variant_calls 
           run: |
             # install postprocessing_variant_calls 
             cd /opt/postprocessing_variant_calls
             git checkout ${{ steps.extract_branch.outputs.branch }} 
-            echo ls 
+            git pull
         
         - name: Refresh conda env 
           run: |
