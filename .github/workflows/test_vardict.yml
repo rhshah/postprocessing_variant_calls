@@ -17,11 +17,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.github_token }}
     steps: 
-        - name: Start conda env 
+        - name: Start conda env and test
           run: |
-            eval "$(conda shell.bash hook)"
+            eval "$(conda shell.bash hook)" postprocessing_variant_calls
             conda activate vardict 
-        - name: Test with pytest
-          run: |
             cd /opt/postprocessing_variant_calls
             pytest tests
+            
