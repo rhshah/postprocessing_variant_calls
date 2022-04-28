@@ -28,7 +28,7 @@ def test_single(call):
     os.remove("data/single/Myeloid200-1_STDfilter.vcf")
     os.remove("data/single/Myeloid200-1_STDfilter.txt")
 
-@pytest.mark.parametrize("call", vardict_single_calls)
+@pytest.mark.parametrize("call", vardict_matched)
 def test_two(call):
     result = runner.invoke(app, call)
     assert result.exit_code == 0
