@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "postprocessing_variant_calls"
+name = "pv"
 version = "0.1.0"
 description = ""
 authors = ["Ronak Shaw <shahr2@mskcc.org>"]
@@ -28,7 +28,7 @@ pytest = "^6.2"
 pytest-cov = "^2.11"
 
 [tool.poetry.scripts]
-vardict = "vardict.vardict_process:app"
+pv = "pv:app"
 [tool.black]
 line-length = 88
 target-version = ["py38"]

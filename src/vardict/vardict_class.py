@@ -203,7 +203,7 @@ class var_sample:
         txt_fh.close()
         return self.vcf_out, self.vcf_complex_out, self.txt_out
 
-    def filter_two(self):
+    def filter_case_control(self):
         # TODO: continue to simplify method since we are now only worried about tumor/control vcf 
         '''
         @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
