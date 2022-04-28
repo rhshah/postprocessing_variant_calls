@@ -23,18 +23,16 @@ jobs:
             echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           id: extract_branch
        
-        - name: Get current branch of postprocessing_variant_calls 
+        - name: Pull current branch of postprocessing_variant_calls 
           run: |
             # install postprocessing_variant_calls 
-            cd /opt
-            mkdir postprocessing_variant_calls_test 
-            cd postprocessing_variant_calls_test 
-            git clone --recursive -b ${{ steps.extract_branch.outputs.branch }} https://github.com/msk-access/postprocessing_variant_calls.git 
+            cd /opt/postprocessing_variant_calls
+            git checkout ${{ steps.extract_branch.outputs.branch }} 
             echo ls 
         
         - name: Refresh conda env 
           run: |
-            cd /opt/postprocessing_variant_calls_test
+            cd /opt/postprocessing_variant_calls
             conda env update -f environment.yml
             make deps-install
 
@@ -42,6 +40,6 @@ jobs:
           run: |
             eval "$(conda shell.bash hook)"
             conda activate vardict 
-            cd /opt/postprocessing_variant_calls_test
+            cd /opt/postprocessing_variant_calls
             pytest tests
             
