@@ -9,18 +9,19 @@ on:
     - 'docs/**'
     - '**.md'
 jobs:
-    test_post_processing:
-      runs-on: ubuntu-latest
-      container:
-          image: ghcr.io/owner/postprovessing_variant_calls
-          credentials:
-            username: ${{ github.actor }}
-            password: ${{ secrets.github_token }}
-          - name: Start conda env 
-            run: |
-              eval "$(conda shell.bash hook)"
-              conda activate vardict 
-          - name: Test with pytest
-            run: |
-              cd /opt/postprocessing_variant_calls
-              pytest tests
+  test_post_processing:
+    runs-on: ubuntu-latest
+    container:
+        image: ghcr.io/owner/postprovessing_variant_calls
+        credentials:
+          username: ${{ github.actor }}
+          password: ${{ secrets.github_token }}
+    steps: 
+        - name: Start conda env 
+          run: |
+            eval "$(conda shell.bash hook)"
+            conda activate vardict 
+        - name: Test with pytest
+          run: |
+            cd /opt/postprocessing_variant_calls
+            pytest tests
