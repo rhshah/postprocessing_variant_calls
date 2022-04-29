@@ -10,47 +10,64 @@ on:
     - '**.md'
 jobs:
   test_post_processing:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform }}
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+    strategy:
+      max-parallel: 1
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.9.7]
     # container:
     #     image: ghcr.io/msk-access/postprocessing_variant_calls:feature-add_inputs
     #     credentials:
     #       username: ${{ github.actor }}
     #       password: ${{ secrets.github_token }}
     steps: 
-        # Install Miniconda 
-        - name: Installing Miniconda 
-          run: | 
-          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh 
-          mkdir /root/.conda 
-          bash Miniconda3-latest-Linux-x86_64.sh -b 
-          rm -f Miniconda3-latest-Linux-x86_64.sh 
-        # get current branch 
-        - name: Extract branch name
-          run: |
-            echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-          id: extract_branch
-       
-        - name: Checkout current branch of postprocessing_variant_calls 
-          run: |
-            # install postprocessing_variant_calls 
-            cd /opt/postprocessing_variant_calls
-            git checkout ${{ steps.extract_branch.outputs.branch }} 
-            git pull
-        
-        - name: Clone current branch of postprocessing_variant_calls
-          run: |
-            cd /opt 
-            git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git 
-        - name: Create conda virtual environment
-          run: | 
-            cd /opt/postprocessing_variant_calls 
-            conda env create -f environment.yml 
-        - name: Install depencies
-          run: | 
-            make deps-install
-        - name: Start conda env and Pytest 
-          run: |
-            conda activate vardict 
-            cd /opt/postprocessing_variant_calls
-            pytest tests
+      # Checkout Repo 
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+          submodules: recursive
+      # Install Python 
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      # Install Miniconda 
+      - name: Installing Miniconda 
+        run: | 
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh 
+        mkdir /root/.conda 
+        bash Miniconda3-latest-Linux-x86_64.sh -b 
+        rm -f Miniconda3-latest-Linux-x86_64.sh 
+      # get current branch 
+      - name: Extract branch name
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      
+      # - name: Checkout current branch of postprocessing_variant_calls 
+      #   run: |
+      #     # install postprocessing_variant_calls 
+      #     cd /opt/postprocessing_variant_calls
+      #     git checkout ${{ steps.extract_branch.outputs.branch }} 
+      #     git pull
+      
+      # - name: Clone current branch of postprocessing_variant_calls
+      #   run: |
+      #     cd /opt 
+      #     git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git 
+      - name: Create conda virtual environment
+        run: | 
+          cd /opt/postprocessing_variant_calls 
+          conda env create -f environment.yml 
+      - name: Install depencies
+        run: | 
+          make deps-install
+      - name: Start conda env and Pytest 
+        run: |
+          conda activate vardict 
+          cd /opt/postprocessing_variant_calls
+          pytest tests
             
