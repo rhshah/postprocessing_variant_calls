@@ -29,13 +29,11 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           submodules: recursive
-          
-      - uses: actions/checkout@v2
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
           python-version: 3.9.7
-      - name: Install dependencies
+      - name: Install Conda 
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
           $CONDA/bin/conda env update --file environment.yml --name base
@@ -58,7 +56,6 @@ jobs:
       #     git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git 
       - name: Create conda virtual environment
         run: | 
-          cd postprocessing_variant_calls 
           conda env create -f environment.yml 
 
       - name: Install depencies
@@ -68,6 +65,5 @@ jobs:
       - name: Start conda env and Pytest 
         run: |
           conda activate vardict 
-          cd postprocessing_variant_calls
           pytest tests
             
