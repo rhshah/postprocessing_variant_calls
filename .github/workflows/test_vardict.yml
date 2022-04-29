@@ -11,12 +11,19 @@ on:
 jobs:
   test_post_processing:
     runs-on: ubuntu-latest
-    container:
-        image: ghcr.io/msk-access/postprocessing_variant_calls:feature-add_inputs
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ secrets.github_token }}
+    # container:
+    #     image: ghcr.io/msk-access/postprocessing_variant_calls:feature-add_inputs
+    #     credentials:
+    #       username: ${{ github.actor }}
+    #       password: ${{ secrets.github_token }}
     steps: 
+        # Install Miniconda 
+        - name: Installing Miniconda 
+          run: | 
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh 
+          mkdir /root/.conda 
+          bash Miniconda3-latest-Linux-x86_64.sh -b 
+          rm -f Miniconda3-latest-Linux-x86_64.sh 
         # get current branch 
         - name: Extract branch name
           run: |
@@ -30,15 +37,19 @@ jobs:
             git checkout ${{ steps.extract_branch.outputs.branch }} 
             git pull
         
-        - name: Refresh conda env 
+        - name: Clone current branch of postprocessing_variant_calls
           run: |
-            cd /opt/postprocessing_variant_calls
-            conda env update -f environment.yml
+            cd /opt 
+            git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git 
+        - name: Create conda virtual environment
+          run: | 
+            cd /opt/postprocessing_variant_calls 
+            conda env create -f environment.yml 
+        - name: Install depencies
+          run: | 
             make deps-install
-
         - name: Start conda env and Pytest 
           run: |
-            eval "$(conda shell.bash hook)"
             conda activate vardict 
             cd /opt/postprocessing_variant_calls
             pytest tests
