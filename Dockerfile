@@ -45,7 +45,3 @@ RUN wget \
 RUN cd /opt/postprocessing_variant_calls \ 
     && conda env create -f environment.yml  
 
-RUN cd /opt/postprocessing_variant_calls \  
-    && eval "$(conda shell.bash hook)"\
-    && conda activate vardict \ 
-    && make deps-install  
