@@ -64,7 +64,7 @@ jobs:
 
       - name: Start conda env and Pytest 
         run: |
-          conda init 
+          eval "$(${CONDA}/bin/conda shell.bash hook)" 
           conda activate vardict 
           pytest tests
             
