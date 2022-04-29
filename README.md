@@ -109,12 +109,8 @@ instead of `conda create`, and then re-run `make deps-install`
   - [logging][logging]
   - [python-json-logger][python-json-logger]
   - [configparser][configparser]
-  - [python-dotenv][python-dotenv]
   - [pydantic][pydantic]
   - [Typer][typer]
-  - [FastAPI][fastapi]
-  - [Uvicorn][uvicorn]
-  - [Gunicorn][gunicorn]
   - [Make][make]
 
 [conda]: https://docs.conda.io/en/latest
