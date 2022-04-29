@@ -16,12 +16,6 @@ jobs:
       max-parallel: 1
       matrix:
         platform: [ubuntu-latest]
-        python-version: [3.9.7]
-    # container:
-    #     image: ghcr.io/msk-access/postprocessing_variant_calls:feature-add_inputs
-    #     credentials:
-    #       username: ${{ github.actor }}
-    #       password: ${{ secrets.github_token }}
     steps: 
       # Checkout Repo 
       - name: Checkout repo
@@ -29,31 +23,11 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           submodules: recursive
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9.7
+        
       - name: Install Conda 
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
           $CONDA/bin/conda env update --file environment.yml --name base
-      # get current branch 
-      # - name: Extract branch name
-      #   run: |
-      #     echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      #   id: extract_branch
-      
-      # - name: Checkout current branch of postprocessing_variant_calls 
-      #   run: |
-      #     # install postprocessing_variant_calls 
-      #     cd /opt/postprocessing_variant_calls
-      #     git checkout ${{ steps.extract_branch.outputs.branch }} 
-      #     git pull
-      
-      # - name: Clone current branch of postprocessing_variant_calls
-      #   run: |
-      #     cd /opt 
-      #     git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git 
       - name: Create conda virtual environment
         run: | 
           conda env create -f environment.yml 
@@ -64,7 +38,7 @@ jobs:
           conda activate vardict 
           make deps-install
 
-      - name: Start conda env and Pytest 
+      - name: Pytest test_post_processing
         run: |
           eval "$(${CONDA}/bin/conda shell.bash hook)" 
           conda activate vardict 
