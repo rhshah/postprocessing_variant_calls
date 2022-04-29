@@ -60,6 +60,8 @@ jobs:
 
       - name: Install package dependencies
         run: | 
+          eval "$(${CONDA}/bin/conda shell.bash hook)"
+          conda activate vardict 
           make deps-install
 
       - name: Start conda env and Pytest 
