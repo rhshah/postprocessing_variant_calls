@@ -26,7 +26,6 @@ Template used: https://github.com/yxtay/python-project-template
   - logging with standard logging and python-json-logger
   - configuration with standard configparser, python-dotenv and pydantic
   - command line with Typer
-  - web service with FastAPI, Uvicorn and Gunicorn
 - deployment with Docker images
   - development image based on `python:latest`
   - lightweight production image based on `python:slim` using multi-stage build
@@ -73,7 +72,7 @@ To update the environment after initial setup up run:
 conda env update -f environment.yml
 ```
 
-instead of `conda create`, and then re-run `poetry lock --no-update` and `make deps-install`
+instead of `conda create`, and then re-run `make deps-install`
 
 ### Tools
 
