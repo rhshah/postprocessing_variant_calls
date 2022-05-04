@@ -1,4 +1,4 @@
-name: setup
+name: vardict
 
 channels:
   - defaults

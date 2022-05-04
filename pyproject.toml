@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "postprocessing_variant_calls"
+name = "pv"
 version = "0.1.0"
 description = ""
-authors = ["shahr2@mskcc.org"]
+authors = ["Ronak Shaw <shahr2@mskcc.org>"]
 
 [tool.poetry.dependencies]
-python = "~3.8"
+python = "3.9.7"
 fastapi = "^0.65"
 gunicorn = "^20.1"
 pydantic = { extras = ["dotenv"], version = "^1.8" }
@@ -28,7 +28,7 @@ pytest = "^6.2"
 pytest-cov = "^2.11"
 
 [tool.poetry.scripts]
-vardict = "vardict.vardict:vardict"
+pv = "pv:app"
 [tool.black]
 line-length = 88
 target-version = ["py38"]
@@ -59,7 +59,7 @@ float_to_top = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = """
+addopts = """ 
     -ra
     -v
     --strict-markers
