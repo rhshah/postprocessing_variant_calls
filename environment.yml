@@ -1,9 +1,9 @@
-name: vardict
+name: pv_calls
 
 channels:
   - defaults
   - conda-forge
 
 dependencies:
-  - python=3.8
-  - pyvcf
+  - python=3.6.6
+  - pyvcf 

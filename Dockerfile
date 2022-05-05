@@ -5,7 +5,8 @@ FROM --platform=linux/amd64 debian:latest
 ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG LICENSE="Apache-2.0"
-ARG PYTHON_VERSION="3.8"
+ARG PYTHON_VERSION="3.6.10"
+ARG POSTPROCESSING_VARIANT_CALLS_VERSION="re-project-layout"
 ARG VCS_REF
 ENV BOOST_ROOT /usr
 ENV PATH="/root/miniconda3/bin:$PATH"
@@ -32,16 +33,17 @@ RUN apt-get update && apt-get install -y \
 
 # install postprocessing_variant_calls 
 RUN cd /opt \ 
-    && git clone --recursive -b feature/add_inputs https://github.com/msk-access/postprocessing_variant_calls.git \ 
+    && git clone --recursive -b ${POSTPROCESSING_VARIANT_CALLS_VERSION} https://github.com/msk-access/postprocessing_variant_calls.git \ 
     && cd postprocessing_variant_calls
 
 # install miniconda and add to path 
 RUN wget \
-    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    https://repo.anaconda.com/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh \
     && mkdir /root/.conda \
-    && bash Miniconda3-latest-Linux-x86_64.sh -b \
-    && rm -f Miniconda3-latest-Linux-x86_64.sh 
-# set up conda env 
-RUN cd /opt/postprocessing_variant_calls \ 
-    && conda env create -f environment.yml  
+    && bash Miniconda3-4.5.4-Linux-x86_64.sh -b \
+    && rm -f Miniconda3-4.5.4-Linux-x86_64.sh 
 
+RUN conda install -c bioconda pyvcf
+
+RUN cd /opt/postprocessing_variant_calls \
+    && make deps-install
