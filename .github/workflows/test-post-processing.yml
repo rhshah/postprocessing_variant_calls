@@ -15,32 +15,22 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        platform: [ubuntu-latest]
+        platform: [debian-latest]
     steps: 
       # Checkout Repo 
       - name: Checkout repo
         uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
-          submodules: recursive
-        
-      - name: Install Conda 
-        run: |
-          # $CONDA is an environment variable pointing to the root of the miniconda directory
-          $CONDA/bin/conda env update --file environment.yml --name base
-      - name: Create conda virtual environment
-        run: | 
-          conda env create -f environment.yml 
-
+          submodules: recursive   
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.6.6
       - name: Install package dependencies
         run: | 
-          eval "$(${CONDA}/bin/conda shell.bash hook)"
-          conda activate vardict 
+          conda install -c bioconda pyvcf
           make deps-install
-
       - name: Pytest test_post_processing
         run: |
-          eval "$(${CONDA}/bin/conda shell.bash hook)" 
-          conda activate vardict 
           pytest tests
             
