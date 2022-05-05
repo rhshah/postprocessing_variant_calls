@@ -23,9 +23,8 @@ jobs:
       - name: Checkout Extracted Branch in Image
         run: |
           cd /opt/postprocessing_variant_calls
-          checkout ${{ steps.extract_branch.outputs.branch }}
+          git checkout ${{ steps.extract_branch.outputs.branch }}
       - name: Pytest test_post_processing in Image 
         run: |
           make deps-install
           pytest tests
-          
