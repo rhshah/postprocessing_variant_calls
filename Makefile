@@ -38,6 +38,7 @@ deps-install:  ## install dependencies
 
 .PHONY: deps-update
 deps-update:
+	poetry config virtualenvs.create false
 	poetry lock --no-update
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
