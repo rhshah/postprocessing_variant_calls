@@ -10,27 +10,22 @@ on:
     - '**.md'
 jobs:
   test_post_processing:
-    runs-on: ${{ matrix.platform }}
-    if: "!contains(github.event.head_commit.message, 'ci skip')"
-    strategy:
-      max-parallel: 1
-      matrix:
-        platform: [debian-latest]
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/msk-access/postprocessing_variant_calls:re-project-layout
     steps: 
       # Checkout Repo 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
       - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
-          submodules: recursive   
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: 3.6.6
-      - name: Install package dependencies
-        run: | 
-          conda install -c bioconda pyvcf
-          make deps-install
+        run: |
+          cd opt/postprocessing_variant_calls
+          checkout ${{ steps.extract_branch.outputs.branch }}
       - name: Pytest test_post_processing
         run: |
+          make deps-install
           pytest tests
             
