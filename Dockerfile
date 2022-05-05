@@ -6,6 +6,7 @@ ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG LICENSE="Apache-2.0"
 ARG PYTHON_VERSION="3.6.10"
+ARG CONDA_VERSION="4.5.4"
 ARG POSTPROCESSING_VARIANT_CALLS_VERSION="re-project-layout"
 ARG VCS_REF
 ENV BOOST_ROOT /usr
@@ -23,7 +24,9 @@ LABEL org.opencontainers.image.created=${BUILD_DATE} \
     org.opencontainers.image.version=${BUILD_VERSION} \
     org.opencontainers.image.licenses=${LICENSE} \
     org.opencontainers.image.version.python=${PYTHON_VERSION} \ 
-    org.opencontainers.image.vcs-ref=${VCS_REF}
+    org.opencontainers.image.vcs-ref=${VCS_REF} \ 
+    org.opencontainers.image.version.conda=${CONDA_VERSION} \ 
+    org.opencontainers.image.version.postprocessing_variant_calls=${POSTPROCESSING_VARIANT_CALLS_VERSION}
 
 LABEL org.opencontainers.image.description="This container uses conda/conda/miniconda3 as the base image to build"
 
@@ -40,10 +43,10 @@ RUN cd /opt \
 
 # install miniconda and add to path 
 RUN wget \
-    https://repo.anaconda.com/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh \
+    https://repo.anaconda.com/miniconda/Miniconda3-${CONDA_VERSION}-Linux-x86_64.sh \
     && mkdir /root/.conda \
-    && bash Miniconda3-4.5.4-Linux-x86_64.sh -b \
-    && rm -f Miniconda3-4.5.4-Linux-x86_64.sh 
+    && bash Miniconda3-${CONDA_VERSION}-Linux-x86_64.sh -b \
+    && rm -f Miniconda3-${CONDA_VERSION}-Linux-x86_64.sh 
 
 RUN conda install -c bioconda pyvcf
 
