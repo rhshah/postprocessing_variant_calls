@@ -36,22 +36,11 @@ deps-install:  ## install dependencies
 	poetry config virtualenvs.create false
 	poetry install --no-interaction
 
-.PHONY: deps-install-container
-deps-install:  ## install dependencies
-	pip install poetry==$(POETRY_VERSION)
-	poetry config virtualenvs.create false
-	poetry install
-
 .PHONY: deps-update
 deps-update:
 	poetry lock --no-update
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
-.PHONY: deps-install
-deps-install:  ## install dependencies
-	pip install poetry
-	poetry config virtualenvs.create false
-	poetry install 
 requirements.txt: poetry.lock
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 

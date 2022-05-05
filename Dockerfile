@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y \
 
 # install postprocessing_variant_calls 
 RUN cd /opt \ 
-    && git clone --recursive -b ${POSTPROCESSING_VARIANT_CALLS_VERSION} https://github.com/msk-access/postprocessing_variant_calls.
+    && git clone --recursive -b ${POSTPROCESSING_VARIANT_CALLS_VERSION} https://github.com/msk-access/postprocessing_variant_calls.git
 
 # install miniconda and add to path 
 RUN wget \
