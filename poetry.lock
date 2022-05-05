@@ -529,14 +529,14 @@ python-versions = "*"
 
 [[package]]
 name = "pyparsing"
-version = "3.0.8"
-description = "pyparsing module - Classes and methods to define and execute parsing grammars"
+version = "3.0.7"
+description = "Python parsing module"
 category = "dev"
 optional = false
-python-versions = ">=3.6.8"
+python-versions = ">=3.6"
 
 [package.extras]
-diagrams = ["railroad-diagrams", "jinja2"]
+diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pytest"
@@ -769,8 +769,8 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 
 [metadata]
 lock-version = "1.1"
-python-versions = "3.6.10"
-content-hash = "46f9ee6e9c7d4ea6796a7a0c80439e4021dd0f250f26f7e2ed89511871a167cd"
+python-versions = "3.6.6"
+content-hash = "afad03e027180cf27789696417565524964d4b46f575e594ea198c5db9aaa4e8"
 
 [metadata.files]
 atomicwrites = [
@@ -1108,8 +1108,8 @@ pylev = [
     {file = "pylev-1.4.0.tar.gz", hash = "sha256:9e77e941042ad3a4cc305dcdf2b2dec1aec2fbe3dd9015d2698ad02b173006d1"},
 ]
 pyparsing = [
-    {file = "pyparsing-3.0.8-py3-none-any.whl", hash = "sha256:ef7b523f6356f763771559412c0d7134753f037822dad1b16945b7b846f7ad06"},
-    {file = "pyparsing-3.0.8.tar.gz", hash = "sha256:7bf433498c016c4314268d95df76c81b842a4cb2b276fa3312cfb1e1d85f6954"},
+    {file = "pyparsing-3.0.7-py3-none-any.whl", hash = "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"},
+    {file = "pyparsing-3.0.7.tar.gz", hash = "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea"},
 ]
 pytest = [
     {file = "pytest-6.2.5-py3-none-any.whl", hash = "sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134"},
