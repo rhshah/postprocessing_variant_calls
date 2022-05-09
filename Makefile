@@ -9,7 +9,7 @@ SHELL := bash
 .DELETE_ON_ERROR:
 
 ## variables
-POETRY_VERSION = 1.0
+POETRY_VERSION = 1.2.0b1
 ENVIRONMENT ?= dev
 ARGS =
 APP_NAME = $(shell python -m src.config app_name)
@@ -38,8 +38,9 @@ deps-install:  ## install dependencies
 
 .PHONY: deps-update
 deps-update:
+	pip install poetry==$(POETRY_VERSION)
 	poetry config virtualenvs.create false
-	poetry lock --no-update
+	poetry lock 
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
 requirements.txt: poetry.lock

@@ -83,15 +83,18 @@ class var_sample:
             "The variant callers that reported this event",
             "msk-access/postprocessing_varaint_calls",
             "v0.0.1",
+            "vcf",
         )
         vcf_reader.formats["DP"] = VcfFormat(
-            "DP", "1", "Integer", "Total read depth at this site"
+            "DP", "1", "Integer", "Total read depth at this site",
+            "vcf",
         )
         vcf_reader.formats["AD"] = VcfFormat(
             "AD",
             "R",
             "Integer",
             "Allelic depths for the ref and alt alleles in the order listed",
+            "vcf",
         )
 
         # Manually add the new SHIFT3_ADJUSTED header to the reader, which will then be passed to the writer
@@ -161,7 +164,7 @@ class var_sample:
             tmq = int(record.INFO["QUAL"])
 
             if tcall["DP"] is not None:
-                tdp = int(tcall["DP"])
+                tdp = int(tcall["DP"][0])
             else:
                 tdp = 0
             if tcall["VD"] is not None:
@@ -268,9 +271,9 @@ class var_sample:
                     tmq = 0
             except:
                 tmq = int(record.INFO["QUAL"])
-
+          
             if tcall["DP"] is not None:
-                tdp = int(tcall["DP"])
+                tdp = int(tcall["DP"][0])
             else:
                 tdp = 0
             if tcall["VD"] is not None:
@@ -290,7 +293,7 @@ class var_sample:
                 else:
                     nmq = 0
                 if ncall["DP"] is not None:
-                    ndp = int(ncall["DP"])
+                    ndp = int(ncall["DP"][0])
                 else:
                     ndp = 0
                 if ncall["VD"] is not None:
