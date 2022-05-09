@@ -6,7 +6,7 @@ FROM python:${PYTHON_VERSION}
 ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG LICENSE="Apache-2.0"
-ARG POSTPROCESSING_VARIANT_CALLS_VERSION="develop"
+ARG POSTPROCESSING_VARIANT_CALLS_VERSION="re-project-layout"
 ARG VCS_REF
 
 ################## METADATA ########################
@@ -32,3 +32,6 @@ RUN cd /opt \
 # install postprocessing_variant_calls 
 RUN cd /opt/postprocessing_variant_calls \
     && make deps-install
+
+# by default /bin/sh
+CMD ["/bin/sh"]
