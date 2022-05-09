@@ -20,11 +20,6 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
-      - name: Checkout/Pull Extracted Branch in Image
-        run: |
-          cd /opt/postprocessing_variant_calls
-          git checkout ${{ steps.extract_branch.outputs.branch }}
-          git pull 
       - name: Update test_post_processing Dependencies
         run: |
           cd /opt/postprocessing_variant_calls
