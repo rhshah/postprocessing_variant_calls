@@ -1,6 +1,6 @@
 ################## Base Image ##########
 ARG PYTHON_VERSION="3.9.7"
-FROM python:${PYTHON_VERSION}
+FROM --platform=linux/amd64 python:${PYTHON_VERSION}
 
 ################## ARGUMENTS/Environments ##########
 ARG BUILD_DATE
