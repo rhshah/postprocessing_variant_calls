@@ -5,7 +5,7 @@ description = ""
 authors = ["Ronak Shaw <shahr2@mskcc.org>", "Karthigayini Sivaprakasam <sivaprk@mskcc.org>", "Eric Buehler <buehlere@mskcc.org>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "3.9.7"
 fastapi = "^0.65"
 pydantic = { extras = ["dotenv"], version = "^1.8" }
 python-json-logger = "^0.1"
