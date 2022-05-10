@@ -20,13 +20,13 @@ logging.basicConfig(
 
 logger = logging.getLogger("filter")
 
-app = typer.Typer()
+app = typer.Typer(help="post-processing commands for VarDict version 1.4.6 VCFs.")
 # single filter 
 single_app = typer.Typer()
-app.add_typer(single_app, name="single")
+app.add_typer(single_app, name="single", help="Post-processing commands for a single sample VarDict version 1.4.6 VCFs")
 # case control filter 
 case_control_app = typer.Typer()
-app.add_typer(case_control_app, name="case-control")
+app.add_typer(case_control_app, name="case-control", help="Post-processing commands for a case-controlled VarDict version 1.4.6 VCFs")
 
 
 
@@ -93,35 +93,7 @@ def filter(
 ):
 
     '''
-    @Description : This tool helps to filter vardict version 1.4.6 vcf for matched calling
-    @Created : 03/23/2022
-    @author : Ronak H Shah
-
-
-    Visual representation of how this module works:
-
-    "Somatic" not in record['STATUS'] and filter_germline ?
-    |
-    yes --> DONT KEEP
-    |
-    no --> tumor_variant_fraction > nvfRF ?
-            |
-            no --> DONT KEEP
-            |
-            yes --> tmq >= minQual and
-                    nmq >= minQual and
-                    tdp >= totalDepth and
-                    tad >= alleleDepth and
-                    tvf >= variantFraction ?
-                    |
-                    no --> DONT KEEP
-                    |
-                    yes --> KEEP
-
-    Note: BasicFiltering VarDict's additional filters over MuTect include:
-    1. Tumor variant quality threshold
-    2. Normal variant quality threshold
-    3. Somatic filter (MuTect does not report germline events)
+    This tool helps to filter vardict version 1.4.6 VCFs for single sample calling
     '''
     logger.info("process_vardict: Started the run for doing standard filter.")
     # single sample case 
@@ -202,35 +174,7 @@ def filter(
 ):
 
     '''
-    @Description : This tool helps to filter vardict version 1.4.6 vcf for matched calling
-    @Created : 03/23/2022
-    @author : Ronak H Shah
-
-
-    Visual representation of how this module works:
-
-    "Somatic" not in record['STATUS'] and filter_germline ?
-    |
-    yes --> DONT KEEP
-    |
-    no --> tumor_variant_fraction > nvfRF ?
-            |
-            no --> DONT KEEP
-            |
-            yes --> tmq >= minQual and
-                    nmq >= minQual and
-                    tdp >= totalDepth and
-                    tad >= alleleDepth and
-                    tvf >= variantFraction ?
-                    |
-                    no --> DONT KEEP
-                    |
-                    yes --> KEEP
-
-    Note: BasicFiltering VarDict's additional filters over MuTect include:
-    1. Tumor variant quality threshold
-    2. Normal variant quality threshold
-    3. Somatic filter (MuTect does not report germline events)
+    This tool helps to filter vardict version 1.4.6 VCFs for case control calling
     '''
     logger.info("process_vardict: Started the run for doing standard filter.")
     # single sample case 
