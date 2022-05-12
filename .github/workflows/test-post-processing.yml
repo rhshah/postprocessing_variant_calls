@@ -15,15 +15,10 @@ jobs:
     container:
       image: ghcr.io/msk-access/postprocessing_variant_calls:latest
     steps: 
-      # Checkout Repo 
-      - name: Extract Branch Name 
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
       - name: Checkout/Pull Extracted Branch in Image
         run: |
           cd /opt/postprocessing_variant_calls
-          git checkout ${{ steps.extract_branch.outputs.branch }}
+          git checkout GITHUB_REF_NAME
           git pull 
       - name: Update test_post_processing Dependencies
         run: |
