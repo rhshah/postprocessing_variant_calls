@@ -18,7 +18,7 @@ jobs:
       - name: Checkout/Pull Extracted Branch in Image
         run: |
           cd /opt/postprocessing_variant_calls
-          git checkout GITHUB_REF_NAME
+          git checkout $GITHUB_REF_NAME
           git pull 
       - name: Update test_post_processing Dependencies
         run: |
