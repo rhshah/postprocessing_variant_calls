@@ -87,9 +87,9 @@ def filter(
         "-fg",
         help="Whether to remove calls without 'somatic' status",
     ),
-    # outputDir: str = typer.Option(
-    #     ..., "--outDir", "-o", help="Full Path to the output dir"
-    # ),
+    outputDir: str = typer.Option(
+        ..., "--outDir", "-o", help="Full Path to the output dir"
+    ),
 ):
 
     '''
