@@ -61,7 +61,7 @@ class var_sample:
         '''
         vcf_out = os.path.basename(self.inputVcf)
         vcf_out = os.path.splitext(vcf_out)[0]
-        if self.outputDir:
+        if self.outputDir != "":
             vcf_out = os.path.join(self.outputDir, vcf_out)
         return vcf_out
 
