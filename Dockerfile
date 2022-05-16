@@ -23,6 +23,7 @@ LABEL org.opencontainers.image.created=${BUILD_DATE} \
 
 LABEL org.opencontainers.image.description="This container uses conda/conda/miniconda3 as the base image to build"
 
+
 ################## INSTALL ##########################
 # download postprocessing_variant_calls 
 RUN cd /opt \ 
@@ -32,6 +33,9 @@ RUN cd /opt \
 # install postprocessing_variant_calls 
 RUN cd /opt/postprocessing_variant_calls \
     && make deps-install
+
+# set environment
+USER root 
 
 # by default /bin/sh
 CMD ["/bin/sh"]
