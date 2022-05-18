@@ -47,7 +47,7 @@ deps-install:  ## install dependencies
 deps-update:
 	pip install poetry==$(POETRY_VERSION)
 	poetry config virtualenvs.create false
-	poetry lock --no-update
+	poetry lock 
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
 requirements.txt: poetry.lock
