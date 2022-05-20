@@ -8,20 +8,20 @@ jobs:
   test_post_processing:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/msk-access/postprocessing_variant_calls:latest
     steps: 
-      - name: Checkout/Pull Extracted Branch in Image
-        run: |
-          cd /opt/postprocessing_variant_calls
-          git checkout $GITHUB_HEAD_REF
-          git pull 
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.9.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.7
       - name: Update test_post_processing Dependencies
         run: |
-          cd /opt/postprocessing_variant_calls
+          cd postprocessing_variant_calls
           make deps-update
           make deps-install
       - name: Pytest test_post_processing in Image 
         run: |
-          cd /opt/postprocessing_variant_calls
+          cd postprocessing_variant_calls
           pytest tests
