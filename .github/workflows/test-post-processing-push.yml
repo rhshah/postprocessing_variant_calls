@@ -1,0 +1,27 @@
+name: test_post_processing
+on:
+  push:
+    paths-ignore:
+    - 'docs/**'
+    - '**.md'
+jobs:
+  test_post_processing:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/msk-access/postprocessing_variant_calls:latest
+    steps: 
+      - name: Checkout/Pull Extracted Branch in Image
+        run: |
+          cd /opt/postprocessing_variant_calls
+          git checkout $GITHUB_REF_NAME
+          git pull 
+      - name: Update test_post_processing Dependencies
+        run: |
+          cd /opt/postprocessing_variant_calls
+          make deps-update
+          make deps-install
+      - name: Pytest test_post_processing in Image 
+        run: |
+          cd /opt/postprocessing_variant_calls
+          pytest tests
