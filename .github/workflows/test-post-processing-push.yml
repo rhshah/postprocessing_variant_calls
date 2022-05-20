@@ -18,10 +18,10 @@ jobs:
           python-version: 3.9.7
       - name: Update test_post_processing Dependencies
         run: |
-          cd postprocessing_variant_calls
+          cd usr/bin/git/postprocessing_variant_calls
           make deps-update
           make deps-install
       - name: Pytest test_post_processing in Image 
         run: |
-          cd postprocessing_variant_calls
+          cd usr/bin/git/postprocessing_variant_calls
           pytest tests
