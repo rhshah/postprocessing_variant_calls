@@ -137,3 +137,9 @@ dmypy.json
 .git
 
 .log*
+
+# ignore test output files 
+tests/vardict/data/single/*
+!tests/vardict/data/single/blank.txt
+tests/vardict/data/two/*
+!tests/vardict/data/two/blank.txt
