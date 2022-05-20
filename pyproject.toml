@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "pv"
-version = "0.1.0"
+version = "0.0.1"
 description = ""
-authors = ["Ronak Shaw <shahr2@mskcc.org>", "Karthigayini Sivaprakasam <sivaprk@mskcc.org>", "Eric Buehler <buehlere@mskcc.org>"]
+authors = ["Ronak Shah <shahr2@mskcc.org>", "Karthigayini Sivaprakasam <sivaprk@mskcc.org>", "Eric Buehler <buehlere@mskcc.org>"]
 
 [tool.poetry.dependencies]
 python = "3.9.7"
