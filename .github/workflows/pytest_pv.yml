@@ -1,7 +1,7 @@
 name: test_post_processing
 on:
     push:
-        branches: [master, develop]
+        branches: [main, develop, release/*]
         paths-ignore:
             - "docs/**"
             - "**.md"
