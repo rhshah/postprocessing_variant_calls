@@ -350,7 +350,7 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "poetry"
-version = "1.2.0b1"
+version = "1.1.13"
 description = "Python dependency management and packaging made easy."
 category = "dev"
 optional = false
