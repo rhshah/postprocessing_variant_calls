@@ -1,10 +1,10 @@
 
-name: push-to-master
+name: push-to-main
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   cicd:
@@ -24,4 +24,3 @@ jobs:
 
       - name: Docker push
         run: make dc-push
-        
