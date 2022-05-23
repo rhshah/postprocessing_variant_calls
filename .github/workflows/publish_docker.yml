@@ -57,7 +57,7 @@ jobs:
                   push: true
                   tags: ${{ steps.prep.outputs.tags }}
                   build-args: |
-                      BIOMETRICS_VERSION=${{ steps.prep.outputs.version }}
+                      POSTPROCESSING_VARIANT_CALLS_VERSION=${{ steps.prep.outputs.version }}
                   labels: |
                       org.opencontainers.image.title=${{ github.event.repository.name }}
                       org.opencontainers.image.description=${{ github.event.repository.description }}
