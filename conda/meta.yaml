@@ -6,6 +6,7 @@ requirements:
   build:
     - python={{ python_version }}
     - make
+    - poetry
   run:
     - python={{ python_version }}
     
