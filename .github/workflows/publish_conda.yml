@@ -1,10 +1,9 @@
-name: publish_conda
+name: Publish package to Conda
 
 on:
     push:
         tags:
             - "*"
-
 jobs:
     publish:
         runs-on: ubuntu-latest

@@ -1,10 +1,7 @@
-name: test_post_processing
+name: test vardict filter command
 on:
     push:
         branches: [main, develop, release/*]
-        paths-ignore:
-            - "docs/**"
-            - "**.md"
         tags:
             - '*'
         paths-ignore:
