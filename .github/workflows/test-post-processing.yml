@@ -1,8 +1,8 @@
 name: test_post_processing
 on: [push, pull_request]
-    paths-ignore:
-    - 'docs/**'
-    - '**.md'
+  paths-ignore:
+  - 'docs/**'
+  - '**.md'
 jobs:
   test_post_processing:
     # The type of runner that the job will run on
