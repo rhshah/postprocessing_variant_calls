@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "postprocessing_variant_calls"
+name = "process_vcf"
 version = "0.1.6"
 description = ""
 authors = ["Ronak Shah <shahr2@mskcc.org>", "Karthigayini Sivaprakasam <sivaprk@mskcc.org>", "Eric Buehler <buehlere@mskcc.org>"]
@@ -17,7 +17,7 @@ poetry = "1.1.13"
 pytest = "^6.2"
 
 [tool.poetry.scripts]
-pv = "postprocessing_variant_calls:app"
+process_vcf = "process_vcf:app"
 
 [build-system]
 requires = ["poetry>=0.12"]
