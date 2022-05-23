@@ -7,7 +7,6 @@ import time
 logger = logging.getLogger("filter")
 app = typer.Typer()
 
-
 # Vardict filter 
 app.add_typer(vardict.vardict_process.app, name="vardict")
 # Haplo filter 
