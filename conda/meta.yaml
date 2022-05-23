@@ -1,0 +1,17 @@
+package:
+  name: pv
+  version: "0.1.1"
+
+requirements:
+  build:
+    - python={{ python_version }}
+  run:
+    - python={{ python_version }}
+    
+source:
+  path: ..
+
+build:
+  number: 0
+  script: make deps-install
+
