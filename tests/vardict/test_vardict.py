@@ -3,7 +3,7 @@ import pytest  # type: ignore
 import os 
 from typer.testing import CliRunner
 from pdb import set_trace as bp
-from postprocessing_variant_calls import app
+from pv import app
 
 runner = CliRunner()
 vardict_single_calls = [
