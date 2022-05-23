@@ -1,0 +1,27 @@
+
+name: push-to-master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  cicd:
+    name: CICD
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: prod
+    steps: 
+      - name: Docker login
+        run: echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USER} --password-stdin
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USER: yxtay
+    
+      - name: Docker build
+        run: make dc-build
+
+      - name: Docker push
+        run: make dc-push
+        
