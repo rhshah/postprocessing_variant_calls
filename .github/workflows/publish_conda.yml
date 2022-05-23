@@ -14,7 +14,7 @@ jobs:
                   sudo apt install build-essential
             - uses: actions/checkout@v2
             - name: publish-to-conda
-              uses: maxibor/conda-package-publish-action@master
+              uses: maxibor/conda-package-publish-action@v1.1
               with:
                   subdir: "conda"
                   anacondatoken: ${{ secrets.ANACONDA_TOKEN }}
