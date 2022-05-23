@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "process_vcf"
-version = "0.1.6"
+version = "0.1.0"
 description = ""
 authors = ["Ronak Shah <shahr2@mskcc.org>", "Karthigayini Sivaprakasam <sivaprk@mskcc.org>", "Eric Buehler <buehlere@mskcc.org>"]
 
