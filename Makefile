@@ -9,7 +9,7 @@ SHELL := bash
 .DELETE_ON_ERROR:
 
 ## variables
-POETRY_VERSION = 1.2.0b1
+POETRY_VERSION = 1.1.13
 ENVIRONMENT ?= dev
 ARGS =
 APP_NAME = $(shell python -m src.config app_name)
