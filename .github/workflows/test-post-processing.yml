@@ -1,6 +1,5 @@
 name: test_post_processing
-on:
-  pull_request:
+on: [push, pull_request]
     paths-ignore:
     - 'docs/**'
     - '**.md'
