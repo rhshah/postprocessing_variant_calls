@@ -18,8 +18,7 @@ LABEL org.opencontainers.image.created=${BUILD_DATE} \
     org.opencontainers.image.licenses=${LICENSE} \
     org.opencontainers.image.version.python=${PYTHON_VERSION} \ 
     org.opencontainers.image.vcs-ref=${VCS_REF} \ 
-    org.opencontainers.image.version.conda=${CONDA_VERSION} \ 
-    org.opencontainers.image.version.postprocessing_variant_calls=${POSTPROCESSING_VARIANT_CALLS_VERSION}
+    org.opencontainers.image.version.conda=${CONDA_VERSION} 
 
 LABEL org.opencontainers.image.description="This container uses conda/conda/miniconda3 as the base image to build"
 

@@ -43,14 +43,6 @@ deps-update:
 	poetry lock 
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
-.PHONY: dc-build
-dc-build: requirements.txt  ## build app image
-	IMAGE_TAG=$(IMAGE_TAG) docker-compose build
-
-.PHONY: dc-push
-dc-push:
-	IMAGE_TAG=$(IMAGE_TAG) docker-compose push
-	
 requirements.txt: poetry.lock
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
