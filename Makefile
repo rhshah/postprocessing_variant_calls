@@ -34,14 +34,7 @@ help:  ## print help message
 deps-install:  ## install dependencies
 	pip install poetry==$(POETRY_VERSION)
 	poetry config virtualenvs.create false
-	poetry install --no-interaction --no-dev
-
-.PHONY: deps-install-dev
-deps-install:  ## install dependencies
-	pip install poetry==$(POETRY_VERSION)
-	poetry config virtualenvs.create false
-	poetry install --no-interaction --no-dev
-
+	poetry install --no-interaction 
 
 .PHONY: deps-update
 deps-update:
