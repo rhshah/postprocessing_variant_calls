@@ -10,8 +10,6 @@ jobs:
   cicd:
     name: CICD
     runs-on: ubuntu-latest
-    env:
-      ENVIRONMENT: prod
     steps: 
       - name: Docker login
         run: echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USER} --password-stdin
