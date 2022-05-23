@@ -32,15 +32,9 @@ help:  ## print help message
 
 .PHONY: deps-install
 deps-install:  ## install dependencies
-	pip install poetry
-	poetry install --no-root
-
-.PHONY: deps-install-ci
-deps-install-ci:
-	pip install poetry
+	pip install poetry==$(POETRY_VERSION)
 	poetry config virtualenvs.create false
-	poetry install --no-root
-	poetry show
+	poetry install --no-interaction 
 
 .PHONY: deps-update
 deps-update:

@@ -2,7 +2,7 @@
 name = "postprocessing_variant_calls"
 version = "0.1.0"
 description = ""
-authors = ["shahr2@mskcc.org"]
+authors = ["Ronak Shah <shahr2@mskcc.org>", "Karthigayini Sivaprakasam <sivaprk@mskcc.org>", "Eric Buehler <buehlere@mskcc.org>"]
 
 [tool.poetry.dependencies]
 python = "~3.8"
