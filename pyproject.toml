@@ -20,7 +20,7 @@ poetry = "^1.1.0"
 pytest = "^6.2"
 
 [tool.poetry.scripts]
-pv = "postprocessing_variant_calls:app"
+postprocessing_variant_calls = "postprocessing_variant_calls:app"
 
 [build-system]
 requires = ["poetry>=0.12"]
