@@ -43,6 +43,16 @@ deps-update:
 	poetry lock 
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
+.PHONY: whl-install 
+whl-install:  ## install dependencies
+	pip install poetry
+	poetry config virtualenvs.create false
+	poetry install --no-interaction 
+	poetry build
+	pip install dist/postprocessing_variant_calls-*-py3-none-any.whl
+	pv --help
+
+
 requirements.txt: poetry.lock
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
