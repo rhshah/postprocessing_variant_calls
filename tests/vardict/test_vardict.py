@@ -1,10 +1,10 @@
-#!/usr/bin/env python
 import pytest  # type: ignore
 import os 
 from typer.testing import CliRunner
 from pdb import set_trace as bp
-from process_vcf import app
-
+from importlib.machinery import SourceFileLoader
+postprocessing_variant_calls = SourceFileLoader("postprocessing_variant_calls","src/postprocessing_variant_calls.py").load_module()
+app = postprocessing_variant_calls.app
 runner = CliRunner()
 vardict_single_calls = [
         ['vardict', 'single', 'filter', '--inputVcf', 'tests/vardict/data/single_test.vcf' , '--tsampleName', 'Myeloid200-1', '-ad','1', '-o', 'tests/vardict/data/single'], 
