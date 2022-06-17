@@ -44,7 +44,7 @@ class var_sample:
         # vcf output name
         self.vcf_out = self.out_name()
         self.txt_out = self.vcf_out + "_STDfilter.txt" 
-        self.vcf_complex_out = self.vcf_out + "_complex_STDfilter.vcf"
+        self.vcf_complex_out = self.vcf_out + "_STDfilter_complex.vcf"
         self.vcf_out = self.vcf_out + "_STDfilter.vcf"
         # vcf reader 
         self.vcf_reader = self.set_reader() 

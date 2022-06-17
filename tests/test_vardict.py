@@ -21,10 +21,10 @@ def test_single(call):
     result.stdout 
     assert result.exit_code == 0
     assert '' in result.stdout
-    assert os.path.exists("tests/data/vardict/single/single_test_complex_STDfilter.vcf") == True
+    assert os.path.exists("tests/data/vardict/single/single_test_STDfilter_complex.vcf") == True
     assert os.path.exists("tests/data/vardict/single/single_test_STDfilter.vcf") == True
     assert os.path.exists("tests/data/vardict/single/single_test_STDfilter.txt") == True
-    os.remove("tests/data/vardict/single/single_test_complex_STDfilter.vcf")
+    os.remove("tests/data/vardict/single/single_test_STDfilter_complex.vcf")
     os.remove("tests/data/vardict/single/single_test_STDfilter.vcf")
     os.remove("tests/data/vardict/single/single_test_STDfilter.txt")
 
@@ -33,10 +33,10 @@ def test_two(call):
     result = runner.invoke(app, call)
     assert result.exit_code == 0
     assert '' in result.stdout
-    assert os.path.exists("tests/data/vardict/two/case_control_test_complex_STDfilter.vcf") == True
+    assert os.path.exists("tests/data/vardict/two/case_control_test_STDfilter_complex.vcf") == True
     assert os.path.exists("tests/data/vardict/two/case_control_test_STDfilter.vcf") == True
     assert os.path.exists("tests/data/vardict/two/case_control_test_STDfilter.txt") == True
-    os.remove("tests/data/vardict/two/case_control_test_complex_STDfilter.vcf")
+    os.remove("tests/data/vardict/two/case_control_test_STDfilter_complex.vcf")
     os.remove("tests/data/vardict/two/case_control_test_STDfilter.vcf")
     os.remove("tests/data/vardict/two/case_control_test_STDfilter.txt")
 
