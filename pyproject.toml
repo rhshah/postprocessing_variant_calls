@@ -21,5 +21,4 @@ pytest = "^*"
 pv = "postprocessing_variant_calls.main:app"
 
 [build-system]
-requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
