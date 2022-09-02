@@ -9,12 +9,11 @@ homepage = "https://cmo-ci.gitbook.io/postprocessing_variant_calls/"
 
 [tool.poetry.dependencies]
 python = ">=3.7"
-typer = {extras = ["all"], version = "^*"} 
+typer = {extras = ["all"], version = "^*"} # "^0.3"
 PyVCF3 = "^*"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^*"
-poetry = "^*"
 pytest = "^*"
 
 [tool.poetry.scripts]
