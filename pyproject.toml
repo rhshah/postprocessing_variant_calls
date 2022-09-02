@@ -8,16 +8,16 @@ repository = "https://github.com/msk-access/postprocessing_variant_calls"
 homepage = "https://cmo-ci.gitbook.io/postprocessing_variant_calls/"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-pydantic = { extras = ["dotenv"], version = "^1.7" }
-typer = {extras = ["all"], version = "^0.4.0"} # "^0.3"
-pip = "^22.0.4"
+python = ">=3.7"
+pydantic = { extras = ["dotenv"], version = "^*" }
+typer = {extras = ["all"], version = "^*"} 
+pip = "^*"
 PyVCF3 = "^*"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.9"
-poetry = "^1.1.0"
-pytest = "^6.2"
+flake8 = "^*"
+poetry = "^*"
+pytest = "^*"
 
 [tool.poetry.scripts]
 pv = "postprocessing_variant_calls.main:app"
