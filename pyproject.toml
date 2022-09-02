@@ -9,9 +9,7 @@ homepage = "https://cmo-ci.gitbook.io/postprocessing_variant_calls/"
 
 [tool.poetry.dependencies]
 python = ">=3.7"
-pydantic = { extras = ["dotenv"], version = "^*" }
 typer = {extras = ["all"], version = "^*"} 
-pip = "^*"
 PyVCF3 = "^*"
 
 [tool.poetry.dev-dependencies]
