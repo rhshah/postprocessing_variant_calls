@@ -34,7 +34,7 @@ help:  ## print help message
 deps-install:  ## install dependencies
 	pip install poetry
 	poetry config virtualenvs.create false
-	poetry install --no-interaction 
+	poetry install 
 
 .PHONY: deps-update
 deps-update:

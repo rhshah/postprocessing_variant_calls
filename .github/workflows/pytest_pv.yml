@@ -29,7 +29,6 @@ jobs:
                   python-version: ${{ matrix.python-version }}
             - name: Update test_post_processing Dependencies
               run: |
-                  make deps-update
                   make deps-install
             - name: Pytest for postprocessing_variant_calls
               run: |
