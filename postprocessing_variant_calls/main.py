@@ -1,17 +1,19 @@
-# Main Import 
+# Main Import
 import typer
 from .vardict import vardict_process
 import logging
 import time
-# setup logger 
+# setup logger
 logger = logging.getLogger("filter")
 app = typer.Typer()
 
-# Vardict filter 
+# Vardict filter
 app.add_typer(vardict_process.app, name="vardict")
-# Haplo filter 
+# Haplo filter
+# Maf concat #
+app.add_typer(maf_concat.app, name="concat")
 #### Insert Here ####
 
-# Main App 
+# Main App
 if __name__ == "__main__":
     app()
