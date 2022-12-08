@@ -18,7 +18,12 @@ import typer
 import pandas as pd
 
 def main(
-    maf: Path = typer.Option(
+    list_of_files: Path = typer.Option(
+        "--list",
+        "-l",
+        help="File of files, List of maf files to be concatenated, one per line, no header",
+    ),
+    maf: Optional[List[Path]] = typer.Option(
         "--maf",
         "-m",
         exists=True,
@@ -27,26 +32,44 @@ def main(
         writable=False,
         readable=True,
         resolve_path=True,
-        help="MAF files to be concatenated",
+        help="Maf files to be concatenated. Can be given multiple times",
     ),
-    merged_maf: str = typer.Option(
-        "merged.maf",
-        "--name",
-        "-n",
-        help="Name of the output merged maf file",
+    output_maf_file_prefix: str = typer.Option(
+        "concat_maf_output",
+        "--prefix",
+        "-p",
+        help="Prefix of the output MAF",
     ),
 ):
-    # Read maf files
-    skip = get_row(maf)
-    maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
+    if not list_of_files:
+        typer.secho(
+            "File are not provided as file of files.", fg=typer.colors.BRIGHT_YELLOW
+        )
+        if not maf:
+            typer.secho(
+                "File were not provided via command line as well",
+                fg=typer.colors.BRIGHT_RED,
+            )
+            raise typer.Abort()
+    # Read file of files
+    if not maf:
+        maf = [line.strip() for line in open(list_of_files, "r")]
+    final_df = pd.DataFrame()
+    for maf_file in maf:
+        if Path(maf_file).is_file():
+            # Read maf file
+            typer.secho(f"Reading: {maf_file}", fg=typer.colors.BRIGHT_GREEN)
+            maf_df = pd.read_csv(maf_file, sep="/t", low_memory=False)
+
     # Minimum required columns for maf format
     #Hugo_Symbol, Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele2, Variant_Classification, Variant_Type, Tumor_Sample_Barcode
     maf_col_df = maf_df["Hugo_Symbol", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele2", "Variant_Classification", "Variant_Type", "Tumor_Sample_Barcode"]
     # Concatenate maf files
-    merged_mafs = pd.concat(maf_col_df, axis=0)
+    merged_mafs = pd.concat(maf_col_df, join='inner')
 
     # Export merged maf
-    merged_mafs().to_csv(merged_maf, sep="\t", index=False)
+    merged_mafs.to_csv(f"{output_maf_file_prefix}.maf", index=False, sep="\t")
+#    merged_mafs().to_csv(merged_maf, sep="\t", index=False)
 
 if __name__ == "__main__":
     typer.run(main)
