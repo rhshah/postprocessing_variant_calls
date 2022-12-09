@@ -59,9 +59,9 @@ def main(
         if Path(maf_file).is_file():
             # Read maf file
             typer.secho(f"Reading: {maf_file}", fg=typer.colors.BRIGHT_GREEN)
-            maf_df = pd.read_csv(maf_file, sep='/t', low_memory=True)
+            maf_df = pd.read_csv(maf_file, sep='\t', low_memory=True)
             maf_col_df = maf_df[["Hugo_Symbol", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele2", "Variant_Classification", "Variant_Type", "Tumor_Sample_Barcode"]]
-            merged_mafs = pd.concat(maf_col_df, join='inner')
+            merged_mafs = pd.concat([maf_col_df], join='inner')
         else:
             continue
     else:
