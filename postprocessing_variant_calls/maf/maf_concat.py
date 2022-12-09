@@ -59,16 +59,24 @@ def main(
         if Path(maf_file).is_file():
             # Read maf file
             typer.secho(f"Reading: {maf_file}", fg=typer.colors.BRIGHT_GREEN)
-            maf_df = pd.read_csv(maf_file, sep="/t", low_memory=False)
-
+            maf_df = pd.read_csv(maf_file, sep='/t', low_memory=True)
+            maf_col_df = maf_df[["Hugo_Symbol", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele2", "Variant_Classification", "Variant_Type", "Tumor_Sample_Barcode"]]
+            merged_mafs = pd.concat(maf_col_df, join='inner')
+        else:
+            continue
+    else:
+        typer.secho(f"{maf_file} file does not exists", fg=typer.colors.BRIGHT_RED)
+        raise typer.Abort()
+    # write concatanted df to maf
+    typer.secho(
+        f"Done processing the CSV file writing output to {output_maf_file_prefix} in txt and excel format",
+        fg=typer.colors.GREEN,
+    )
+    final_df.to_csv(f"{output_maf_file_prefix}.maf", index=False, sep="\t")
     # Minimum required columns for maf format
     #Hugo_Symbol, Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele2, Variant_Classification, Variant_Type, Tumor_Sample_Barcode
-    maf_col_df = maf_df["Hugo_Symbol", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele2", "Variant_Classification", "Variant_Type", "Tumor_Sample_Barcode"]
     # Concatenate maf files
-    merged_mafs = pd.concat(maf_col_df, join='inner')
-
     # Export merged maf
-    merged_mafs.to_csv(f"{output_maf_file_prefix}.maf", index=False, sep="\t")
 #    merged_mafs().to_csv(merged_maf, sep="\t", index=False)
 
 if __name__ == "__main__":

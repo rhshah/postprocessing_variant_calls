@@ -10,8 +10,6 @@ app = typer.Typer()
 # Vardict filter
 app.add_typer(vardict_process.app, name="vardict")
 # Haplo filter
-# Maf concat #
-app.add_typer(maf_concat.app, name="concat")
 #### Insert Here ####
 
 # Main App
