@@ -61,15 +61,16 @@ def main(
             typer.secho(f"Reading: {maf_file}", fg=typer.colors.BRIGHT_GREEN)
             maf_df = pd.read_csv(maf_file, sep='\t', low_memory=True)
             maf_col_df = maf_df[["Hugo_Symbol", "Chromosome", "Start_Position", "End_Position", "Reference_Allele", "Tumor_Seq_Allele2", "Variant_Classification", "Variant_Type", "Tumor_Sample_Barcode"]]
-            merged_mafs = pd.concat([maf_col_df], join='inner')
+            final_df = final_df.append(maf_col_df, ignore_index=True)
+            merged_mafs = pd.concat([final_df], join='inner')
         else:
             continue
-    else:
-        typer.secho(f"{maf_file} file does not exists", fg=typer.colors.BRIGHT_RED)
-        raise typer.Abort()
+#    else:
+#        typer.secho(f"{maf_file} file does not exists", fg=typer.colors.BRIGHT_RED)
+#        raise typer.Abort()
     # write concatanted df to maf
     typer.secho(
-        f"Done processing the CSV file writing output to {output_maf_file_prefix} in txt and excel format",
+        f"Done processing the concatenation of maf files writing output to {output_maf_file_prefix} in maf format",
         fg=typer.colors.GREEN,
     )
     final_df.to_csv(f"{output_maf_file_prefix}.maf", index=False, sep="\t")
