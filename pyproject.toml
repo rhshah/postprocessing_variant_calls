@@ -11,6 +11,7 @@ homepage = "https://cmo-ci.gitbook.io/postprocessing_variant_calls/"
 python = ">=3.7"
 typer = {extras = ["all"], version = "*"} # "^0.3"
 PyVCF3 = "*"
+pandas = "*"
 
 [tool.poetry.dev-dependencies]
 flake8 = "*"

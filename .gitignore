@@ -143,3 +143,4 @@ tests/data/vardict/single/*
 !tests/data/vardict/single/blank.txt
 tests/data/vardict/two/*
 !tests/data/vardict/two/blank.txt
+postprocessing_variant_calls/annotate/testing.maf
