@@ -21,10 +21,8 @@ logging.basicConfig(
 logger = logging.getLogger("filter")
 
 app = typer.Typer(help="merge multiple maf files produced by variants callers as part of the postprocessing process.")
-maf_app = typer.Typer()
-app.add_typer(maf_app, name="maf", help="")
 
-@maf_app.command("concat")
+@app.command("maf")
 def maf_maf(
     #TODO change args to be relevant to concat
     # I think this should be a list of mafs? 
