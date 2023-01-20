@@ -20,17 +20,22 @@ logging.basicConfig(
 
 logger = logging.getLogger("filter")
 
-app = typer.Typer(help="post-processing commands for VarDict version 1.4.6 VCFs.")
+app = typer.Typer(help="merge multiple maf files produced by variants callers as part of the postprocessing process.")
 maf_app = typer.Typer()
-app.add_typer(maf_app, name="maf", help="Post-processing commands for a single sample VarDict version 1.4.6 VCFs")
+app.add_typer(maf_app, name="maf", help="")
 
-@app.command("maf")
+@maf_app.command("concat")
 def maf_maf(
     #TODO change args to be relevant to concat
     # I think this should be a list of mafs? 
-    input_maf: Path = typer.Option(
-        ...,
-        "--input_maf",
+    list_of_files: Path = typer.Option(
+        "--list",
+        "-l",
+        help="File of files, List of maf files to be concatenated, one per line, no header"
+    ),
+    maf: List[str] = typer.Option(
+        [], # set default list, otherwise error
+        "--maf",
         "-m",
         exists=True,
         file_okay=True,
@@ -38,19 +43,20 @@ def maf_maf(
         writable=False,
         readable=True,
         resolve_path=True,
-        help="Input maf(s)",
+        help="Maf files to be concatenated. Can be given multiple times"
     ),
-    output_maf: str = typer.Option(
-        'output_maf',
-        "--output_maf",
-        help="Output maf file name",
+    output_maf_file_prefix: str = typer.Option(
+        "concat_maf_output",
+        "--prefix",
+        "-p",
+        help="Prefix of the output MAF"
     )
 ):
 
     logger.info("started concat")
     #TODO build function in concat_helpers and call her before returning
     #Functions can be tested outside of this script 
-    annotated = helper("hello")
+    item = helper("hello")
     return 1
 
 
