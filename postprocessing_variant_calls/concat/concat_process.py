@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# imports 
+# imports
 from __future__ import division
 import os
 import sys
@@ -25,7 +25,7 @@ app = typer.Typer(help="merge multiple maf files produced by variants callers as
 @app.command("maf")
 def maf_maf(
     #TODO change args to be relevant to concat
-    # I think this should be a list of mafs? 
+    # I think this should be a list of mafs?
     list_of_files: Path = typer.Option(
         "--list",
         "-l",
@@ -53,8 +53,8 @@ def maf_maf(
 
     logger.info("started concat")
     #TODO build function in concat_helpers and call her before returning
-    #Functions can be tested outside of this script 
-    item = helper("hello")
+    #Functions can be tested outside of this script
+    item = helper("MAF files concatenated")
     return 1
 
 
