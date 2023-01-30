@@ -20,9 +20,18 @@ requirements-dev.txt: poetry.lock
 	poetry export --dev --format requirements.txt --output requirements-dev.txt --without-hashes
 
 init-submodule:
-	git submodule update --init --recursive
+	git submodule update --init
+
+clean-submodule:
+	git submodule deinit -f .
+
+init-submodule:
+	git submodule update --init
+
+update-submodule:
+	git submodule update --recursive --remote
 
 init-tools:
-	cd python_bed_lookup
-	python setup.py build
-	python setup.py install
+	cd python_bed_lookup \
+	python setup.py build \
+	python setup.py install \
