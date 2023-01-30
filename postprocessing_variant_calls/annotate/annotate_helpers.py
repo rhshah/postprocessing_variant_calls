@@ -4,7 +4,7 @@ import os
 import sys
 import csv 
 import pandas as pd
-
+from bed_lookup import BedFile
 
 #TODO add functions for maf/bed annotation 
 def maf_bed_annotate(maf, bed):
