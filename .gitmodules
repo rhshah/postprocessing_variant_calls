@@ -1,3 +1,0 @@
-[submodule "python_bed_lookup"]
-	path = python_bed_lookup
-	url = git@github.com:msk-access/python_bed_lookup.git
