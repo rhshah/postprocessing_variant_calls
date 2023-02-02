@@ -25,9 +25,6 @@ init-submodule:
 clean-submodule:
 	git submodule deinit -f .
 
-init-submodule:
-	git submodule update --init
-
 update-submodule:
 	git submodule update --recursive --remote
 
