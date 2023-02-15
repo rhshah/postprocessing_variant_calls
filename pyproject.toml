@@ -13,6 +13,7 @@ typer = {extras = ["all"], version = "*"} # "^0.3"
 PyVCF3 = "*"
 pandas = "*"
 Cython = "*"
+bed-lookup = "1.1"
 
 [tool.poetry.dev-dependencies]
 flake8 = "*"

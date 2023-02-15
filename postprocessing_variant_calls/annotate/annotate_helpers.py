@@ -8,7 +8,7 @@ from bed_lookup import BedFile
 import tempfile 
 
 #TODO add functions for maf/bed annotation 
-def maf_bed_annotate(maf, bed,cname,outputFile):
+def maf_bed_annotate(maf, bed, cname, outputFile):
     cname=cname
     outputFile=outputFile
     print('here')
@@ -38,6 +38,3 @@ def get_row(file):
     with open(file, "r") as csv_file:
         skipped.extend(i for i, line in enumerate(csv_file) if line.startswith("#"))
     return skipped
-
-maf_bed_annotate("../../in/C-C1V52M-L001-d.DONOR22-TP.vardict.maf", "../../rmsk_mod.bed",
-"complexity", "output.csv")
