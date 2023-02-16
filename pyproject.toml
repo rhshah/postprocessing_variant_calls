@@ -11,12 +11,12 @@ homepage = "https://cmo-ci.gitbook.io/postprocessing_variant_calls/"
 pv = "postprocessing_variant_calls.main:app"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.9"
 typer = "*"
 PyVCF3 = "*"
 pandas = "*"
 numpy = ">1.21.1"
-bed-lookup = "1.3"
+python-bed-lookup = "0.1.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "*"
