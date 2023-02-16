@@ -6,4 +6,3 @@
 deps-install:  ## install dependencies
 	pip install poetry
 	poetry install 
-	poetry shell
