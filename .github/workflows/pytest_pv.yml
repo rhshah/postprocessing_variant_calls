@@ -31,6 +31,7 @@ jobs:
                   cache: 'poetry'
             - run: pip install cython 
             - run: poetry install --with dev-dependencies
+            - run: poetry shell
             - name: Pytest for postprocessing_variant_calls
               run: |
                   pytest tests
