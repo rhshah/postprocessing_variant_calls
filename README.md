@@ -38,15 +38,6 @@ Template used: https://github.com/yxtay/python-project-template
 - [Docker][docker]
 - [Make][make]
 
-#### Create environment
-
-Use Conda to create a virtual environment and activate it for the project.
-
-```bash
-conda env create -f environment.yml
-conda activate pv_calls
-```
-
 #### Install dependencies
 
 Then install project dependencies with Poetry.
@@ -54,13 +45,3 @@ Then install project dependencies with Poetry.
 ```bash
 make deps-install
 ```
-
-#### Updating Environment
-
-To update the environment after initial setup up run: 
-
-```bash
-conda env update -f environment.yml
-```
-
-instead of `conda create`, and then re-run `make deps-install`

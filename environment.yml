@@ -1,7 +1,0 @@
-name: pv_calls
-
-channels:
-  - defaults
-
-dependencies:
-  - python=3.9.7
