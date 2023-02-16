@@ -16,7 +16,7 @@ typer = "*"
 PyVCF3 = "*"
 pandas = "*"
 numpy = ">1.21.1"
-bed-lookup = "0.1.0"
+bed-lookup = "1.5"
 
 [tool.poetry.dev-dependencies]
 flake8 = "*"
