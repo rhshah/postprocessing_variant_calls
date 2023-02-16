@@ -31,20 +31,8 @@ def maf_maf(
         "-l",
         help="File of files, List of maf files to be concatenated, one per line, no header"
     ),
-    maf: List[str] = typer.Option(
-        [], # set default list, otherwise error
-        "--maf",
-        "-m",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=False,
-        readable=True,
-        resolve_path=True,
-        help="Maf files to be concatenated. Can be given multiple times"
-    ),
-    output_maf_file_prefix: str = typer.Option(
-        "concat_maf_output",
+    output_maf: str = typer.Option(
+        "output_maf",
         "--prefix",
         "-p",
         help="Prefix of the output MAF"
@@ -54,9 +42,8 @@ def maf_maf(
     logger.info("started concat")
     #TODO build function in concat_helpers and call her before returning
     #Functions can be tested outside of this script
-    item = helper("MAF files concatenated")
+    item = helper(list_of_files, output_maf)
     return 1
-
 
 
 if __name__ == "__main__":
