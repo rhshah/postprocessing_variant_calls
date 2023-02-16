@@ -30,8 +30,7 @@ jobs:
                   python-version: ${{ matrix.python-version }}
                   cache: 'poetry'
             - run: pip install cython 
-            - run: poetry install --with dev-dependencies
-            - run: poetry shell
+            - run: poetry install --with dev-dependencies --no-interaction
             - name: Pytest for postprocessing_variant_calls
               run: |
-                  pytest tests
+                  poetry run pytest tests
