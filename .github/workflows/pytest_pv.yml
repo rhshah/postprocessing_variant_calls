@@ -33,4 +33,4 @@ jobs:
             - run: poetry install
             - name: Pytest for postprocessing_variant_calls
               run: |
-                  pytest tests
+                  pytest tests --dev-dependency

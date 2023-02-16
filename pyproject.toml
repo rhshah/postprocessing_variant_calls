@@ -23,5 +23,5 @@ flake8 = "*"
 pytest = "*"
 
 [build-system]
-requires = ["poetry-core", "Cython=^0.29.23"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
