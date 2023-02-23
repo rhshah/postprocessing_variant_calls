@@ -41,7 +41,7 @@ def maf_maf(
         help="A text file containing paths of maf files to concatenate. Maf files are specified here, or using files parameter.",
         callback = check_txt # call back allow us to check input parameters
     ),
-    output_maf: str = typer.Option(
+    output_maf: Path = typer.Option(
         "output_maf",
         "--output",
         "-o",
