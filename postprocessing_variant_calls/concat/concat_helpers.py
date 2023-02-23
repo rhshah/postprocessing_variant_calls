@@ -9,7 +9,28 @@ from typing import List, Optional
 import typer
 import pandas as pd
 
+def check_maf(files: List[Path]):
+    # return non if argument is empty 
+    if files is None: 
+        return None 
+    # check that we have a list of mafs after reading off the cli
+    extensions = [os.path.splitext(f)[1] for f in files]
+    for ext in extensions:
+        if ext != '.maf':
+            typer.secho(f"If using files argument, all files must be mafs.", fg=typer.colors.RED)
+            raise typer.Abort()
+    return files 
 
+def check_txt(paths: Path):
+    # return None if argument is empty, kind of unfortunate we have to handle this case
+    if paths is None: 
+        return None
+    # check that we have a text file after reading off the cli
+    extension = os.path.splitext(paths)[1]
+    if extension != '.txt':
+        typer.secho(f"If using paths argument, must provided an input txt file.", fg=typer.colors.RED)
+        raise typer.Abort()
+    return paths
 
 def concat_mafs(files, output_maf):
     #TODO appending to empty data frame is slow, we sould make list of frames and flatten

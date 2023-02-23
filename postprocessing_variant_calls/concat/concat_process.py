@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 import typer
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
-from .concat_helpers import concat_mafs
+from .concat_helpers import concat_mafs, check_maf, check_txt
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -23,23 +23,6 @@ logger = logging.getLogger("filter")
 app = typer.Typer(help="merge multiple maf files produced by variants callers as part of the postprocessing process.")
 
 
-def check_maf(files: List[Path]):
-    # check that we have a list of mafs after reading off the cli
-    extensions = [os.path.splitext(f)[1] for f in files]
-    for ext in extensions:
-        if ext != '.maf':
-            typer.secho(f"If using files argument, all files must be mafs.", fg=typer.colors.RED)
-            raise typer.Abort()
-    return files 
-
-def check_txt(paths: Path):
-    # check that we have a text file after reading off the cli
-    extension = os.path.splitext(paths)[1]
-    if extension != '.txt':
-        typer.secho(f"If using paths argument, must provided an input txt file.", fg=typer.colors.RED)
-        raise typer.Abort()
-    return paths
-
 @app.command("maf")
 def maf_maf(
     #TODO change args to be relevant to concat
@@ -49,14 +32,14 @@ def maf_maf(
         "--files",
         "-f",
         help="MAF file to concatenate. Maf files are specified here, or using paths parameter.",
-        callback = check_maf
+        callback = check_maf # call back allow us to check input parameters
     ),
     paths: Path = typer.Option(
         None,
         "--paths",
         "-p",
         help="A text file containing paths of maf files to concatenate. Maf files are specified here, or using files parameter.",
-        callback = check_txt
+        callback = check_txt # call back allow us to check input parameters
     ),
     output_maf: str = typer.Option(
         "output_maf",
