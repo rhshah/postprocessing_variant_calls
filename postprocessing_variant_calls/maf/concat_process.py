@@ -61,7 +61,7 @@ def maf_maf(
         opaths = open(paths, 'r')
         files = []
         for line in opaths.readlines():
-            files.append(line.rstrip('\n').split(',')[0])
+            files.append(line.rstrip('\n')[0])
     # concat maf files 
     # paths vs files is taken care of at this point
     concat_mafs(files, output_maf)

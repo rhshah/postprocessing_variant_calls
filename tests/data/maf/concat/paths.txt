@@ -1,0 +1,2 @@
+tests/data/maf/concat/C-1234-L001-d.maf
+tests/data/maf/concat/C-1234-L002-d.maf
