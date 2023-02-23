@@ -2,7 +2,7 @@
 import typer
 from .vardict import vardict_process
 from .annotate import annotate_process
-from .concat import concat_process
+from .maf import concat_process
 import logging
 import time
 # setup logger
@@ -15,8 +15,8 @@ app.add_typer(vardict_process.app, name="vardict", help="post-processing command
 # Add Annote App 
 app.add_typer(annotate_process.app, name="annotate", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
 
-# Add Concat App 
-app.add_typer(concat_process.app, name="concat", help="concat common variant file formats")
+# Add for Maf Operations  
+app.add_typer(concat_process.app, name="maf", help="operations for manipulating mafs.")
 
 # Haplo filter
 
