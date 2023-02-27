@@ -3,18 +3,29 @@ import numpy
 def maf_bed_annotate(maf,bed,cname,outputFile):
     cname=cname
     outputFile=outputFile
+    ## input files preprocessing
+    # call the function to remove lines starting with #
     skip = get_row(maf)
+    #read MSF file using Pandas
     maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
+    #call the function to remove lines starting with #
     skip = get_row(bed)
+    #assigning column names to BED file
     bed_names=['Chromosome','Start_Position','End_Position','Comment']
+    #store it as Pandas dataframe
     bed_df = pd.read_csv(bed, sep="\t", skiprows=skip, low_memory=False,header=None,names=bed_names)
+    #remove the string "chr"
     bed_df['Chromosome']=bed_df['Chromosome'].str.replace("chr", "")
+    #sort both the input files
     bed_df=bed_df.sort_values(by=['Chromosome', 'Start_Position', 'End_Position'])
     maf_df=maf_df.sort_values(by=['Chromosome', 'Start_Position', 'End_Position'])
     mafdf_sub=maf_df[['Chromosome', 'Start_Position', 'End_Position']]
+    #convert both the files to a dictionary
     mafdf_dic=dict(mafdf_sub.set_index('Chromosome').groupby(level=0).apply(lambda x : x.to_dict(orient='records')))
     beddf_dic=dict(bed_df.set_index('Chromosome').groupby(level=0).apply(lambda x : x.to_dict(orient='records')))
+    #output data frame
     maf_annotated = []
+    #loop to process the input files - similar to bedtools intersect
     for k1,v1 in mafdf_dic.items():
         # subset to bed
         subset_bed = beddf_dic[k1]
@@ -37,6 +48,7 @@ def maf_bed_annotate(maf,bed,cname,outputFile):
     final_annotate = combined_annotations.merge(maf_df, on=['Start_Position','End_Position', 'Chromosome'], how='right')
     final_annotate.to_csv(outputFile)
 
+#function to find the lines that starts with #
 def get_row(file):
     skipped = []
     with open(file, "r") as csv_file:
