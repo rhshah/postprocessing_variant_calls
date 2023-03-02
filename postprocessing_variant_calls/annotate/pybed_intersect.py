@@ -34,19 +34,24 @@ def maf_bed_annotate(maf,bed,cname,outputFile):
             for loc_bed in subset_bed:
                 #TODO take advantage of sorted bed and maf
                 # logic for whether to include comment 
-                include_logic = loc_maf['Start_Position'] > loc_bed['Start_Position']  & loc_maf['Start_Position'] <= loc_bed['End_Position'] & loc_maf['End_Position'] <= loc_bed['End_Position'] 
+                include_logic = (loc_maf['Start_Position'] >= loc_bed['Start_Position']) and (loc_maf['End_Position'] < loc_bed['End_Position']) 
                 if include_logic:
                     # add comment to bed 
                     loc_maf[cname] = loc_bed['Comment']
+                    mafdf_dic[k1][idx] = loc_maf
+                    break
                 if not include_logic: 
                     loc_maf[cname] = None 
-                mafdf_dic[k1][idx] = loc_maf
+                    mafdf_dic[k1][idx] = loc_maf
         chr_df_maf = pd.DataFrame(mafdf_dic[k1])
         chr_df_maf['Chromosome'] = k1
         maf_annotated.append(chr_df_maf)
     combined_annotations = pd.concat(maf_annotated, axis=0, ignore_index=True)
     final_annotate = combined_annotations.merge(maf_df, on=['Start_Position','End_Position', 'Chromosome'], how='right')
-    final_annotate.to_csv(outputFile)
+    sort_index=maf_df.columns.values.tolist()
+    sort_index=sort_index+[cname]
+    final_annotate = final_annotate[sort_index]
+    final_annotate.drop_duplicates().to_csv(outputFile, index=False)
 
 #function to find the lines that starts with #
 def get_row(file):
@@ -55,5 +60,5 @@ def get_row(file):
         skipped.extend(i for i, line in enumerate(csv_file) if line.startswith("#"))
     return skipped
 
-maf_bed_annotate("/Users/ebuehler/Downloads/mount/C-C1V52M-L001-d.DONOR22-TP.vardict.maf", "/Users/ebuehler/Downloads/mount/rmsk_mod.bed",
+maf_bed_annotate("../../in/C-C1V52M-L001-d.DONOR22-TP.vardict.maf", "../../rmsk_mod.bed",
 "complexity", "output.csv")
