@@ -20,14 +20,14 @@ logging.basicConfig(
 
 logger = logging.getLogger("filter")
 
-app = typer.Typer(help="post-processing commands for VarDict version 1.4.6 VCFs.")
+app = typer.Typer(help="post-processing command annotating maf file by bed a bed file.")
 
 
-@app.command("maf_maf")
-def maf_maf(
-    input_maf: Path = typer.Option(
+@app.command("mafbybed")
+def maf_bed(
+    maf: Path = typer.Option(
         ...,
-        "--input_maf",
+        "--maf",
         "-m",
         exists=True,
         file_okay=True,
@@ -35,51 +35,11 @@ def maf_maf(
         writable=False,
         readable=True,
         resolve_path=True,
-        help="Input maf file which needs to be tagged",
+        help="input maf file",
     ),
-    reference_maf: Path = typer.Option(
+    bed: Path = typer.Option(
         ...,
-        "--reference_maf",
-        "-h",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=False,
-        readable=True,
-        resolve_path=True,
-        help="Input maf file which has hotspots",
-    ),
-    output_maf: str = typer.Option(
-        'output_maf',
-        "--output_maf",
-        help="Output maf file name",
-    )
-):
-
-    logger.info("started tagging")
-    # breakpoint()
-    annotated = maf_annotater(input_maf, reference_maf, output_maf).tag_hotspots()
-    return 1
-
-
-@app.command("maf_bed")
-def maf_maf(
-    #TODO Change these to fit bed tagging structure
-    input_maf: Path = typer.Option(
-        ...,
-        "--input_maf",
-        "-m",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=False,
-        readable=True,
-        resolve_path=True,
-        help="Input maf file which needs to be tagged",
-    ),
-    input_bedfile: Path = typer.Option(
-        ...,
-        "--input_bedfile",
+        "--bed",
         "-b",
         exists=True,
         file_okay=True,
@@ -87,30 +47,25 @@ def maf_maf(
         writable=False,
         readable=True,
         resolve_path=True,
-        help="Input Bed file to check for overlap",
+        help="bed file to annotate maf",
     ),
-    input_columnname: Path = typer.Option(
-        ...,
-        "--input_columnname",
+    outputFile: str = typer.Option(
+        'output.csv',
+        '--output',
+        "-o",
+        help="output maf file",
+    ),
+    cname: str = typer.Option(
+        'annotation',
+        '--cname',
         "-c",
-        exists=True,
-        file_okay=True,
-        dir_okay=False,
-        writable=False,
-        readable=True,
-        resolve_path=True,
-        help="Input column name for the output MAF file",
-    ),
-    output_maf: str = typer.Option(
-        'output_maf',
-        "--output_maf",
-        help="Output maf file name",
+        help="name for annotation column",
     )
 ):
 
-    logger.info("tagging based on bed")
-    #TODO your function will be called before returning
-
+    logger.info("starting annotation")
+    typer.secho(f"annotating {maf} with {bed}".format(maf=maf, bed=bed), fg=typer.colors.GREEN)
+    maf_bed_annotate(maf, bed, cname, outputFile)
     return 1
 
 if __name__ == "__main__":

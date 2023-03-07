@@ -4,34 +4,40 @@ import os
 import sys
 import csv 
 import pandas as pd
-from bed_lookup import BedFile
-import tempfile 
+from utils.pybed_intersect import annotater
+import typer
 
-#TODO add functions for maf/bed annotation 
-def maf_bed_annotate(maf, bed,cname,outputFile):
-    cname=cname
-    outputFile=outputFile
-    print('here')
+def maf_bed_annotate(maf,bed,cname,outputFile):
+    """main function for annotation a bed file
+
+    Args:
+        maf (string/path): a valid maf file
+        bed (string/path): a valid bed file
+        cname (string): column name of annotation column
+        outputFile (string): name of output file
+
+    Returns:
+        float: returns zero if annotated maf successfully written
+    """
+    ## input files preprocessing
+    # call the function to remove lines starting with #
     skip = get_row(maf)
+    #read MSF file using Pandas
     maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
-    print("maf")
+    #call the function to remove lines starting with #
     skip = get_row(bed)
-    bed_df = pd.read_csv(bed, sep="\t", skiprows=skip, low_memory=False,header=None)
-    bed_df[0]=bed_df[0].str.replace("chr", "")
-    with tempfile.NamedTemporaryFile(delete=False) as temp:
-        tmpBedName=temp.name + '.bed'
-        bed_df.to_csv(tmpBedName, header=False, index=False,sep="\t")
-        bFile = BedFile(tmpBedName)
-        temp.close()
-    print("bed")
-    maf_df=maf_df.sort_values(by=['Chromosome', 'Start_Position', 'End_Position'])
-    maf_overlap=maf_df
-    maf_overlap[cname]=bFile.lookup_df(maf_df, "Chromosome", "Start_Position")
-    maf_overlap.loc[maf_overlap[cname].notnull(), cname] = "yes"
-    maf_overlap.loc[maf_overlap[cname].notna(), cname] = "yes"
-    maf_overlap.loc[maf_overlap[cname].isnull(), cname] = "no"
-    maf_overlap.loc[maf_overlap[cname].isna(), cname] = "no"
-    maf_overlap.drop_duplicates().to_csv(outputFile, sep="\t", index=False)
+    #assigning column names to BED file
+    bed_names=['Chromosome','Start_Position','End_Position','Comment']
+    #store it as Pandas dataframe
+    bed_df = pd.read_csv(bed, sep="\t", skiprows=skip, low_memory=False,header=None,names=bed_names)
+    #remove the string "chr"
+    bed_df['Chromosome']=bed_df['Chromosome'].str.replace("chr", "")
+    # annotate maf with processed bed file
+    annotated_maf = annotater(maf_df,bed_df,cname)
+    # write to csv
+    typer.secho(f"Writing out maf file to the following location: {outputFile}.csv".format(outputFile=outputFile), fg=typer.colors.GREEN)
+    annotated_maf.to_csv(f"{outputFile}.csv".format(outputFile=outputFile), index=False)
+    return 0
 
 def get_row(file):
     skipped = []
@@ -39,5 +45,5 @@ def get_row(file):
         skipped.extend(i for i, line in enumerate(csv_file) if line.startswith("#"))
     return skipped
 
-maf_bed_annotate("../../in/C-C1V52M-L001-d.DONOR22-TP.vardict.maf", "../../rmsk_mod.bed",
-"complexity", "output.csv")
+# maf_bed_annotate("/Users/ebuehler/Downloads/shared/C-C1V52M-L001-d.DONOR22-TP.vardict.maf", "/Users/ebuehler/Downloads/shared/rmsk_mod.bed",
+# "complexity", "output2.csv")
