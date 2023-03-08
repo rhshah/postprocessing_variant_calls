@@ -6,7 +6,6 @@
 deps-install:  ## install dependencies
 	pip install poetry
 	poetry install 
-	poetry shell
 
 .PHONY: deps-update
 deps-update:
