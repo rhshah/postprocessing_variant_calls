@@ -5,8 +5,8 @@
 .PHONY: deps-install
 deps-install:  ## install dependencies
 	pip install poetry
-	pip install pytest
 	poetry install 
+	poetry shell
 
 .PHONY: deps-update
 deps-update:
