@@ -36,7 +36,7 @@ where path/to/paths.txt is a txt file with maf path locations. See `resources/pa
 maf annotate examples: 
 
 maf annotate examples:
-- `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.maf -o output/path/file -c annotation`
+- `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.bed -o output/path/file -c annotation`
 
 ## How the repo was made
 
