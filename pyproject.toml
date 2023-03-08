@@ -12,7 +12,6 @@ python = ">=3.7"
 typer = {extras = ["all"], version = "*"} # "^0.3"
 PyVCF3 = "*"
 pandas = "*"
-Cython = "*"
 
 [tool.poetry.dev-dependencies]
 flake8 = "*"
