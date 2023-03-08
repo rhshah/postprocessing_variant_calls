@@ -30,6 +30,5 @@ jobs:
             - name: Update test_post_processing Dependencies
               run: |
                   make deps-install
-            - name: Pytest for postprocessing_variant_calls
-              run: |
                   pytest tests
+                  
