@@ -44,6 +44,3 @@ def get_row(file):
     with open(file, "r") as csv_file:
         skipped.extend(i for i, line in enumerate(csv_file) if line.startswith("#"))
     return skipped
-
-# maf_bed_annotate("/Users/ebuehler/Downloads/shared/C-C1V52M-L001-d.DONOR22-TP.vardict.maf", "/Users/ebuehler/Downloads/shared/rmsk_mod.bed",
-# "complexity", "output2.csv")

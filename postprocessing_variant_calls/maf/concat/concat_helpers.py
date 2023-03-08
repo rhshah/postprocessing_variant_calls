@@ -56,7 +56,16 @@ def check_headers(maf, header):
         raise typer.Abort()
     
 def concat_mafs(files, output_maf, header):
-    #TODO appending to empty data frame is slow, we sould make list of frames and flatten
+    """main function for annotation a bed file
+
+    Args:
+        files (List string): a list of strings pointing to maf files 
+        output_maf (string/path): name of output maf 
+        header (List string): the header names by which the mafs will be row-wise concatenated
+
+    Returns:
+        float: returns zero if concatenated maf successfully written
+    """
     maf_list = []
     for maf in files:
         if Path(maf).is_file():
