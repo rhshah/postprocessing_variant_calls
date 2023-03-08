@@ -34,6 +34,8 @@ where header.txt is a header file with names by which the mafs will be row-wise 
 - `pv maf -p path/to/paths.txt -o output/path/file`
 where path/to/paths.txt is a txt file with maf path locations. See `resources/paths.txt` for an example. 
 maf annotate examples: 
+
+maf annotate examples:
 - `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.maf -o output/path/file -c annotation`
 
 ## How the repo was made
