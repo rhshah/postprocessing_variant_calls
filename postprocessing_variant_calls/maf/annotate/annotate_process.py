@@ -18,10 +18,10 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-logger = logging.getLogger("filter")
+logger = logging.getLogger("annotate")
 
 app = typer.Typer(help="post-processing command annotating maf file by bed a bed file.")
-
+# app.add_typer(app, name="annotate", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
 
 @app.command("mafbybed")
 def maf_bed(

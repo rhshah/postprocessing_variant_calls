@@ -6,8 +6,8 @@ from postprocessing_variant_calls.main import app
 
 runner = CliRunner()
 maf_concat_files = [
-        ['maf', 'concat', '-f', 'tests/data/maf/concat/C-1234-L001-d.maf' , 
-        '-f', 'tests/data/maf/concat/C-1234-L002-d.maf', 
+        ['maf', 'concat', '-f', 'tests/data/maf/maf2.maf' , 
+        '-f', 'tests/data/maf/concat/maf1.maf', 
         "-o", "tests/data/maf/concat/output_maf"] 
 
 ]

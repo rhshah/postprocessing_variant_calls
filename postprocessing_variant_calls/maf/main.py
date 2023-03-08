@@ -1,17 +1,14 @@
-#!/usr/bin/env python
-# imports
-from __future__ import division
-import os
-import sys
-import vcf
-import time
+from .annotate import annotate_process
+from .concat import concat_process
+from .concat.concat_helpers import concat_mafs, check_maf, check_txt, process_paths, process_header
+import typer 
 import logging
 from pathlib import Path
 from typing import List, Optional
 import typer
-from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
-from .concat_helpers import concat_mafs, check_maf, check_txt
-
+import logging
+import time
+# setup logger
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     datefmt="%m/%d/%Y %I:%M:%S %p",
@@ -23,10 +20,13 @@ logger = logging.getLogger("concat")
 app = typer.Typer(help="operations for manipulating mafs.")
 
 
+app = typer.Typer()
+# Add Annote App 
+app.add_typer(annotate_process.app, name="annotate", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
+
+# Concat Features: This needs to be in main since we it doesn't have sub-commands
 @app.command("concat")
 def maf_maf(
-    #TODO change args to be relevant to concat
-    # I think this should be a list of mafs?
     files: List[Path] = typer.Option(
         None, 
         "--files",
@@ -42,10 +42,17 @@ def maf_maf(
         callback = check_txt # call back allow us to check input parameters
     ),
     output_maf: Path = typer.Option(
-        "output_maf",
+        "output.maf",
         "--output",
         "-o",
         help="Maf output file name."
+    ),
+    header: Path = typer.Option(
+        "resources/header.txt",
+        "--header",
+        "-h",
+        help="a header file containing the headers for maf file",
+        callback = check_txt
     )
 ):
     logger.info("started concat")
@@ -58,15 +65,15 @@ def maf_maf(
         raise typer.Abort()
     # process our paths txt file 
     if paths:
-        opaths = open(paths, 'r')
-        files = []
-        for line in opaths.readlines():
-            files.append(line.rstrip('\n')[0])
+        files = process_paths(paths)
+    # process our header file
+    if header:
+        header = process_header(header)
     # concat maf files 
     # paths vs files is taken care of at this point
-    concat_mafs(files, output_maf)
+    concat_mafs(files, output_maf, header)
     return 0
-
+    
 
 if __name__ == "__main__":
     app()
