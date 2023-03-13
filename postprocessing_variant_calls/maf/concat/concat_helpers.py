@@ -20,7 +20,7 @@ def process_paths(paths):
 
 def process_header(header):
     file = open(header, 'r')
-    line = file.readline().split(',')
+    line = file.readline().rstrip('\n').split(',')
     file.close
     return line
 
