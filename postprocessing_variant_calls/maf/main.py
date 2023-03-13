@@ -84,7 +84,7 @@ def maf_maf(
     concat_df = concat_mafs(files, output_maf, header)
     # deduplicate 
     if deduplicate:
-        concat_df[de_duplication_columns].unique()
+        concat_df = concat_df[de_duplication_columns].drop_duplicates()
     # write out paths
     concat_df.to_csv(f"{output_maf}.maf", index=False, sep="\t")
     return 0
