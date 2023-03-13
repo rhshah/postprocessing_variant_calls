@@ -6,7 +6,7 @@ import csv
 
 from pathlib import Path
 from typing import List, Optional
-from .resources import acceptable_extensions, possible_maf_columns, minimal_maf_columns
+from .resources import acceptable_extensions, minimal_maf_columns
 import typer
 import pandas as pd
 
@@ -48,10 +48,11 @@ def check_txt(paths: Path):
     return paths
 
 def check_headers(maf, header):
-    if set(header).issubset(set(maf.columns)):
+    columns_set = set(maf.columns)
+    if set(header).issubset(columns_set):
             return maf[header]
     else:
-        typer.secho(f"{maf} is not a subset of {header}. Please provide custom header file if the provided a header file or edit the current header file if you maf uses different columns names", 
+        typer.secho(f"{columns_set} is not a subset of {header}. Please provide custom header file if the provided a header file or edit the current header file if you maf uses different columns names", 
                     fg=typer.colors.RED)
         raise typer.Abort()
     
@@ -72,12 +73,8 @@ def concat_mafs(files, output_maf, header):
             # Read maf file
             typer.secho(f"Reading: {maf}", fg=typer.colors.BRIGHT_GREEN)
             maf_df = pd.read_csv(maf, sep="\t", low_memory=True)
-            # custom header 
-            if header:
-                maf_col_df = check_headers(maf_df, header)
-            # default header
-            else:
-                maf_col_df = check_headers(maf_df, minimal_maf_columns)
+            # header
+            maf_col_df = check_headers(maf_df, header)
             maf_list.append(maf_col_df)
         else:
             typer.secho(f"failed to open {maf}", fg=typer.colors.RED)
@@ -90,5 +87,5 @@ def concat_mafs(files, output_maf, header):
         fg=typer.colors.GREEN,
     )
     # write final df and return 0
-    merged_mafs.to_csv(f"{output_maf}.maf", index=False, sep="\t")
-    return 0
+    return merged_mafs.drop_duplicates()
+    

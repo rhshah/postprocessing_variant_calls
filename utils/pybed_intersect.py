@@ -12,6 +12,7 @@ def annotater(maf_df,bed_df,cname):
     Returns:
         float: returns maf dataframe with added annotated column
     """
+    #TODO break down more
     #sort both the input files
     bed_df=bed_df.sort_values(by=['Chromosome', 'Start_Position', 'End_Position'])
     maf_df=maf_df.sort_values(by=['Chromosome', 'Start_Position', 'End_Position'])

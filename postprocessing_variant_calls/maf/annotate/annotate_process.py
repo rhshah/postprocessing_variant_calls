@@ -10,7 +10,10 @@ from pathlib import Path
 from typing import List, Optional
 import typer
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
-from .annotate_helpers import maf_bed_annotate
+from .annotate_helpers import read_bed, read_maf
+from utils.pybed_intersect import annotater
+import pandas as pd
+
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -62,10 +65,17 @@ def maf_bed(
         help="name for annotation column",
     )
 ):
-
     logger.info("starting annotation")
     typer.secho(f"annotating {maf} with {bed}".format(maf=maf, bed=bed), fg=typer.colors.GREEN)
-    maf_bed_annotate(maf, bed, cname, outputFile)
+    # read bed 
+    bed_df = read_bed(bed)
+    # read maf
+    maf_df = read_maf(maf)
+    # annotate maf with processed bed file
+    annotated_maf = annotater(maf_df,bed_df,cname)
+    # write to csv
+    typer.secho(f"Writing out maf file to the following location: {outputFile}.csv".format(outputFile=outputFile), fg=typer.colors.GREEN)
+    annotated_maf.to_csv(f"{outputFile}.csv".format(outputFile=outputFile), index=False)
     return 1
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ app = typer.Typer()
 app.add_typer(vardict_process.app, name="vardict", help="post-processing commands for VarDict version 1.4.6 VCFs.")
 
 # Add Annote Maf 
-app.add_typer(main.app, name="maf", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
+app.add_typer(main.app, name="maf", help="operations for manipulating maf files based on a given input.")
 
 # Main App
 if __name__ == "__main__":

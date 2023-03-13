@@ -7,6 +7,9 @@ import pandas as pd
 from utils.pybed_intersect import annotater
 import typer
 
+
+# this function is no longer used
+# functionality split up between annoate_process mafbybed and other helpers in this file
 def maf_bed_annotate(maf,bed,cname,outputFile):
     """main function for annotation a bed file
 
@@ -44,3 +47,22 @@ def get_row(file):
     with open(file, "r") as csv_file:
         skipped.extend(i for i, line in enumerate(csv_file) if line.startswith("#"))
     return skipped
+
+def read_bed(bed):
+    #call the function to remove lines starting with #
+    #assigning column names to BED file
+    #store it as Pandas dataframe
+    skip = get_row(bed)
+    #TODO more robust handling for bed column names
+    bed_names=['Chromosome','Start_Position','End_Position','Comment']
+    bed_df = pd.read_csv(bed, sep="\t", skiprows=skip, low_memory=False,header=None,names=bed_names)
+    #remove the string "chr"
+    bed_df['Chromosome']=bed_df['Chromosome'].str.replace("chr", "")
+    return bed_df
+
+def read_maf(maf):
+    # call the function to remove lines starting with #
+    #read MSF file using Pandas
+    skip = get_row(maf)
+    maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
+    return maf_df
