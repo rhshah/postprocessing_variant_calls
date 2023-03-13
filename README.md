@@ -25,6 +25,18 @@ There are various options and input specifications for filtering so see `pv vard
 
 See `example_calls.sh` for more example calls. 
 
+### Maf 
+
+maf concat examples: 
+- `pv maf concat -f path/to/maf1.maf -f path/to/maf2.maf -o output_maf`
+- `pv maf concat -f path/to/maf1.maf -f path/to/maf2.maf -o output_maf -h header.txt`
+where `header.txt` is a header file with names by which the mafs will be row-wise concatenated. See `resources/header.txt` for an example.
+- `pv maf -p path/to/paths.txt -o output/path/file`
+where `path/to/paths.txt` is a txt file with maf path locations. See `resources/paths.txt` for an example. 
+
+maf annotate examples:
+- `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.bed -o output/path/file -c annotation`
+
 ## How the repo was made
 
 Template used: https://github.com/yxtay/python-project-template
