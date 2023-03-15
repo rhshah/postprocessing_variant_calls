@@ -1,0 +1,2 @@
+tests/data/maf/concat/maf1.maf
+tests/data/maf/concat/maf2.maf
