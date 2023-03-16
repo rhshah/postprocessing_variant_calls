@@ -34,5 +34,7 @@ ADD . /app
 RUN apt-get update && apt-get install --no-install-recommends -y gcc g++ zlib1g-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && make deps-install
+    && make deps-install \ 
+    && poetry build \
+    && pip install dist/postprocessing_variant_calls-*-py3-none-any.whl
 
