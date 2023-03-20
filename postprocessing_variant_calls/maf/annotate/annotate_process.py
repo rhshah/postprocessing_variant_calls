@@ -75,7 +75,7 @@ def maf_bed(
     annotated_maf = annotater(maf_df,bed_df,cname)
     # write to csv
     typer.secho(f"Writing out maf file to the following location: {outputFile}.maf".format(outputFile=outputFile), fg=typer.colors.GREEN)
-    annotated_maf.to_csv(f"{outputFile}.maf".format(outputFile=outputFile), index=False)
+    annotated_maf.to_csv(f"{outputFile}.maf".format(outputFile=outputFile), index=False,sep="\t")
     return 1
 
 if __name__ == "__main__":
