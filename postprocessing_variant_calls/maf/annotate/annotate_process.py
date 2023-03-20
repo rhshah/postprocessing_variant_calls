@@ -53,7 +53,7 @@ def maf_bed(
         help="bed file to annotate maf",
     ),
     outputFile: str = typer.Option(
-        'output.csv',
+        'output',
         '--output',
         "-o",
         help="output maf file",
@@ -74,8 +74,8 @@ def maf_bed(
     # annotate maf with processed bed file
     annotated_maf = annotater(maf_df,bed_df,cname)
     # write to csv
-    typer.secho(f"Writing out maf file to the following location: {outputFile}.csv".format(outputFile=outputFile), fg=typer.colors.GREEN)
-    annotated_maf.to_csv(f"{outputFile}.csv".format(outputFile=outputFile), index=False)
+    typer.secho(f"Writing out maf file to the following location: {outputFile}.maf".format(outputFile=outputFile), fg=typer.colors.GREEN)
+    annotated_maf.to_csv(f"{outputFile}.maf".format(outputFile=outputFile), index=False)
     return 1
 
 if __name__ == "__main__":
