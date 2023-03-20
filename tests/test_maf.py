@@ -23,7 +23,7 @@ maf_annotate_maf_by_bed = [
 
 ]
 
-maf_annotate_help_message = 'Usage: root maf annotate mafbybed [OPTIONS]\n\nOptions:\n  -m, --maf FILE     input maf file  [required]\n  -b, --bed FILE     bed file to annotate maf  [required]\n  -o, --output TEXT  output maf file  [default: output.csv]\n  -c, --cname TEXT   name for annotation column  [default: annotation]\n  --help             Show this message and exit.\n'
+maf_annotate_help_message = 'Usage: root maf annotate mafbybed [OPTIONS]\n\nOptions:\n  -m, --maf FILE     input maf file  [required]\n  -b, --bed FILE     bed file to annotate maf  [required]\n  -o, --output TEXT  output maf file  [default: output]\n  -c, --cname TEXT   name for annotation column  [default: annotation]\n  --help             Show this message and exit.\n'
 
 @pytest.mark.parametrize("call", maf_concat_files)
 def test_concat_files(call):
