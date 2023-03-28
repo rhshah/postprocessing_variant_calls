@@ -35,11 +35,11 @@ def annotater(maf_df,bed_df,cname):
                 include_logic = (loc_maf['Start_Position'] >= loc_bed['Start_Position']) and (loc_maf['End_Position'] < loc_bed['End_Position']) 
                 if include_logic:
                     # add comment to bed 
-                    loc_maf[cname] = loc_bed['Comment']
+                    loc_maf[cname] = 'yes'
                     mafdf_dic[k1][idx] = loc_maf
                     found = True 
                 if not include_logic: 
-                    loc_maf[cname] = None 
+                    loc_maf[cname] = 'no' 
                     mafdf_dic[k1][idx] = loc_maf
                 idb = idb + 1 
     # combining annotations back into a single dataframe
