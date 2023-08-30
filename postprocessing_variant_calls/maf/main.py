@@ -128,6 +128,12 @@ def subset_maf(
         "-c",
         help="Name of the column header to be used for sub-setting",
     ),
+    separator: str = typer.Option(
+        "\t",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+    ),
 ):
 
     """
@@ -148,9 +154,10 @@ def subset_maf(
             typer.echo("Identifiers were not provided via command line as well")
             raise typer.Abort()
 
-    maf_df = read_tsv(maf)
+    maf_df = read_tsv(maf, separator)
     ids_to_subset = read_ids(sid, ids)
     subset_maf = filter_by_rows(ids_to_subset, maf_df, col_name)
+    typer.echo(f"Writing to {output_file}")
     subset_maf.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     typer.echo("Done!")
 
