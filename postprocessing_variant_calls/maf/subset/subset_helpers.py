@@ -83,6 +83,14 @@ def get_row(tsv_file):
     with open(tsv_file, "r") as FH:
         skipped.extend(i for i, line in enumerate(FH) if line.startswith("#"))
     return skipped
+def check_separator(separator: str):
+    separator_dict = {"tsv":'\t', "csv":","}
+    if separator in separator_dict.keys():
+        sep = separator_dict[separator]
+    else:
+        typer.secho(f"Separator for delimited file must be 'tsv' or 'csv', not '{separator}'", fg=typer.colors.RED)
+        raise typer.Abort()
+    return sep
 
 if __name__ == "__main__":
     app()

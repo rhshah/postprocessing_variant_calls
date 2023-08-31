@@ -2,7 +2,7 @@ from .annotate import annotate_process
 from .concat import concat_process
 from .concat.concat_helpers import concat_mafs, check_maf, check_txt, process_paths, process_header
 from .concat.resources import de_duplication_columns, minimal_maf_columns
-from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows
+from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
 import typer 
 import logging
 from pathlib import Path
@@ -129,10 +129,11 @@ def subset_maf(
         help="Name of the column header to be used for sub-setting",
     ),
     separator: str = typer.Option(
-        "\t",
+        "tsv",
         "--separator",
         "-sep",
         help="Specify a seperator for delimited data.",
+        callback= check_separator
     ),
 ):
 
@@ -158,7 +159,7 @@ def subset_maf(
     ids_to_subset = read_ids(sid, ids)
     subset_maf = filter_by_rows(ids_to_subset, maf_df, col_name)
     typer.echo(f"Writing to {output_file}")
-    subset_maf.drop_duplicates().to_csv(output_file, sep="\t", index=False)
+    subset_maf.drop_duplicates().to_csv(output_file, sep=",", index=False)
     typer.echo("Done!")
 
 if __name__ == "__main__":
