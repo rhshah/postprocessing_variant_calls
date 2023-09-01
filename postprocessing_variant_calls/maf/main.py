@@ -37,7 +37,7 @@ def maf_maf(
         "--files",
         "-f",
         help="MAF file to concatenate. Maf files are specified here, or using paths parameter.",
-        callback = check_maf # call back allow us to check input parameters
+        # callback = check_maf # call back allow us to check input parameters
     ),
     paths: Path = typer.Option(
         None,
@@ -64,7 +64,14 @@ def maf_maf(
         '--deduplicate',
         "-de",
         help="deduplicate outputted maf file.",
-    )
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback= check_separator
+    ),
 ):
     logger.info("started concat")
     # make sure files or paths was specified
@@ -82,7 +89,7 @@ def maf_maf(
         header = process_header(header)
     # concat maf files 
     # paths vs files is taken care of at this point
-    concat_df = concat_mafs(files, output_maf, header)
+    concat_df = concat_mafs(files, output_maf, header, separator)
     # deduplicate 
     if deduplicate:
         concat_df = concat_df[de_duplication_columns].drop_duplicates()
@@ -159,7 +166,7 @@ def subset_maf(
     ids_to_subset = read_ids(sid, ids)
     subset_maf = filter_by_rows(ids_to_subset, maf_df, col_name)
     typer.echo(f"Writing to {output_file}")
-    subset_maf.drop_duplicates().to_csv(output_file, sep=",", index=False)
+    subset_maf.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     typer.echo("Done!")
 
 if __name__ == "__main__":
