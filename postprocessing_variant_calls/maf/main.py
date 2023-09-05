@@ -94,7 +94,7 @@ def maf_maf(
     if deduplicate:
         concat_df = concat_df[de_duplication_columns].drop_duplicates()
     # write out paths
-    concat_df.to_csv(f"{output_maf}.maf", index=False, sep="\t")
+    concat_df.to_csv(output_maf, index=False, sep="\t")
     return 0
 
 # Add Subset App 
