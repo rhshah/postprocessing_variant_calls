@@ -36,14 +36,14 @@ def maf_maf(
         None, 
         "--files",
         "-f",
-        help="MAF file to concatenate. Maf files are specified here, or using paths parameter.",
-        # callback = check_maf # call back allow us to check input parameters
+        help="MAF file to concatenate. Default assumes MAFs are tsv. MAF inputs are specified here, or using paths parameter",
+        callback = check_maf # call back allow us to check input parameters
     ),
     paths: Path = typer.Option(
         None,
         "--paths",
         "-p",
-        help="A text file containing paths of maf files to concatenate. Maf files are specified here, or using files parameter.",
+        help="A text file containing paths of maf files to concatenate. Default assumes MAFs are tsv. MAF files are specified here, or using files parameter.",
         callback = check_txt # call back allow us to check input parameters
     ),
     output_maf: Path = typer.Option(
