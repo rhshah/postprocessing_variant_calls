@@ -32,7 +32,7 @@ def check_maf(files: List[Path]):
     extensions = [os.path.splitext(f)[1] for f in files]
     for ext in extensions:
         if ext not in acceptable_extensions:
-            typer.secho(f"If using files argument, all files must be mafs.", fg=typer.colors.RED)
+            typer.secho(f"If using files argument, all files must be mafs using the same extension.", fg=typer.colors.RED)
             raise typer.Abort()
     return files
 
@@ -52,11 +52,12 @@ def check_headers(maf, header):
     if set(header).issubset(columns_set):
             return maf[header]
     else:
+        list(set(header) - columns_set)
         typer.secho(f"{columns_set} is not a subset of {header}. Please provide custom header file if the provided a header file or edit the current header file if you maf uses different columns names", 
                     fg=typer.colors.RED)
         raise typer.Abort()
     
-def concat_mafs(files, output_maf, header):
+def concat_mafs(files, output_maf, header, separator):
     """main function for annotation a bed file
 
     Args:
@@ -72,7 +73,7 @@ def concat_mafs(files, output_maf, header):
         if Path(maf).is_file():
             # Read maf file
             typer.secho(f"Reading: {maf}", fg=typer.colors.BRIGHT_GREEN)
-            maf_df = pd.read_csv(maf, sep="\t", low_memory=True)
+            maf_df = pd.read_csv(maf, sep=separator, low_memory=True)
             # header
             maf_col_df = check_headers(maf_df, header)
             maf_list.append(maf_col_df)

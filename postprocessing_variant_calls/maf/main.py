@@ -2,7 +2,7 @@ from .annotate import annotate_process
 from .concat import concat_process
 from .concat.concat_helpers import concat_mafs, check_maf, check_txt, process_paths, process_header
 from .concat.resources import de_duplication_columns, minimal_maf_columns
-from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows
+from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
 import typer 
 import logging
 from pathlib import Path
@@ -36,14 +36,14 @@ def maf_maf(
         None, 
         "--files",
         "-f",
-        help="MAF file to concatenate. Maf files are specified here, or using paths parameter.",
+        help="MAF file to concatenate. Default assumes MAFs are tsv. MAF inputs are specified here, or using paths parameter",
         callback = check_maf # call back allow us to check input parameters
     ),
     paths: Path = typer.Option(
         None,
         "--paths",
         "-p",
-        help="A text file containing paths of maf files to concatenate. Maf files are specified here, or using files parameter.",
+        help="A text file containing paths of maf files to concatenate. Default assumes MAFs are tsv. MAF files are specified here, or using files parameter.",
         callback = check_txt # call back allow us to check input parameters
     ),
     output_maf: Path = typer.Option(
@@ -64,7 +64,14 @@ def maf_maf(
         '--deduplicate',
         "-de",
         help="deduplicate outputted maf file.",
-    )
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback= check_separator
+    ),
 ):
     logger.info("started concat")
     # make sure files or paths was specified
@@ -82,12 +89,12 @@ def maf_maf(
         header = process_header(header)
     # concat maf files 
     # paths vs files is taken care of at this point
-    concat_df = concat_mafs(files, output_maf, header)
+    concat_df = concat_mafs(files, output_maf, header, separator)
     # deduplicate 
     if deduplicate:
         concat_df = concat_df[de_duplication_columns].drop_duplicates()
     # write out paths
-    concat_df.to_csv(f"{output_maf}.maf", index=False, sep="\t")
+    concat_df.to_csv(output_maf, index=False, sep="\t")
     return 0
 
 # Add Subset App 
@@ -128,6 +135,13 @@ def subset_maf(
         "-c",
         help="Name of the column header to be used for sub-setting",
     ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback= check_separator
+    ),
 ):
 
     """
@@ -148,9 +162,10 @@ def subset_maf(
             typer.echo("Identifiers were not provided via command line as well")
             raise typer.Abort()
 
-    maf_df = read_tsv(maf)
+    maf_df = read_tsv(maf, separator)
     ids_to_subset = read_ids(sid, ids)
     subset_maf = filter_by_rows(ids_to_subset, maf_df, col_name)
+    typer.echo(f"Writing to {output_file}")
     subset_maf.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     typer.echo("Done!")
 

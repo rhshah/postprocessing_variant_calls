@@ -5,7 +5,7 @@ import pandas as pd
 
 app = typer.Typer()
 
-def read_tsv(tsv):
+def read_tsv(tsv, separator):
     """Read a tsv file
 
     Args:
@@ -14,9 +14,9 @@ def read_tsv(tsv):
     Returns:
         data_frame: Output a data frame containing the MAF/tsv
     """
-    typer.echo("Read TSV file...")
+    typer.echo("Read Delimited file...")
     skip = get_row(tsv)
-    return pd.read_csv(tsv, sep="\t", skiprows=skip, low_memory=False)
+    return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=False)
 
 
 def read_ids(sid, ids):
@@ -83,6 +83,14 @@ def get_row(tsv_file):
     with open(tsv_file, "r") as FH:
         skipped.extend(i for i, line in enumerate(FH) if line.startswith("#"))
     return skipped
+def check_separator(separator: str):
+    separator_dict = {"tsv":'\t', "csv":","}
+    if separator in separator_dict.keys():
+        sep = separator_dict[separator]
+    else:
+        typer.secho(f"Separator for delimited file must be 'tsv' or 'csv', not '{separator}'", fg=typer.colors.RED)
+        raise typer.Abort()
+    return sep
 
 if __name__ == "__main__":
     app()

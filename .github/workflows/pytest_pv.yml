@@ -3,7 +3,7 @@ on:
     push:
         branches: [main, develop, release/*]
         tags:
-            - '*'
+            - '*.*.*'
         paths-ignore:
             - "docs/**"
             - "**.md"
