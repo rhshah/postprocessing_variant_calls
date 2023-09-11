@@ -4,7 +4,7 @@ import typer
 import pandas as pd
 
 app = typer.Typer()
-
+#TODO need to make this accessible from all locations
 def read_tsv(tsv, separator):
     """Read a tsv file
 

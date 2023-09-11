@@ -36,6 +36,7 @@ where `path/to/paths.txt` is a txt file with maf path locations. See `resources/
 
 maf annotate examples:
 - `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.bed -o output/path/file -c annotation`
+- `pv maf annotate mafbytsv -m /path/to/maf.(tsv/csv/maf) -t path/to/tsv.tsv -sep tsv -oc hotspot -v "Yes" "No"`
 
 ## How the repo was made
 
@@ -64,7 +65,8 @@ conda activate pv_calls
 Then install project dependencies with Poetry.
 
 ```bash
-make deps-install
+cd /path/to/postprocessing_variant_calls
+poetry install .
 ```
 
 #### Updating Environment
@@ -72,7 +74,7 @@ make deps-install
 To update the environment after initial setup up run: 
 
 ```bash
-conda env update -f environment.yml
+poetry shell
 ```
 
 instead of `conda create`, and then re-run `make deps-install`
