@@ -44,21 +44,8 @@ Template used: https://github.com/yxtay/python-project-template
 
 ### Usage
 
-
-#### External dependencies
-
-- [Conda][conda]
 - [Docker][docker]
 - [Make][make]
-
-#### Create environment
-
-Use Conda to create a virtual environment and activate it for the project.
-
-```bash
-conda env create -f environment.yml
-conda activate pv_calls
-```
 
 #### Install dependencies
 
@@ -76,5 +63,3 @@ To update the environment after initial setup up run:
 ```bash
 poetry shell
 ```
-
-instead of `conda create`, and then re-run `make deps-install`

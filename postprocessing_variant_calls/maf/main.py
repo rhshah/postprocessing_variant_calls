@@ -1,5 +1,8 @@
 from .annotate import annotate_process
 from .concat import concat_process
+from postprocessing_variant_calls.maf.helper import MAFFile
+from .tag import tag_process
+from .filter import filter_process
 from .concat.concat_helpers import concat_mafs, check_maf, check_txt, process_paths, process_header
 from .concat.resources import de_duplication_columns, minimal_maf_columns
 from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
@@ -28,6 +31,8 @@ app = typer.Typer()
 
 # Add Annote App 
 app.add_typer(annotate_process.app, name="annotate", help="annotate maf files based on a given input.")
+app.add_typer(tag_process.app, name="tag", help="tag maf files based on a given input.")
+app.add_typer(filter_process.app, name="filter", help="filter maf files based on a given input.")
 
 # Concat Features: This needs to be in main since we it doesn't have sub-commands
 @app.command("concat", help="row-wise concatenation for maf files.")
@@ -168,6 +173,65 @@ def subset_maf(
     typer.echo(f"Writing to {output_file}")
     subset_maf.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     typer.echo("Done!")
+
+@app.command("mergetsv")
+def mergetsv(
+    mafa: Path = typer.Option(
+        None, 
+        "--mafa",
+        "-ma",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to subset",
+    ),
+        mafb: Path = typer.Option(
+        None, 
+        "--mafb",
+        "-mb",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF",
+    ),
+    output_maf: Path = typer.Option(
+        "merged.maf",
+        "--output",
+        "-o",
+        help="Maf output file name."
+    ),
+    id: str = typer.Option(
+        "id",
+        "--merge_id",
+        "-id",
+        help="id to merge mafs on."
+    ),
+    how: str = typer.Option(
+        "left",
+        "--how",
+        "-h",
+        help="Type of merge to be performed on mafs. Defaults to left."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback= check_separator
+    )
+):
+    # prep maf 
+    mafa = MAFFile(mafa, separator)
+    mafb = read_tsv(mafb, separator)
+    maf = mafa.merge(mafb,id,how)
+    maf.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
+    return 0
 
 if __name__ == "__main__":
     app()

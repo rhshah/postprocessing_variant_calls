@@ -54,7 +54,7 @@ def read_tsv(tsv, separator):
     """
     typer.echo("Read Delimited file...")
     skip = get_row(tsv)
-    return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=False)
+    return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=True)
 
 
 def get_row(tsv_file):
@@ -87,8 +87,12 @@ class MAFFile:
         self.file_path = file_path
         self.separator = separator
         self.data_frame = self.read_tsv()
-        self.cols = ["Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"]
+        self.cols = {
+            "general": ["Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"],
+            "germline_status": ["t_alt_count", "t_depth"]
+        }
         self.gen_id()
+
     def read_tsv(self):
         """Read the tsv file and store it in the instance variable 'data_frame'.
 
@@ -97,7 +101,7 @@ class MAFFile:
         """
         typer.echo("Read Delimited file...")
         skip = self.get_row()
-        return pd.read_csv(self.file_path, sep=self.separator, skiprows=skip, low_memory=False)
+        return pd.read_csv(self.file_path, sep=self.separator, skiprows=skip, low_memory=True)
 
     def get_row(self):
         """Function to skip rows
@@ -110,13 +114,29 @@ class MAFFile:
             skipped.extend(i for i, line in enumerate(FH) if line.startswith("#"))
         return skipped
     
+    def merge(self,maf,id,how):
+        maf_df=self.data_frame.merge(maf, on=id, how=how)
+        return maf_df
+    
     def gen_id(self):
         #TODO need to add better controls for values inputs
         #TODO need to check that column can be found in both mafs 
-        self.data_frame['id'] = self.data_frame[self.cols].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
+        self.data_frame['id'] = self.data_frame[self.cols["general"]].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
     
     def annotate_maf_maf(self,maf_df_a,cname,values):
         #TODO need to add better controls for values inputs
         #TODO need to check that column can be found in both mafs 
         self.data_frame[cname] = self.data_frame["id"]=np.where(self.data_frame["id"].isin(maf_df_a["id"]),values[0],values[1])
+        return self.data_frame
+    
+    def tag(self,tagging):
+        cols = self.cols[tagging]
+        if set(cols).issubset(set(self.data_frame.columns.tolist())):
+            if tagging == "germline_status":
+                    self.data_frame['t_alt_freq']= pd.to_numeric((self.data_frame['t_alt_count'])) / pd.to_numeric(self.data_frame['t_depth'])
+                    self.data_frame['germline_status']=np.where((self.data_frame['t_alt_freq']>0.35),'likely_germline',"")
+        else:
+            typer.secho(f"missing columns expected for {tagging} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
+            raise typer.Abort()
+
         return self.data_frame
