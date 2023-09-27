@@ -63,9 +63,6 @@ def germline_status(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-
-
-
 @app.command("common_variant")
 def common_variant(
     maf: Path = typer.Option(
@@ -96,6 +93,109 @@ def common_variant(
 ):
     # prep maf 
     mafa = MAFFile(maf, separator)
+    mafa = mafa.tag("common_variant")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
+    return 0
+
+@app.command("prevalence_in_cosmicDB")
+def prevalence_in_cosmicDB(
+    maf: Path = typer.Option(
+        None, 
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to subset",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf",
+        "--output",
+        "-o",
+        help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback= check_separator
+    )
+):
+    # prep maf 
+    mafa = MAFFile(maf, separator)
+    mafa = mafa.tag("prevalence_in_cosmicDB")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
+    return 0
+
+@app.command("truncating_mut_in_TSG")
+def truncating_mut_in_TSG(
+    maf: Path = typer.Option(
+        None, 
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to subset",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf",
+        "--output",
+        "-o",
+        help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback= check_separator
+    )
+):
+    # prep maf 
+    mafa = MAFFile(maf, separator)
+    mafa = mafa.tag("truncating_mut_in_TSG")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
+    return 0
+
+@app.command("cmo_ch")
+def cmo_ch(
+    maf: Path = typer.Option(
+        None, 
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to subset",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf",
+        "--output",
+        "-o",
+        help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback= check_separator
+    )
+):
+    # prep maf 
+    mafa = MAFFile(maf, separator)
+    mafa = mafa.tag_all("cmo_ch")
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
