@@ -29,7 +29,7 @@ logger = logging.getLogger("annotate")
 app = typer.Typer(help="post-processing command annotating maf file by bed a bed file.")
 # app.add_typer(app, name="annotate", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
 
-@app.command("mafbybed")
+@app.command("mafbybed", help="annotate a maf column by a bed file.")
 def maf_bed(
     maf: Path = typer.Option(
         ...,
@@ -56,7 +56,7 @@ def maf_bed(
         help="bed file to annotate maf",
     ),
     outputFile: str = typer.Option(
-        'output',
+        'output.maf',
         '--output',
         "-o",
         help="output maf file",
@@ -78,15 +78,15 @@ def maf_bed(
     annotated_maf = annotater(maf_df,bed_df,cname)
     # write to csv
     typer.secho(f"Writing out maf file to the following location: {outputFile}.maf".format(outputFile=outputFile), fg=typer.colors.GREEN)
-    annotated_maf.to_csv(f"{outputFile}.maf".format(outputFile=outputFile), index=False,sep="\t")
+    annotated_maf.to_csv(f"{outputFile}".format(outputFile=outputFile), index=False,sep="\t")
     return 1
 
 
 
-@app.command("mafbytsv")
+@app.command("mafbytsv", help = "annotate a maf column by a bed file.")
 def maf_tsv(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -98,7 +98,7 @@ def maf_tsv(
         help="MAF file to subset",
     ),
     tsv: Path = typer.Option(
-        None, 
+        ..., 
         "--tsv",
         "-t",
         exists=True,

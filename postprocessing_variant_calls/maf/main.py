@@ -103,7 +103,7 @@ def maf_maf(
     return 0
 
 # Add Subset App 
-@app.command("subset", help="subset maf files")
+@app.command("subset", help="subset maf files.")
 def subset_maf(
     maf: Path = typer.Option(
         None, 
@@ -174,7 +174,7 @@ def subset_maf(
     subset_maf.drop_duplicates().to_csv(output_file, sep="\t", index=False)
     typer.echo("Done!")
 
-@app.command("mergetsv")
+@app.command("mergetsv", help = "merge a tsv file onto a maf by a shared id column.")
 def mergetsv(
     mafa: Path = typer.Option(
         None, 
