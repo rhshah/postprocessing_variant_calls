@@ -29,7 +29,7 @@ logger = logging.getLogger("filter")
 app = typer.Typer(help="post-processing command filtering maf files")
 # app.add_typer(app, name="annotate", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
 
-@app.command("hotspot")
+@app.command("hotspot", help="help text")
 def hotspot(
     maf: Path = typer.Option(
         ..., 
@@ -64,7 +64,7 @@ def hotspot(
     return 0
 
 
-@app.command("non_hotspot")
+@app.command("non_hotspot", help="help text")
 def non_hotspot(
     maf: Path = typer.Option(
         ..., 
@@ -98,7 +98,7 @@ def non_hotspot(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("not_complex")
+@app.command("not_complex", help="help text")
 def not_complex(
     maf: Path = typer.Option(
         ..., 
@@ -132,7 +132,7 @@ def not_complex(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("mappable")
+@app.command("mappable", help="help text")
 def mappable(
     maf: Path = typer.Option(
         ..., 
@@ -166,7 +166,7 @@ def mappable(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("non_common_variant")
+@app.command("non_common_variant", help="help text")
 def non_common_variant(
     maf: Path = typer.Option(
         ..., 
@@ -200,7 +200,7 @@ def non_common_variant(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("cmo_ch")
+@app.command("cmo_ch", help="help text")
 def cmo_ch(
     maf: Path = typer.Option(
         ..., 

@@ -29,7 +29,7 @@ logger = logging.getLogger("tag")
 app = typer.Typer(help="post-processing command tagging maf files")
 # app.add_typer(app, name="annotate", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
 
-@app.command("germline_status")
+@app.command("germline_status", help="help text")
 def germline_status(
     maf: Path = typer.Option(
         ..., 
@@ -63,7 +63,7 @@ def germline_status(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("common_variant")
+@app.command("common_variant", help="help text")
 def common_variant(
     maf: Path = typer.Option(
         ..., 
@@ -97,7 +97,7 @@ def common_variant(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("prevalence_in_cosmicDB")
+@app.command("prevalence_in_cosmicDB", help="help text")
 def prevalence_in_cosmicDB(
     maf: Path = typer.Option(
         ..., 
@@ -131,7 +131,7 @@ def prevalence_in_cosmicDB(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("truncating_mut_in_TSG")
+@app.command("truncating_mut_in_TSG", help="help text")
 def truncating_mut_in_TSG(
     maf: Path = typer.Option(
         ..., 
@@ -165,7 +165,7 @@ def truncating_mut_in_TSG(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("cmo_ch")
+@app.command("cmo_ch", help="help text")
 def cmo_ch(
     maf: Path = typer.Option(
         ..., 
