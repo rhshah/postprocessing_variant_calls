@@ -1,4 +1,4 @@
-### VarDictJava
+### MAF
 
 The sub-command `pv maf` allows users to perform post-processing on maf files. It has has six sub-commands: `annotate`, `concat`, `filter`, `mergetsv`, `subset`, `tag`. 
 
