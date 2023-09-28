@@ -38,14 +38,29 @@ maf annotate examples:
 - `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.bed -o output/path/file -c annotation`
 - `pv maf annotate mafbytsv -m /path/to/maf.(tsv/csv/maf) -t path/to/tsv.tsv -sep tsv -oc hotspot -v "Yes" "No"`
 
+
+maf tag examples: 
+- `pv maf tag cmoch -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag common_variant -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag germline_status -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag prevalence_in_cosmicDB -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag truncating_mut_in_TSG -m path/to/maf.maf -o output/path/file -sep "tsv"`
+
+maf filter examples:
+- `pv maf filter cmo_ch -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter hotspot -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter mappable -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter non_common_variant -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter non_hotspot -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter not_complex -m path/to/maf.maf -o output/path/file -sep "tsv"`
+
 ## How the repo was made
 
 Template used: https://github.com/yxtay/python-project-template
 
 ### Usage
 
-- [Docker][docker]
-- [Make][make]
+- [Poetry][poetry]
 
 #### Install dependencies
 

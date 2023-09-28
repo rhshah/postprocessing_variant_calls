@@ -32,7 +32,7 @@ app = typer.Typer(help="post-processing command tagging maf files")
 @app.command("germline_status")
 def germline_status(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -66,7 +66,7 @@ def germline_status(
 @app.command("common_variant")
 def common_variant(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -100,7 +100,7 @@ def common_variant(
 @app.command("prevalence_in_cosmicDB")
 def prevalence_in_cosmicDB(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -134,7 +134,7 @@ def prevalence_in_cosmicDB(
 @app.command("truncating_mut_in_TSG")
 def truncating_mut_in_TSG(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -168,7 +168,7 @@ def truncating_mut_in_TSG(
 @app.command("cmo_ch")
 def cmo_ch(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,

@@ -32,7 +32,7 @@ app = typer.Typer(help="post-processing command filtering maf files")
 @app.command("hotspot")
 def hotspot(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -67,7 +67,7 @@ def hotspot(
 @app.command("non_hotspot")
 def non_hotspot(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -101,7 +101,7 @@ def non_hotspot(
 @app.command("not_complex")
 def not_complex(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -135,7 +135,7 @@ def not_complex(
 @app.command("mappable")
 def mappable(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -169,7 +169,7 @@ def mappable(
 @app.command("non_common_variant")
 def non_common_variant(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
@@ -203,7 +203,7 @@ def non_common_variant(
 @app.command("cmo_ch")
 def cmo_ch(
     maf: Path = typer.Option(
-        None, 
+        ..., 
         "--maf",
         "-m",
         exists=True,
