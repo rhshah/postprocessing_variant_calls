@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'postprocessing variant calls'
-copyright = '2023, Eric Buehler, Karthigayini Sivaprakasam, Ronka Shah'
-author = 'Eric Buehler, Karthigayini Sivaprakasam, Ronka Shah'
+copyright = '2023, Eric Buehler, Karthigayini Sivaprakasam, Ronak Shah'
+author = 'Eric Buehler, Karthigayini Sivaprakasam, Ronak Shah'
 
 # The full version, including alpha/beta/rc tags
 release = '0.2.2'
@@ -31,6 +31,7 @@ release = '0.2.2'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
