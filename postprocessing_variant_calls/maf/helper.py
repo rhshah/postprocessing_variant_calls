@@ -105,6 +105,9 @@ class MAFFile:
     def read_tsv(self):
         """Read the tsv file and store it in the instance variable 'data_frame'.
 
+        Args: 
+            self
+
         Returns:
             pd.DataFrame: Output a data frame containing the MAF/tsv
         """
