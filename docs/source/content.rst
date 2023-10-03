@@ -3,6 +3,6 @@ API
 
 .. autosummary::
    :toctree: _autosummary
-   :recursive:
 
-   postprocessing_variant_calls
+   postprocessing_variant_calls.maf.helper
+   postprocessing_variant_calls.maf.main
