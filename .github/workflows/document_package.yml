@@ -1,7 +1,7 @@
 name: Document package 
 on:
     push:
-        branches: "*" #[main, develop, release/*]
+        branches: "feature/docs_cleanup" #[main, develop, release/*]
     pull_request:
         branches: "*"
 jobs:
