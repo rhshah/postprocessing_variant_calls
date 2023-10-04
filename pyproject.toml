@@ -21,7 +21,7 @@ numpy = "*"
 [tool.poetry.dev-dependencies]
 flake8 = "*"
 pytest = "*"
-typing-extensions = "*"
+typer-cli = "*"
 
 [tool.poetry.scripts]
 pv = "postprocessing_variant_calls.main:app"
