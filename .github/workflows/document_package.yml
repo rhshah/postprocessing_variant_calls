@@ -22,7 +22,7 @@ jobs:
             - name: Document and write to folder
               run: |
                   make deps-install
-                  typer postprocessing_variant_calls.main utils docs > docs/CLI.md
+                  poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
 
 
 
