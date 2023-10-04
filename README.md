@@ -78,3 +78,5 @@ To update the environment after initial setup up run:
 ```bash
 poetry shell
 ```
+# TO document:
+`typer postprocessing_variant_calls.maf.main utils docs`
