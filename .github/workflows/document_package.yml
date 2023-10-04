@@ -1,0 +1,33 @@
+name: Document package 
+on:
+    push:
+        branches: "*" #[main, develop, release/*]
+        tags:
+            - '*.*.*'
+        paths-ignore:
+            - "docs/**"
+            - "**.md"
+    pull_request:
+        branches: "*"
+jobs:
+    run_test_vardict_filter:
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.7, 3.8, 3.9]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Python 
+              uses: actions/setup-python@v3
+              with:
+                  python-version: ${{ matrix.python-version }}
+            - name: Document and write to folder
+              run: |
+                  make deps-install
+                  typer postprocessing_variant_calls.main utils docs > docs/CLI.md
+
+
+
