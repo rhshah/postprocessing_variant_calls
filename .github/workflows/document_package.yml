@@ -23,6 +23,12 @@ jobs:
               run: |
                   make deps-install
                   poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
+            - name: Commit and Push Docs
+              run: |
+                    git config --local user.name "buehlere"
+                    git add ./docs
+                    git commit -m "Updating the repository GitHub MD documentation in the docs folder"
+                    git push
 
 
 
