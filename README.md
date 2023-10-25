@@ -25,7 +25,7 @@ There are various options and input specifications for filtering so see `pv vard
 
 See `example_calls.sh` for more example calls. 
 
-### Maf 
+### Maf Methods
 
 maf concat examples: 
 - `pv maf concat -f path/to/maf1.maf -f path/to/maf2.maf -o output_maf`
