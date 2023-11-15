@@ -29,7 +29,7 @@ logger = logging.getLogger("filter")
 app = typer.Typer(help="post-processing command filtering maf files")
 # app.add_typer(app, name="annotate", help="annotate maf files based on a given input. Currently supports bed and maf files as references.")
 
-@app.command("hotspot", help="help text")
+@app.command("hotspot", help="filter a MAF file based on the presence of Hotspot variants")
 def hotspot(
     maf: Path = typer.Option(
         ..., 
@@ -64,7 +64,7 @@ def hotspot(
     return 0
 
 
-@app.command("non_hotspot", help="help text")
+@app.command("non_hotspot", help="filter a MAF file based on the presence of Hotspot variants")
 def non_hotspot(
     maf: Path = typer.Option(
         ..., 
@@ -98,7 +98,7 @@ def non_hotspot(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("not_complex", help="help text")
+@app.command("not_complex", help="Filter a MAF filter for complex variants and retain only simple variants")
 def not_complex(
     maf: Path = typer.Option(
         ..., 
@@ -132,7 +132,7 @@ def not_complex(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("mappable", help="help text")
+@app.command("mappable", help="Filter a MAF file to retain only mappable variants")
 def mappable(
     maf: Path = typer.Option(
         ..., 
@@ -166,7 +166,7 @@ def mappable(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("non_common_variant", help="help text")
+@app.command("non_common_variant", help="Filter a MAF file for common variants and retain only uncommo variants")
 def non_common_variant(
     maf: Path = typer.Option(
         ..., 
@@ -200,7 +200,7 @@ def non_common_variant(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
-@app.command("cmo_ch", help="help text")
+@app.command("cmo_ch", help="Filter a MAF file based on all the parameters")
 def cmo_ch(
     maf: Path = typer.Option(
         ..., 
