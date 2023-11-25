@@ -206,12 +206,13 @@ class MAFFile:
         cols = self.cols[filter]
         if set(cols).issubset(set(self.data_frame.columns.tolist())):
             if filter == "cmo_ch":
+                breakpoint()
                 self.filter("hotspot")
                 self.filter("non_hotspot")
                 self.filter("not_complex")
                 self.filter("mappable")
                 self.filter("non_common_variant")
             else:
-                typer.secho(f"missing columns expected for {tagging} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
+                typer.secho(f"missing columns expected for {filter} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
                 raise typer.Abort()
         return self.data_frame
