@@ -98,7 +98,8 @@ class MAFFile:
             "non_hotspot": ["t_alt_count","hotspot"],
             "not_complex": ["complexity"],
             "mappable": ["mappability"],
-            "non_common_variant" :["common_variant"]
+            "non_common_variant" :["common_variant"],
+            "cmo_ch": ["t_alt_count", "t_depth","gnomAD_AF","CNT","Consequence","Variant_Classification","Hugo_Symbol"]
         }
         self.gen_id()
         self.tsg_genes = tsg_genes
