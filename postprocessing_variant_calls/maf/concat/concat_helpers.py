@@ -20,7 +20,7 @@ def process_paths(paths):
 
 def process_header(header):
     file = open(header, 'r')
-    line = file.readline().rstrip('\n').split(',')
+    line = set(file.readline().rstrip('\n').split(','))
     file.close
     return line
 
@@ -49,11 +49,11 @@ def check_txt(paths: Path):
 
 def check_headers(maf, header):
     columns_set = set(maf.columns)
-    if set(header).issubset(columns_set):
-            return maf[header]
+    if minimal_maf_columns.issubset(header):
+            return maf
     else:
-        list(set(header) - columns_set)
-        typer.secho(f"{columns_set} is not a subset of {header}. Please provide custom header file if the provided a header file or edit the current header file if you maf uses different columns names", 
+        diff = minimal_maf_columns.difference(header)
+        typer.secho(f"{diff} is missing from the header file. Header must be a superset of: {minimal_maf_columns} ", 
                     fg=typer.colors.RED)
         raise typer.Abort()
     
@@ -83,6 +83,7 @@ def concat_mafs(files, output_maf, header, separator):
         
     # merge mafs
     merged_mafs = pd.concat(maf_list, axis=0, ignore_index=True)
+    merged_mafs = merged_mafs[list(header)]
     typer.secho(
         f"Done processing the concatenation of maf files writing output to: {output_maf}",
         fg=typer.colors.GREEN,
