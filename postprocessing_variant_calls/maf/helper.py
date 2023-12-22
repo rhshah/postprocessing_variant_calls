@@ -76,7 +76,7 @@ def get_row(tsv_file):
 def gen_id_tsv(df):
     cols = set(["Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"])
     if cols.issubset(set(df.columns.tolist())):
-        df['id'] = df[cols].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
+        df['id'] = df[list(cols)].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
     else:
         typer.secho(f"tsv file must include {cols} columns to generate an id for annotating the input maf.", fg=typer.colors.RED)
         raise typer.Abort()
