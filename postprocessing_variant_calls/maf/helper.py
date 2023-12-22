@@ -141,7 +141,7 @@ class MAFFile:
     def annotate_maf_maf(self,maf_df_a,cname,values):
         #TODO need to add better controls for values inputs
         #TODO need to check that column can be found in both mafs 
-        self.data_frame[cname] = self.data_frame["id"]=np.where(self.data_frame["id"].isin(maf_df_a["id"]),values[0],values[1])
+        self.data_frame[cname] = np.where(self.data_frame["id"].isin(maf_df_a["id"]),values[0],values[1])
         return self.data_frame
     
     def tag(self,tagging):
