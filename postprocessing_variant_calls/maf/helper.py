@@ -136,7 +136,12 @@ class MAFFile:
     def gen_id(self):
         #TODO need to add better controls for values inputs
         #TODO need to check that column can be found in both mafs 
-        self.data_frame['id'] = self.data_frame[self.cols["general"]].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
+        cols = set(["Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"])
+        if cols.issubset(set(self.data_frame.columns.tolist())):
+            self.data_frame['id'] = self.data_frame[list(cols)].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
+        else:
+            typer.secho(f"maf file must include {cols} columns to generate an id for annotating the input maf.", fg=typer.colors.RED)
+            raise typer.Abort()
     
     def annotate_maf_maf(self,maf_df_a,cname,values):
         #TODO need to add better controls for values inputs
