@@ -62,6 +62,10 @@ Template used: https://github.com/yxtay/python-project-template
 
 - [Poetry][poetry]
 
+```
+pip install poetry
+```
+
 #### Install dependencies
 
 Then install project dependencies with Poetry.
