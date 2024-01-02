@@ -99,8 +99,11 @@ class MAFFile:
             "not_complex": ["complexity"],
             "mappable": ["mappability"],
             "non_common_variant" :["common_variant"],
-            "cmo_ch": ["t_alt_count", "t_depth","gnomAD_AF","CNT","Consequence","Variant_Classification","Hugo_Symbol",
-            "t_alt_count","hotspot","t_alt_count","complexity","mappability","common_variant",
+            "cmo_ch_tag": ["t_alt_count", "t_depth","gnomAD_AF","CNT","Consequence","Variant_Classification","Hugo_Symbol",
+            "t_alt_count","hotspot","t_alt_count","complexity","mappability",
+            "Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"],
+            "cmo_ch_filter": ["t_alt_count", "t_depth","gnomAD_AF","Consequence","Variant_Classification","Hugo_Symbol",
+            "t_alt_count","hotspot","t_alt_count","complexity","mappability",
             "Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"]
         }
         self.gen_id()
@@ -175,14 +178,14 @@ class MAFFile:
     def tag_all(self,tagging):
         cols = self.cols[tagging]
         if set(cols).issubset(set(self.data_frame.columns.tolist())):
-            if tagging == "cmo_ch":
+            if tagging == "cmo_ch_tag":
                 self.tag("germline_status")
                 self.tag("common_variant")
                 self.tag("prevalence_in_cosmicDB")
                 self.tag("truncating_mut_in_TSG")
-            else:
-                typer.secho(f"missing columns expected for {tagging} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
-                raise typer.Abort()
+        else:
+            typer.secho(f"missing columns expected for {tagging} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
+            raise typer.Abort()
         return self.data_frame
     
     def filter(self,filter):
@@ -202,21 +205,11 @@ class MAFFile:
                 self.data_frame=self.data_frame[self.data_frame['mappability']=="no"]
             if filter == "non_common_variant":
                 self.data_frame=self.data_frame[self.data_frame['common_variant']=="no"]
+            if filter == "cmo_ch_filter":
+                self.data_frame['retain']=np.where((((self.data_frame['hotspot']=="yes") & (self.data_frame['t_alt_count']>=3)) | ((self.data_frame['hotspot']=="no") & (self.data_frame['t_alt_count']>=5))),"yes","no") 
+                self.data_frame=self.data_frame[((self.data_frame['common_variant']=="yes")  & (self.data_frame['mappability']=="no") & (self.data_frame['complexity']=="no") & (self.data_frame['retain']=="yes"))]
         else:
             typer.secho(f"missing columns expected for {filter} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
             raise typer.Abort()
         return self.data_frame
 
-    def filter_all(self,filter):
-        cols = self.cols[filter]
-        if set(cols).issubset(set(self.data_frame.columns.tolist())):
-            if filter == "cmo_ch":
-                self.filter("hotspot")
-                self.filter("non_hotspot")
-                self.filter("not_complex")
-                self.filter("mappable")
-                self.filter("non_common_variant")
-            else:
-                typer.secho(f"missing columns expected for {filter} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
-                raise typer.Abort()
-        return self.data_frame

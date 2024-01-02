@@ -230,7 +230,7 @@ def cmo_ch(
 ):
     # prep maf 
     mafa = MAFFile(maf, separator)
-    mafa = mafa.filter_all("cmo_ch")
+    mafa = mafa.filter("cmo_ch_filter")
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 
