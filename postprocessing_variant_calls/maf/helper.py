@@ -160,7 +160,7 @@ class MAFFile:
                     self.data_frame['common_variant']=np.where((self.data_frame['gnomAD_AF']>0.05),'yes','no')
             if tagging == "prevalence_in_cosmicDB":
                     self.data_frame['prevalence_in_cosmicDB']= self.data_frame['CNT'].apply(lambda x: int(x.split(",")[0]) if pd.notnull(x) else x)
-                    self.data_frame('CNT', axis=1, inplace=True)
+                    self.data_frame.drop(['CNT'], axis=1, inplace=True)
             if tagging == "truncating_mut_in_TSG":
                     self.data_frame['truncating_mutation']=np.where((self.data_frame['Consequence'].str.contains("stop_gained")) | (self.data_frame['Variant_Classification']=="Frame_Shift_Ins") | 
         (self.data_frame['Variant_Classification']=="Nonsense_Mutation") | (self.data_frame['Variant_Classification']=="Splice_Site") | (self.data_frame['Variant_Classification']=="Frame_Shift_Del") |
@@ -202,16 +202,15 @@ class MAFFile:
                 self.data_frame=self.data_frame[self.data_frame['mappability']=="no"]
             if filter == "non_common_variant":
                 self.data_frame=self.data_frame[self.data_frame['common_variant']=="no"]
-            else:
-                typer.secho(f"missing columns expected for {filter} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
-                raise typer.Abort()
+        else:
+            typer.secho(f"missing columns expected for {filter} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
+            raise typer.Abort()
         return self.data_frame
 
     def filter_all(self,filter):
         cols = self.cols[filter]
         if set(cols).issubset(set(self.data_frame.columns.tolist())):
             if filter == "cmo_ch":
-                breakpoint()
                 self.filter("hotspot")
                 self.filter("non_hotspot")
                 self.filter("not_complex")
