@@ -20,11 +20,12 @@ jobs:
             - name: Document CLI and write to folder
               run: |
                     make deps-install
-                    poetry run typer postprocessing_variant_calls.main utils docs > CLI.md
+                    poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
             - name: Commit and Push Docs
               run: |
                     git config --local user.name "buehlere"
                     git config --global user.email "buehlere77@gmail.com"
-                    git add CLI.md
+                    git checkout main 
+                    git add docs/CLI.md
                     git commit -m "Updating the repository GitHub CLI documentation"
-                    git push origin origin/docs
+                    git push origin main
