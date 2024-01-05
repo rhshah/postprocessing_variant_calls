@@ -28,4 +28,4 @@ jobs:
                     git config --global user.email 'buehlere77@gmail.com'
                     git add ./docs
                     git commit -m "Updating the repository GitHub MD documentation in the docs folder"
-                    git push origin $GITHUB_REF
+                    git push origin "HEAD:refs/pull/${{ github.event.number }}/merge"
