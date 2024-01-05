@@ -27,4 +27,4 @@ jobs:
                     git config --global user.email "buehlere77@gmail.com"
                     git add CLI.md
                     git commit -m "Updating the repository GitHub CLI documentation"
-                    git push origin docs
+                    git push origin origin/docs
