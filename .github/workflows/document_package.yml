@@ -24,6 +24,6 @@ jobs:
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
             - uses: EndBug/add-and-commit@v4
               with:
-                ref: ${{ github.head_ref }}
-                env:
+                    ref: ${{ github.head_ref }}
+              env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
