@@ -1,0 +1,28 @@
+name: Document package 
+on:
+    push:
+        branches: [main, feature/mafbymaf] #[main, develop, release/*]
+jobs:
+    run_test_vardict_filter:
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: [3.8, 3.9, 3.10]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Python 
+              uses: actions/setup-python@v3
+              with:
+                  python-version: ${{ matrix.python-version }}
+            - name: Document CLI and write to folder
+              run: |
+                    make deps-install
+                    poetry run typer postprocessing_variant_calls.main utils docs > CLI.md
+            - name: Commit and Push Docs
+              run: |
+                    git add CLI.md
+                    git commit -m "Updating the repository GitHub CLI documentation"
+                    git push origin HEAD:docs
