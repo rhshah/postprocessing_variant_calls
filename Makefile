@@ -7,14 +7,8 @@ deps-install:  ## install dependencies
 	pip install poetry
 	poetry install 
 
-.PHONY: deps-update
-deps-update:
-	pip install poetry
-	poetry lock 
-	poetry export --format requirements.txt --output requirements.txt --without-hashes
-
 requirements.txt: poetry.lock
 	poetry export --format requirements.txt --output requirements.txt --without-hashes
 
 requirements-dev.txt: poetry.lock
-	poetry export --dev --format requirements.txt --output requirements-dev.txt --without-hashes
+	poetry export --with dev --format requirements.txt --output requirements-dev.txt --without-hashes
