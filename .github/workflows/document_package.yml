@@ -2,7 +2,7 @@ name: Document package
 on:
     pull_request:
       branches:
-        - develop
+        - main
 jobs:
     update_cli_doc:
         # The type of runner that the job will run on
@@ -32,4 +32,3 @@ jobs:
                     git add ./docs
                     git commit -m "Updating the repository GitHub MD documentation in the docs folder"
                     git push origin
-                    
