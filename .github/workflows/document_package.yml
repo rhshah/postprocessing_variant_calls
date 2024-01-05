@@ -23,6 +23,7 @@ jobs:
                     poetry run typer postprocessing_variant_calls.main utils docs > CLI.md
             - name: Commit and Push Docs
               run: |
+                    git config --local user.name "buehlere"
                     git add CLI.md
                     git commit -m "Updating the repository GitHub CLI documentation"
                     git push origin HEAD:docs
