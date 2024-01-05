@@ -1,7 +1,8 @@
 name: Document package 
 on:
-    push:
-        branches: [main, feature/mafbymaf] #[main, develop, release/*]
+    pull_request:
+      branches:
+        - develop
 jobs:
     run_test_vardict_filter:
         # The type of runner that the job will run on
@@ -26,5 +27,3 @@ jobs:
                     git config --local user.name "buehlere"
                     git config --global user.email "buehlere77@gmail.com"
                     git add docs/CLI.md
-                    git commit -m "Updating the repository GitHub CLI documentation"
-                    git push origin --force main
