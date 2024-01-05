@@ -68,9 +68,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
-
 # PyBuilder
 target/
 
@@ -145,3 +142,4 @@ tests/data/vardict/two/*
 !tests/data/vardict/two/blank.txt
 postprocessing_variant_calls/annotate/testing.maf
 tests/data/maf/concat/output_maf.maf
+docs/source/_autosummary/*

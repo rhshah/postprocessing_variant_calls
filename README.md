@@ -25,7 +25,7 @@ There are various options and input specifications for filtering so see `pv vard
 
 See `example_calls.sh` for more example calls. 
 
-### Maf 
+### Maf Methods
 
 maf concat examples: 
 - `pv maf concat -f path/to/maf1.maf -f path/to/maf2.maf -o output_maf`
@@ -36,6 +36,23 @@ where `path/to/paths.txt` is a txt file with maf path locations. See `resources/
 
 maf annotate examples:
 - `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.bed -o output/path/file -c annotation`
+- `pv maf annotate mafbytsv -m /path/to/maf.(tsv/csv/maf) -t path/to/tsv.tsv -sep tsv -oc hotspot -v "Yes" "No"`
+
+
+maf tag examples: 
+- `pv maf tag cmoch -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag common_variant -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag germline_status -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag prevalence_in_cosmicDB -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag truncating_mut_in_TSG -m path/to/maf.maf -o output/path/file -sep "tsv"`
+
+maf filter examples:
+- `pv maf filter cmo_ch -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter hotspot -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter mappable -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter non_common_variant -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter non_hotspot -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter not_complex -m path/to/maf.maf -o output/path/file -sep "tsv"`
 
 ## How the repo was made
 
@@ -43,20 +60,10 @@ Template used: https://github.com/yxtay/python-project-template
 
 ### Usage
 
+- [Poetry][poetry]
 
-#### External dependencies
-
-- [Conda][conda]
-- [Docker][docker]
-- [Make][make]
-
-#### Create environment
-
-Use Conda to create a virtual environment and activate it for the project.
-
-```bash
-conda env create -f environment.yml
-conda activate pv_calls
+```
+pip install poetry
 ```
 
 #### Install dependencies
@@ -64,7 +71,8 @@ conda activate pv_calls
 Then install project dependencies with Poetry.
 
 ```bash
-make deps-install
+cd /path/to/postprocessing_variant_calls
+poetry install .
 ```
 
 #### Updating Environment
@@ -72,7 +80,5 @@ make deps-install
 To update the environment after initial setup up run: 
 
 ```bash
-conda env update -f environment.yml
+poetry shell
 ```
-
-instead of `conda create`, and then re-run `make deps-install`

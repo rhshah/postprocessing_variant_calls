@@ -4,6 +4,7 @@ import os
 import sys
 import csv 
 import pandas as pd
+import numpy as np 
 from utils.pybed_intersect import annotater
 import typer
 
@@ -51,7 +52,7 @@ def get_row(file):
 def read_bed(bed):
     #call the function to remove lines starting with #
     #assigning column names to BED file
-    #store it as Pandas dataframe
+    #store it as Pandas dataframe 
     skip = get_row(bed)
     #TODO more robust handling for bed column names
     bed_names=['Chromosome','Start_Position','End_Position','Comment']

@@ -1,0 +1,33 @@
+name: Document package 
+on:
+    pull_request:
+      branches:
+        - develop
+jobs:
+    update_cli_doc:
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ["3.9"]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Python 
+              uses: actions/setup-python@v3
+              with:
+                  python-version: ${{ matrix.python-version }}
+            - name: Document CLI and write to folder
+              run: |
+                    make deps-install
+                    poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
+            - name: Commit Doc Changes
+              run: |
+                    BRANCH_NAME=$(echo "refs/pull/25/merge" | awk -F'/' '{print $3}')
+                    git config --global user.name 'buehlere'
+                    git config --global user.email 'buehlere77@gmail.com'
+                    git checkout -b $BRANCH_NAME
+                    git add ./docs
+                    git commit -m "Updating the repository GitHub MD documentation in the docs folder"
+                    git push origin $BRANCH_NAME
