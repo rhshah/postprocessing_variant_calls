@@ -26,6 +26,7 @@ jobs:
               run: |
                     git config --global user.name 'buehlere'
                     git config --global user.email 'buehlere77@gmail.com'
+                    git checkout ${{ github.head_ref }}
                     git add ./docs
                     git commit -m "Updating the repository GitHub MD documentation in the docs folder"
                     git push origin ${{ github.head_ref }}
