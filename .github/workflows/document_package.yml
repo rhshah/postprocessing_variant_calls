@@ -22,8 +22,3 @@ jobs:
               run: |
                     make deps-install
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
-            - name: Commit and Push Docs
-              run: |
-                    git config --local user.name "buehlere"
-                    git config --global user.email "buehlere77@gmail.com"
-                    git add docs/CLI.md
