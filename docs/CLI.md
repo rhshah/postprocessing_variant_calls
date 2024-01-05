@@ -112,7 +112,7 @@ $ maf concat [OPTIONS]
 * `-f, --files PATH`: MAF file to concatenate. Default assumes MAFs are tsv. MAF inputs are specified here, or using paths parameter
 * `-p, --paths PATH`: A text file containing paths of maf files to concatenate. Default assumes MAFs are tsv. MAF files are specified here, or using files parameter.
 * `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-h, --header PATH`: a header file containing the headers for maf file  [default: /Users/ebuehler/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/postprocessing_variant_calls/postprocessing_variant_calls/maf/../../resources/maf_concat/default_header.txt]
+* `-h, --header PATH`: a header file containing the headers for maf file  [default: /home/runner/work/postprocessing_variant_calls/postprocessing_variant_calls/postprocessing_variant_calls/maf/../../resources/maf_concat/default_header.txt]
 * `-de, --deduplicate`: deduplicate outputted maf file.
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
