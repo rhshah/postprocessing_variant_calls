@@ -24,11 +24,10 @@ jobs:
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
             - name: Commit Doc Changes
               run: |
-                    BRANCH_NAME=$(echo "refs/pull/25/merge" | awk -F'/' '{print $3}')
                     git config --global user.name 'buehlere'
                     git config --global user.email 'buehlere77@gmail.com'
-                    git checkout -b $BRANCH_NAME
+                    git checkout -b ${{ github.ref_name }}
                     git pull
                     git add ./docs
                     git commit -m "Updating the repository GitHub MD documentation in the docs folder"
-                    git push origin $BRANCH_NAME
+                    git push origin ${{ github.ref_name }}
