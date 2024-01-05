@@ -25,8 +25,11 @@ jobs:
               run: |
                     make deps-install
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
-            - uses: EndBug/add-and-commit@v9
-              with:
-                    ref: ${{ github.head_ref }}
-              env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Commit Doc Changes
+              run: |
+                    git config --global user.name 'buehlere'
+                    git config --global user.email 'buehlere77@gmail.com'
+                    git add ./docs
+                    git commit -m "Updating the repository GitHub MD documentation in the docs folder"
+                    git push origin
+                    
