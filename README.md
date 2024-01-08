@@ -36,6 +36,23 @@ where `path/to/paths.txt` is a txt file with maf path locations. See `resources/
 
 maf annotate examples:
 - `pv maf mafbybed -m path/to/maf.maf -b path/to/maf.bed -o output/path/file -c annotation`
+- `pv maf annotate mafbytsv -m /path/to/maf.(tsv/csv/maf) -t path/to/tsv.tsv -sep tsv -oc hotspot -v "Yes" "No"`
+
+
+maf tag examples: 
+- `pv maf tag cmoch -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag common_variant -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag germline_status -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag prevalence_in_cosmicDB -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag truncating_mut_in_TSG -m path/to/maf.maf -o output/path/file -sep "tsv"`
+
+maf filter examples:
+- `pv maf filter cmo_ch -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter hotspot -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter mappable -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter non_common_variant -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter non_hotspot -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf filter not_complex -m path/to/maf.maf -o output/path/file -sep "tsv"`
 
 ## How the repo was made
 
@@ -43,36 +60,28 @@ Template used: https://github.com/yxtay/python-project-template
 
 ### Usage
 
+#### Install External Dependencies
+Have an environment with python >= 3.8 installed. 
 
-#### External dependencies
-
-- [Conda][conda]
-- [Docker][docker]
-- [Make][make]
-
-#### Create environment
-
-Use Conda to create a virtual environment and activate it for the project.
+Install poetry: 
 
 ```bash
-conda env create -f environment.yml
-conda activate pv_calls
+pip install poetry
 ```
 
-#### Install dependencies
+#### Install Package Dependencies
 
 Then install project dependencies with Poetry.
 
 ```bash
-make deps-install
+cd /path/to/postprocessing_variant_calls
+poetry install .
 ```
 
-#### Updating Environment
+#### Accessing Environment
 
-To update the environment after initial setup up run: 
+To access the environment after initial setup up run: 
 
 ```bash
-conda env update -f environment.yml
+poetry shell
 ```
-
-instead of `conda create`, and then re-run `make deps-install`

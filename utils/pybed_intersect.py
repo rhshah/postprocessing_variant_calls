@@ -14,6 +14,8 @@ def annotater(maf_df,bed_df,cname):
     """
     #TODO break down more
     #sort both the input files
+    #TODO handle 0 base case in bedfiles, add a base to bedfile. Maf is 1 based.
+    #TODO Do this with an options over commandline: Start_Position + 1, End_Position + 1 for bedfile
     bed_df=bed_df.sort_values(by=['Chromosome', 'Start_Position', 'End_Position'])
     maf_df=maf_df.sort_values(by=['Chromosome', 'Start_Position', 'End_Position'])
     mafdf_sub=maf_df[['Chromosome', 'Start_Position', 'End_Position','Reference_Allele', 'Tumor_Seq_Allele1', 'Tumor_Seq_Allele2']]

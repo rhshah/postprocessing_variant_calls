@@ -35,4 +35,4 @@ de_duplication_columns = [
                 "HGVSp",
                 "HGVSp_Short",
 ]
-acceptable_extensions = ['.maf', '.txt']
+acceptable_extensions = ['.maf', '.txt', '.csv', 'tsv']
