@@ -74,8 +74,8 @@ def get_row(tsv_file):
 
 
 def gen_id_tsv(df):
-    cols = set(["Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"])
-    if cols.issubset(set(df.columns.tolist())):
+    cols = ["Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"]
+    if set(cols).issubset(set(df.columns.tolist())):
         df['id'] = df[cols].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
     else:
         typer.secho(f"tsv file must include {cols} columns to generate an id for annotating the input maf.", fg=typer.colors.RED)
@@ -99,8 +99,8 @@ class MAFFile:
             "not_complex": ["complexity"],
             "mappable": ["mappability"],
             "non_common_variant" :["common_variant"],
-            "cmo_ch": ["t_alt_count", "t_depth","gnomAD_AF","CNT","Consequence","Variant_Classification","Hugo_Symbol",
-            "t_alt_count","hotspot","t_alt_count","complexity","mappability","common_variant",
+            "cmo_ch_filter": ["t_alt_count", "t_depth","gnomAD_AF","Consequence","Variant_Classification","Hugo_Symbol",
+            "t_alt_count","hotspot","t_alt_count","complexity","mappability",
             "Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"]
         }
         self.gen_id()
@@ -136,12 +136,17 @@ class MAFFile:
     def gen_id(self):
         #TODO need to add better controls for values inputs
         #TODO need to check that column can be found in both mafs 
-        self.data_frame['id'] = self.data_frame[self.cols["general"]].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
+        cols = ["Chromosome","Start_Position","End_Position","Reference_Allele","Tumor_Seq_Allele2"]
+        if set(cols).issubset(set(self.data_frame.columns.tolist())):
+            self.data_frame['id'] = self.data_frame[cols].apply(lambda x: '_'.join(x.replace("-","").astype(str)),axis=1)
+        else:
+            typer.secho(f"maf file must include {cols} columns to generate an id for annotating the input maf.", fg=typer.colors.RED)
+            raise typer.Abort()
     
     def annotate_maf_maf(self,maf_df_a,cname,values):
         #TODO need to add better controls for values inputs
         #TODO need to check that column can be found in both mafs 
-        self.data_frame[cname] = self.data_frame["id"]=np.where(self.data_frame["id"].isin(maf_df_a["id"]),values[0],values[1])
+        self.data_frame[cname] = np.where(self.data_frame["id"].isin(maf_df_a["id"]),values[0],values[1])
         return self.data_frame
     
     def tag(self,tagging):
@@ -155,7 +160,7 @@ class MAFFile:
                     self.data_frame['common_variant']=np.where((self.data_frame['gnomAD_AF']>0.05),'yes','no')
             if tagging == "prevalence_in_cosmicDB":
                     self.data_frame['prevalence_in_cosmicDB']= self.data_frame['CNT'].apply(lambda x: int(x.split(",")[0]) if pd.notnull(x) else x)
-                    self.data_frame('CNT', axis=1, inplace=True)
+                    self.data_frame.drop(['CNT'], axis=1, inplace=True)
             if tagging == "truncating_mut_in_TSG":
                     self.data_frame['truncating_mutation']=np.where((self.data_frame['Consequence'].str.contains("stop_gained")) | (self.data_frame['Variant_Classification']=="Frame_Shift_Ins") | 
         (self.data_frame['Variant_Classification']=="Nonsense_Mutation") | (self.data_frame['Variant_Classification']=="Splice_Site") | (self.data_frame['Variant_Classification']=="Frame_Shift_Del") |
@@ -163,21 +168,16 @@ class MAFFile:
                     self.data_frame['tumor_suppressor_gene']=np.where(self.data_frame['Hugo_Symbol'].isin(self.tsg_genes),"yes","no")
                     self.data_frame['truncating_mut_in_TSG']= np.where(((self.data_frame['tumor_suppressor_gene']=="yes") & (self.data_frame['truncating_mutation']=="yes")),"yes","no")          
         else:
-            typer.secho(f"missing columns expected for {tagging} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
+            typer.secho(f"missing columns expected for {tagging} tagging expects: {set(cols).difference(set(self.data_frame.columns.tolist()))}, which was missing from the input", fg=typer.colors.RED)
             raise typer.Abort()
         return self.data_frame
     
     def tag_all(self,tagging):
-        cols = self.cols[tagging]
-        if set(cols).issubset(set(self.data_frame.columns.tolist())):
-            if tagging == "cmo_ch":
-                self.tag("germline_status")
-                self.tag("common_variant")
-                self.tag("prevalence_in_cosmicDB")
-                self.tag("truncating_mut_in_TSG")
-            else:
-                typer.secho(f"missing columns expected for {tagging} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
-                raise typer.Abort()
+        if tagging == "cmo_ch_tag":
+            self.tag("germline_status")
+            self.tag("common_variant")
+            self.tag("prevalence_in_cosmicDB")
+            self.tag("truncating_mut_in_TSG")
         return self.data_frame
     
     def filter(self,filter):
@@ -197,22 +197,11 @@ class MAFFile:
                 self.data_frame=self.data_frame[self.data_frame['mappability']=="no"]
             if filter == "non_common_variant":
                 self.data_frame=self.data_frame[self.data_frame['common_variant']=="no"]
-            else:
-                typer.secho(f"missing columns expected for {filter} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
-                raise typer.Abort()
+            if filter == "cmo_ch_filter":
+                self.data_frame['retain']=np.where((((self.data_frame['hotspot']=="yes") & (self.data_frame['t_alt_count']>=3)) | ((self.data_frame['hotspot']=="no") & (self.data_frame['t_alt_count']>=5))),"yes","no") 
+                self.data_frame=self.data_frame[((self.data_frame['common_variant']=="yes")  & (self.data_frame['mappability']=="no") & (self.data_frame['complexity']=="no") & (self.data_frame['retain']=="yes"))]
+        else:
+            typer.secho(f"missing columns expected for {filter} filtering expects: {set(cols).difference(set(self.data_frame.columns.tolist()))}, which was missing from the input", fg=typer.colors.RED)
+            raise typer.Abort()
         return self.data_frame
 
-    def filter_all(self,filter):
-        cols = self.cols[filter]
-        if set(cols).issubset(set(self.data_frame.columns.tolist())):
-            if filter == "cmo_ch":
-                breakpoint()
-                self.filter("hotspot")
-                self.filter("non_hotspot")
-                self.filter("not_complex")
-                self.filter("mappable")
-                self.filter("non_common_variant")
-            else:
-                typer.secho(f"missing columns expected for {filter} tagging expect the following columns: {cols}.", fg=typer.colors.RED)
-                raise typer.Abort()
-        return self.data_frame

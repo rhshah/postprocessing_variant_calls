@@ -195,7 +195,7 @@ def cmo_ch(
 ):
     # prep maf 
     mafa = MAFFile(maf, separator)
-    mafa = mafa.tag_all("cmo_ch")
+    mafa = mafa.tag_all("cmo_ch_tag")
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False,sep="\t")
     return 0
 

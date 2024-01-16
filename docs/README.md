@@ -60,9 +60,16 @@ Template used: https://github.com/yxtay/python-project-template
 
 ### Usage
 
-- [Poetry][poetry]
+#### Install External Dependencies
+Have an environment with python >= 3.8 installed. 
 
-#### Install dependencies
+Install poetry: 
+
+```bash
+pip install poetry
+```
+
+#### Install Package Dependencies
 
 Then install project dependencies with Poetry.
 
@@ -71,10 +78,12 @@ cd /path/to/postprocessing_variant_calls
 poetry install .
 ```
 
-#### Updating Environment
+#### Accessing Environment
 
-To update the environment after initial setup up run: 
+To access the environment after initial setup up run: 
 
 ```bash
 poetry shell
 ```
+
+
