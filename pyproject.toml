@@ -10,6 +10,7 @@ packages = [
     { include = "utils" },
     { include = "postprocessing_variant_calls" }
 ]
+include = ["resource/resource.txt"]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
