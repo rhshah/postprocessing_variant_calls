@@ -15,6 +15,7 @@ import typer
 import logging
 import time
 import os 
+import pkg_resources
 # dir path 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -59,7 +60,7 @@ def maf_maf(
         help="Maf output file name."
     ),
     header: Path = typer.Option(
-       "resources/maf_concat/default_header.txt", 
+        pkg_resources.resource_filename(__name__, '../resources/maf_concat/default_header.txt'), 
         "--header",
         "-h",
         help="a header file containing the headers for maf file",

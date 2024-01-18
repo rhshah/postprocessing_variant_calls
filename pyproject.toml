@@ -28,4 +28,5 @@ typer-cli = "*"
 pv = "postprocessing_variant_calls.main:app"
 
 [build-system]
+requires = ["poetry>=1.0.0"]
 build-backend = "poetry.masonry.api"
