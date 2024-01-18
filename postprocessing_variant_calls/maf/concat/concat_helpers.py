@@ -20,7 +20,7 @@ def process_paths(paths):
 
 def process_header(header):
     file = open(header, 'r')
-    line = set(file.readline().rstrip('\n').split(','))
+    line = file.readline().rstrip('\n').split(',')
     file.close
     return line
 
@@ -49,10 +49,10 @@ def check_txt(paths: Path):
 
 def check_headers(maf, header):
     columns_set = set(maf.columns)
-    if minimal_maf_columns.issubset(header):
+    if set(minimal_maf_columns).issubset(set(header)):
             return maf
     else:
-        diff = minimal_maf_columns.difference(header)
+        diff = set(minimal_maf_columns).difference(set(header))
         typer.secho(f"{diff} is missing from the header file. Header must be a superset of: {minimal_maf_columns} ", 
                     fg=typer.colors.RED)
         raise typer.Abort()

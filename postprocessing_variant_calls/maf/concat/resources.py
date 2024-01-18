@@ -22,7 +22,7 @@
 #                 "n_alt_count",
 # ]
 
-minimal_maf_columns = {
+minimal_maf_columns = [
                 "Hugo_Symbol", 
                 "Chromosome", 
                 "Start_Position", 
@@ -33,7 +33,7 @@ minimal_maf_columns = {
                 "Variant_Type", 
                 "Tumor_Sample_Barcode", 
                 "Matched_Norm_Sample_Barcode"
-}
+]
 
 de_duplication_columns = [
                 "Hugo_Symbol", 
