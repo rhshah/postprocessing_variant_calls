@@ -10,6 +10,7 @@ packages = [
     { include = "utils" },
     { include = "postprocessing_variant_calls" }
 ]
+include = ["resource/resource.txt"]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
@@ -27,4 +28,5 @@ typer-cli = "*"
 pv = "postprocessing_variant_calls.main:app"
 
 [build-system]
+requires = ["poetry>=1.0.0"]
 build-backend = "poetry.masonry.api"

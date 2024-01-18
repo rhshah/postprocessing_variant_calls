@@ -7,6 +7,7 @@ from .concat.concat_helpers import concat_mafs, check_maf, check_txt, process_pa
 from .concat.resources import de_duplication_columns, minimal_maf_columns
 from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
 import typer 
+from importlib import resources
 import logging
 from pathlib import Path
 from typing import List, Optional
@@ -14,6 +15,7 @@ import typer
 import logging
 import time
 import os 
+import pkg_resources
 # dir path 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -58,7 +60,7 @@ def maf_maf(
         help="Maf output file name."
     ),
     header: Path = typer.Option(
-        os.path.join(dir_path, "../../resources/maf_concat/default_header.txt"),
+        pkg_resources.resource_filename(__name__, '../resources/maf_concat/default_header.txt'), 
         "--header",
         "-h",
         help="a header file containing the headers for maf file",
