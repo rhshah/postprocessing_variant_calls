@@ -158,9 +158,42 @@ class mutect_sample:
             tad = int(row.loc['t_alt_count'])
             nrd = int(row.loc['n_ref_count'])
             nad = int(row.loc['n_alt_count'])
+            judgement = row.loc['judgement']
+            failure_reason = row.loc['failure_reasons']
 
             tdp,tvf = _tumor_variant_calculation()
             ndp,ndf = _normal_variant_calculation()
+            nvfRF = _tvf_threshold_calculation()
+
+            # This will help in filtering VCF
+            key_for_tracking = str(chr) + ':' + str(pos) + ':' + str(ref_allele) + ':' + str(alt_allele)
+
+            if judgement != 'KEEP':
+                # Check the failure reasons to determine if we should still consider this variant
+                failure_tags = failure_reason.split(',')
+                tag_count = 0
+                for tag in failure_tags:
+                    if tag in ACCEPTED_TAGS:
+                        tag_count += 1
+                # All failure_reasons should be found in accepted tags to continue
+                if tag_count != len(failure_tags):
+                    continue
+            else:
+                failure_reason = 'KEEP'
+
+            if tvf > nvfRF:
+                if (tdp >= int(args.dp)) & (tad >= int(args.ad)) & (tvf >= float(args.vf)):
+                    if key_for_tracking in keepDict:
+                        print('MutectStdFilter: There is a repeat ', key_for_tracking)
+                    else:
+                        keepDict[key_for_tracking] = failure_reason
+                    out_line = str.encode(args.tsampleName + "\t" + str(chr) + "\t" + str(pos) + "\t" + str(ref_allele) + "\t" + str(alt_allele) + "\t" + str(failure_reason) + "\n")
+                    txt_fh.write(out_line)
+        txt_fh.close()
+
+        # This section uses the keepDict to write all passed mutations to the new VCF file
+        _write_to_vcf(self.vcf_out,self.vcf_reader,self.allsamples,keepDict)
+
 
         return self.vcf_out, self.txt_out
 
@@ -180,7 +213,7 @@ def _tumor_variant_calculation(trd,tad):
 
     return tdp,tvf
 
-def _normal_variant_calculation(self):
+def _normal_variant_calculation(nrd,nad):
     ###############################
     # Normal Variant Calculations #
     ###############################
@@ -192,3 +225,49 @@ def _normal_variant_calculation(self):
         nvf = 0
 
     return ndp,ndf
+
+def _tvf_threshold_calculation(nvf,tnr):
+    # nvfRF is one of the thresholds that the tumor variant fraction must exceed
+    # in order to pass filtering.
+    
+    # This threshold is equal to the normal variant fraction, multiplied by
+    # the number of times greater we must see the mutation in the tumor (args.tnr):
+    nvfRF = int(args.tnr) * nvf
+
+    return nvfRF
+
+def _write_to_vcf(self.vcf_out,self.vcf_reader,self.allsamples,keepDict):
+    # This section uses the keepDict to write all passed mutations to the new VCF file
+    vcf_writer = vcf.Writer(open(vcf_out, 'w'), vcf_reader)
+    for record in vcf_reader:
+        key_for_tracking = str(record.CHROM) + ':' + str(record.POS) + ':' + str(record.REF) + ':' + str(record.ALT[0])
+        if key_for_tracking in keepDict:
+            failure_reason = keepDict.get(key_for_tracking)
+            # There was no failure reason for calls that had "KEEP" in their judgement column,
+            # but this code uses "KEEP" as the key when they are encountered
+            if failure_reason == 'KEEP':
+                failure_reason = 'None'
+            
+            record.add_info('FAILURE_REASON', failure_reason)
+            record.add_info('set', 'MuTect')
+
+            # If the caller reported the normal genotype column before the tumor, swap those around
+            if self.allsamples[1] == self.tsampleName:
+                self.vcf_reader.samples[0] = self.allsamples[1]
+                self.vcf_reader.samples[1] = self.allsamples[0]
+
+            if record.FILTER == 'PASS':
+                vcf_writer.write_record(record)
+            # Change the failure reason to PASS, for mutations for which we want to override MuTect's assessment
+            else:
+                record.FILTER = 'PASS'
+                vcf_writer.write_record(record)
+        else:
+            continue
+    vcf_writer.close()
+
+
+
+
+
+
