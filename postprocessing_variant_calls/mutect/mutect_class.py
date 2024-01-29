@@ -124,238 +124,71 @@ class mutect_sample:
         else: 
             return True
 
-    def filter_single(self):
+    def filter_paired_sample(self):
         # TODO: contiue work on method, check with Karthi / Ronak about single filter  
         '''
-        @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
-        @Created : 04/20/2022
-        @author : Karthigayini Sivaprakasam, Eric Buehler 
+        @Description : The purpose of this function is to filter VCFs output from MuTect that tumor and normal sample info 
+        @Created : 01/29/2024
+        @author : Rashmi Naidu
         -input: self 
         -ouput: 
             - self.vcf_out
-            - self.vcf_complex_out
             - self.txt_out
         '''
         vcf_writer = vcf.Writer(open(self.vcf_out, "w"), self.vcf_reader)
-        vcf_complex_writer = vcf.Writer(open(self.vcf_complex_out, "w"), self.vcf_reader)
         txt_fh = open(self.txt_out, "wb")
 
-        # mutations 
-
-        # Iterate through rows and filter mutations
-        for record in self.vcf_reader:
-            tcall = record.genotype(self.sampleName)
-
-            # Pad complex indels for proper genotyping
-            if (
-                record.INFO["TYPE"] == "Complex"
-                and len(record.REF) != len(record.ALT)
-                and record.INFO["SHIFT3"] > 0
-                and record.INFO["SHIFT3"] <= len(record.INFO["LSEQ"])
-            ):
-                padding_seq = record.INFO["LSEQ"][
-                    len(record.INFO["LSEQ"]) - (record.INFO["SHIFT3"] + 1) :
-                ]
-                record.REF = padding_seq + record.REF
-                for alt in record.ALT:
-                    alt.sequence = padding_seq + alt.sequence
-                record.POS = record.POS - (record.INFO["SHIFT3"] + 1)
-                record.INFO["SHIFT3_ADJUSTED"] = record.INFO["SHIFT3"]
-                record.INFO["SHIFT3"] = 0
-                complex_flag = True
-            else:
-                complex_flag = False
-                record.INFO["SHIFT3_ADJUSTED"] = 0
-
-            tmq = int(record.INFO["QUAL"])
-
-            if tcall["DP"] is not None:
-                tdp = int(tcall["DP"][0])
-            else:
-                tdp = 0
-            if tcall["VD"] is not None:
-                tad = int(tcall["VD"])
-            else:
-                tad = 0
-            if tdp != 0:
-                tvf = int(tad) / float(tdp)
-            else:
-                tvf = 0
-            record.add_info("set", "VarDict")
-            if (      (tmq >= int(self.minQual))
-                    & (tdp >= int(self.totalDepth))
-                    & (tad >= int(self.alleleDepth))
-                    & (tvf >= float(self.variantFraction))
-                ):
-                    if complex_flag:
-                        vcf_complex_writer.write_record(record)
-                    else:
-                        vcf_writer.write_record(record)
-                    out_line = str.encode(
-                        self.sampleName
-                        + "\t"
-                        + record.CHROM
-                        + "\t"
-                        + str(record.POS)
-                        + "\t"
-                        + str(record.REF)
-                        + "\t"
-                        + str(record.ALT[0])
-                        + "\t"
-                        + "."
-                        + "\n"
-                    )
-                    txt_fh.write(out_line)
-
-        vcf_writer.close()
-        vcf_complex_writer.close()
-        txt_fh.close()
-        return self.vcf_out, self.vcf_complex_out, self.txt_out
-
-    def filter_case_control(self):
-        # TODO: continue to simplify method since we are now only worried about tumor/control vcf 
-        '''
-        @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
-        @Created : 04/20/2022
-        @author : Karthigayini Sivaprakasam, Eric Buehler 
-        -input: self 
-        -ouput: 
-            - self.vcf_out
-            - self.vcf_complex_out
-            - self.txt_out
-        '''
-        if_swap_sample = False
         # If the caller reported the normal genotype column before the tumor, swap those around
-        if self.allsamples[1] == self.sampleName:
-            if_swap_sample = True
+        if self.allsamples[1] == self.tsampleName:
             self.vcf_reader.samples[0] = self.allsamples[1]
             self.vcf_reader.samples[1] = self.allsamples[0]
+    
+        # Dictionary to store records to keep
+        keepDict = {}
 
-        normal_sampleName = self.vcf_reader.samples[1]
+        # Filter each row (Mutation)
+        txtDF = pd.read_table(self.inputTxt, skiprows=1, dtype=str)
+        txt_fh = open(txt_out, "wb")
+        for index, row in txtDF.iterrows():
+            chr = row.loc['contig']
+            pos = row.loc['position']
+            ref_allele = row.loc['ref_allele']
+            alt_allele = row.loc['alt_allele']
+            trd = int(row.loc['t_ref_count'])
+            tad = int(row.loc['t_alt_count'])
+            nrd = int(row.loc['n_ref_count'])
+            nad = int(row.loc['n_alt_count'])
 
-        vcf_writer = vcf.Writer(open(self.vcf_out, "w"), self.vcf_reader)
-        vcf_complex_writer = vcf.Writer(open(self.vcf_complex_out, "w"), self.vcf_reader)
-        txt_fh = open(self.txt_out, "wb")
+            tdp,tvf = _tumor_variant_calculation()
+            ndp,ndf = _normal_variant_calculation()
 
-        # mutations 
+        return self.vcf_out, self.txt_out
 
-        # Iterate through rows and filter mutations
-        for record in self.vcf_reader:
-            tcall = record.genotype(self.sampleName)
 
-            # Pad complex indels for proper genotyping
-            if (
-                record.INFO["TYPE"] == "Complex"
-                and len(record.REF) != len(record.ALT)
-                and record.INFO["SHIFT3"] > 0
-                and record.INFO["SHIFT3"] <= len(record.INFO["LSEQ"])
-            ):
-                padding_seq = record.INFO["LSEQ"][
-                    len(record.INFO["LSEQ"]) - (record.INFO["SHIFT3"] + 1) :
-                ]
-                record.REF = padding_seq + record.REF
-                for alt in record.ALT:
-                    alt.sequence = padding_seq + alt.sequence
-                record.POS = record.POS - (record.INFO["SHIFT3"] + 1)
-                record.INFO["SHIFT3_ADJUSTED"] = record.INFO["SHIFT3"]
-                record.INFO["SHIFT3"] = 0
-                complex_flag = True
-            else:
-                complex_flag = False
-                record.INFO["SHIFT3_ADJUSTED"] = 0
 
-            keep_based_on_status = True
-            try:
-                if "Somatic" not in record.INFO["STATUS"] and self.filterGermline:
-                    keep_based_on_status = False
-            except KeyError:
-                keep_based_on_status = False
-            try:
-                if tcall["QUAL"] is not None:
-                    tmq = int(tcall["QUAL"])
-                else:
-                    tmq = 0
-            except:
-                tmq = int(record.INFO["QUAL"])
-          
-            if tcall["DP"] is not None:
-                tdp = int(tcall["DP"][0])
-            else:
-                tdp = 0
-            if tcall["VD"] is not None:
-                tad = int(tcall["VD"])
-            else:
-                tad = 0
-            if tdp != 0:
-                tvf = int(tad) / float(tdp)
-            else:
-                tvf = 0
-            #### processing normal sample 
-            # Read record for normal sample
-            ncall = record.genotype(normal_sampleName)
-            if ncall:
-                if ncall["QUAL"] is not None:
-                    nmq = int(ncall["QUAL"])
-                else:
-                    nmq = 0
-                if ncall["DP"] is not None:
-                    ndp = int(ncall["DP"][0])
-                else:
-                    ndp = 0
-                if ncall["VD"] is not None:
-                    nad = int(ncall["VD"])
-                else:
-                    nad = 0
-                if ndp != 0:
-                    nvf = nad / ndp
-                else:
-                    nvf = 0
-                nvfRF = int(self.tnRatio) * nvf
+def _tumor_variant_calculation(trd,tad):
+    ##############################
+    # Tumor Variant Calculations #
+    ##############################
 
-            record.add_info("set", "VarDict")
-            if_swap_sample=False
-            if self.allsamples[1] == self.sampleName:
-                if_swap_sample = True
-                self.vcf_reader.samples[0] = self.allsamples[1]
-                self.vcf_reader.samples[1] = self.allsamples[0]
-            normal_sampleName = self.vcf_reader.samples[1]
-            '''
-                if if_swap_sample:
-                nrm = record.samples[0]
-                tum = record.samples[1]
-                record.samples[0] = tum
-                record.samples[1] = nrm
-            '''
-            if tvf > nvfRF: 
-                if (
-                    keep_based_on_status
-                    & (tmq >= int(self.minQual))
-                    & (nmq >= int(self.minQual))
-                    & (tdp >= int(self.totalDepth))
-                    & (tad >= int(self.alleleDepth))
-                    & (tvf >= float(self.variantFraction))
-                ):
-                    if complex_flag:
-                        vcf_complex_writer.write_record(record)
-                    else:
-                        vcf_writer.write_record(record)
-                    out_line = str.encode(
-                        self.sampleName
-                        + "\t"
-                        + record.CHROM
-                        + "\t"
-                        + str(record.POS)
-                        + "\t"
-                        + str(record.REF)
-                        + "\t"
-                        + str(record.ALT[0])
-                        + "\t"
-                        + "."
-                        + "\n"
-                    )
-                    txt_fh.write(out_line)
+    tdp = trd + tad
 
-        vcf_writer.close()
-        vcf_complex_writer.close()
-        txt_fh.close()
-        return self.vcf_out, self.vcf_complex_out, self.txt_out
+    if tdp != 0:
+        tvf = int(tad) / float(tdp)
+    else:
+        tvf = 0
+
+    return tdp,tvf
+
+def _normal_variant_calculation(self):
+    ###############################
+    # Normal Variant Calculations #
+    ###############################
+
+    ndp = nrd + nad
+    if ndp != 0:
+        nvf = int(nad) / float(ndp)
+    else:
+        nvf = 0
+
+    return ndp,ndf

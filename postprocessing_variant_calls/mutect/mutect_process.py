@@ -113,7 +113,7 @@ def filter(
         logger.error('Tumor and normal columns not identified in VCF file. Please check input file again.')
     else: 
         # filter single 
-        vcf_out, txt_out = to_filter.filter_single()
+        vcf_out, txt_out = to_filter.filter_paired_sample()
     return vcf_out,txt_out
 
 
