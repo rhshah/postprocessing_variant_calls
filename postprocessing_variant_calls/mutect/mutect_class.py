@@ -86,7 +86,7 @@ class mutect_sample:
             ".",
             "String",
             "The variant callers that reported this event",
-            "msk-access/postprocessing_varaint_calls",
+            "msk-access/postprocessing_variant_calls",
             "v0.0.1",
             "vcf",
         )

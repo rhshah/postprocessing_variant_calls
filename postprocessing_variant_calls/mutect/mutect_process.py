@@ -23,7 +23,7 @@ logger = logging.getLogger("filter")
 app = typer.Typer(help="post-processing commands for MuTect version 1.1.5 VCFs.")
 # paired sample filter 
 single_app = typer.Typer()
-app.add_typer(single_app, name="paired-sample", help="Post-processing commands for a paired sample MuTect version 1.1.5 VCF input file.")
+app.add_typer(single_app, name="case-control", help="Post-processing commands for case-control filtering of MuTect version 1.1.5 VCF input file.")
 
 
 
@@ -99,18 +99,18 @@ def filter(
 ):
 
     '''
-    This tool helps to filter vardict version 1.4.6 VCFs for single sample calling
+    This tool helps to filter MuTect version 1.1.5 VCFs for case-control calling
     '''
-    logger.info("process_vardict: Started the run for doing standard filter.")
+    logger.info("process_mutect1: Started the run for doing standard filter.")
     # single sample case 
-    # create vardict object 
+    # create mutect object 
     to_filter = mutect_sample(
             inputVcf, inputTxt, refFasta, outputDir, sampleName,totalDepth, 
             alleleDepth, variantFraction, tnRatio
     )
     # check for normal
     if to_filter.has_tumor_and_normal_cols():
-        logger.error('Tumor and normal columns not identified in VCF file. Please check input file again.')
+        logger.error('Tumor and normal columns not identified in input MuTect VCF file. Please check input file again.')
     else: 
         # filter single 
         vcf_out, txt_out = to_filter.filter_paired_sample()
