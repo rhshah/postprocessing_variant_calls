@@ -64,7 +64,6 @@ class mutect_sample:
 
 
     def set_reader(self):  
-        # TODO: I probably need to dig a little deeper to see if everything here is still required 
         '''
         @Description : The purpose of this function is to define and set-up a vcf reader for MuTect derived input VCF files.
         @Created : 01/29/2024
@@ -236,7 +235,7 @@ def _tvf_threshold_calculation(nvf,tnr):
 
     return nvfRF
 
-def _write_to_vcf(self.vcf_out,self.vcf_reader,self.allsamples,keepDict):
+def _write_to_vcf(vcf_out,vcf_reader,allsamples,keepDict):
     # This section uses the keepDict to write all passed mutations to the new VCF file
     vcf_writer = vcf.Writer(open(vcf_out, 'w'), vcf_reader)
     for record in vcf_reader:
