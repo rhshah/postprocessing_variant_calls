@@ -42,8 +42,8 @@ class mutect_sample:
         # custom info 
         # vcf output name
         self.vcf_out = self.out_name()
-        self.txt_out = self.vcf_out + "_filter.mutect.txt" 
-        self.vcf_out = self.vcf_out + "_filter.mutect.vcf"
+        self.txt_out = self.vcf_out + "_filtered.txt" 
+        self.vcf_out = self.vcf_out + "_filtered.vcf"
         # vcf reader 
         self.vcf_reader = self.set_reader() 
         # sample list 
