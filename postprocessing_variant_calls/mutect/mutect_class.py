@@ -234,7 +234,11 @@ def _tumor_variant_calculation(trd,tad):
         try:
             tvf = int(tad) / float(tdp)
         except ZeroDivisionError as e:
-            sys.exit("Can't divide by zero. Please check tumor variant calculation values again.")
+            typer.secho(
+            f"Can't divide by zero. Please check tumor variant calculation values again.",
+            fg=typer.colors.RED)
+            raise typer.Exit(code=1)
+            
     else:
         tvf = 0
 
@@ -250,7 +254,10 @@ def _normal_variant_calculation(nrd,nad):
         try:
             nvf = int(nad) / float(ndp)
         except ZeroDivisionError as e:
-            sys.exit("Can't divide by zero. Please check normal variant calculation values again.")
+            typer.secho(
+            f"Can't divide by zero. Please check tumor variant calculation values again.",
+            fg=typer.colors.RED)
+            raise typer.Exit(code=1)
     else:
         nvf = 0
 
