@@ -28,7 +28,7 @@ maf_annotate_maf_by_bed = [
         ]
 
 maf_subset = [
-    ['maf', 'subset', '-m', 'tests/data/maf/subset/example_input.maf', '--ids', 'resources/maf_subset/example_subset_ids.txt', '-o','tests/data/maf/subset/output_subset.maf']
+    ['maf', 'subset', '-m', 'tests/data/maf/subset/example_input.maf', '--ids', 'resources/maf_subset/example_subset_ids.txt', '-o','tests/data/maf/subset/example_output.maf']
     ]
 
 maf_filter = [
