@@ -12,9 +12,9 @@ import typer
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
 from .mutect_class import mutect_sample
 import typer
-from rich.console import Console
 
-log_console = Console(stderr=True)
+
+
 
 app = typer.Typer(help="post-processing commands for MuTect version 1.1.5 VCFs.")
 # paired sample filter 
@@ -103,7 +103,9 @@ def filter(
     '''
     This tool helps to filter MuTect version 1.1.5 VCFs for case-control calling
     '''
-    log_console.print("process_mutect1: Started the run for doing standard filter.")
+    typer.secho(
+            f"process_mutect1: Started the run for doing standard filter.",
+            fg=typer.colors.BLACK)
     # single sample case 
     # create mutect object 
     to_filter = mutect_sample(
@@ -114,9 +116,14 @@ def filter(
     # check for normal
     if to_filter.has_tumor_and_normal_cols():
         vcf_out, txt_out = to_filter.filter_paired_sample()
-        log_console.print('process_mutect1: Filtering for MuTect VCFs has completed. Please refer to output directory for filtered MuTect VCF and text file.')
+        typer.secho(
+            f"process_mutect1: Filtering for MuTect VCFs has completed. Please refer to output directory for filtered MuTect VCF and text file.",
+            fg=typer.colors.BLACK)
     else: 
-        log_console.print('Tumor and normal columns not identified in input MuTect VCF file. Please check input file again.')
+        typer.secho(
+            f"Tumor and normal columns not identified in input MuTect VCF file. Please check input file again.",
+            fg=typer.colors.RED)
+        raise typer.Abort()
     return vcf_out,txt_out
 
 
