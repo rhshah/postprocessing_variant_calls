@@ -3,6 +3,7 @@
 import os
 import sys
 import vcf
+import pandas as pd 
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
 
 class mutect_sample:
@@ -102,11 +103,7 @@ class mutect_sample:
             "vcf",
         )
 
-        # Manually add the new SHIFT3_ADJUSTED header to the reader, which will then be passed to the writer
-        shift3_line = '##INFO=<ID=SHIFT3_ADJUSTED,Number=1,Type=Integer,Description="No. of bases to be shifted to 5 prime for complex variants to get the preferred left alignment for proper genotyping">'
-        meta_parser = VcfMetadataParser()
-        key, val = meta_parser.read_info(shift3_line)
-        vcf_reader.infos[key] = val
+        
         return vcf_reader 
 
     def has_tumor_and_normal_cols(self):
@@ -118,6 +115,7 @@ class mutect_sample:
         -ouput: boolean representing whether a muTect VCF file has both tumor and normal columns present.
         '''
         #TODO there might be more checks we want to add here 
+        
         if len(self.allsamples) != 2:
             return False  
         else: 
@@ -134,6 +132,33 @@ class mutect_sample:
             - self.vcf_out
             - self.txt_out
         '''
+        ACCEPTED_TAGS = [
+        'alt_allele_in_normal',
+        'clustered_read_position',
+        # Todo: should have underscore?
+        # 'DBSNP Site',
+        'fstar_tumor_lod',
+        'nearby_gap_events',
+        'normal_lod',
+        'poor_mapping_region_alternate_allele_mapq',
+        'possible_contamination',
+        'strand_artifact',
+        'triallelic_site',
+        ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         vcf_writer = vcf.Writer(open(self.vcf_out, "w"), self.vcf_reader)
         txt_fh = open(self.txt_out, "wb")
 
@@ -142,12 +167,12 @@ class mutect_sample:
             self.vcf_reader.samples[0] = self.allsamples[1]
             self.vcf_reader.samples[1] = self.allsamples[0]
     
-        # Dictionary to store records to keep
+        # Dictionary store records to keep
         keepDict = {}
 
         # Filter each row (Mutation)
         txtDF = pd.read_table(self.inputTxt, skiprows=1, dtype=str)
-        txt_fh = open(txt_out, "wb")
+        txt_fh = open(f"{self.outputDir}/{self.txt_out}", "wb")
         for index, row in txtDF.iterrows():
             chr = row.loc['contig']
             pos = row.loc['position']
@@ -160,9 +185,9 @@ class mutect_sample:
             judgement = row.loc['judgement']
             failure_reason = row.loc['failure_reasons']
 
-            tdp,tvf = _tumor_variant_calculation()
-            ndp,ndf = _normal_variant_calculation()
-            nvfRF = _tvf_threshold_calculation()
+            tdp,tvf = _tumor_variant_calculation(trd,tad)
+            ndp,nvf = _normal_variant_calculation(nrd,nad)
+            nvfRF = _tvf_threshold_calculation(nvf,self.tnRatio)
 
             # This will help in filtering VCF
             key_for_tracking = str(chr) + ':' + str(pos) + ':' + str(ref_allele) + ':' + str(alt_allele)
@@ -181,17 +206,17 @@ class mutect_sample:
                 failure_reason = 'KEEP'
 
             if tvf > nvfRF:
-                if (tdp >= int(args.dp)) & (tad >= int(args.ad)) & (tvf >= float(args.vf)):
+                if (tdp >= int(self.totalDepth)) & (tad >= int(self.alleleDepth)) & (tvf >= float(self.variantFraction)):
                     if key_for_tracking in keepDict:
                         print('MutectStdFilter: There is a repeat ', key_for_tracking)
                     else:
                         keepDict[key_for_tracking] = failure_reason
-                    out_line = str.encode(args.tsampleName + "\t" + str(chr) + "\t" + str(pos) + "\t" + str(ref_allele) + "\t" + str(alt_allele) + "\t" + str(failure_reason) + "\n")
+                    out_line = str.encode(self.tsampleName + "\t" + str(chr) + "\t" + str(pos) + "\t" + str(ref_allele) + "\t" + str(alt_allele) + "\t" + str(failure_reason) + "\n")
                     txt_fh.write(out_line)
         txt_fh.close()
 
         # This section uses the keepDict to write all passed mutations to the new VCF file
-        _write_to_vcf(self.vcf_out,self.vcf_reader,self.allsamples,keepDict)
+        _write_to_vcf(self.outputDir,self.vcf_out,self.vcf_reader,self.allsamples,self.tsampleName,keepDict)
 
 
         return self.vcf_out, self.txt_out
@@ -206,7 +231,10 @@ def _tumor_variant_calculation(trd,tad):
     tdp = trd + tad
 
     if tdp != 0:
-        tvf = int(tad) / float(tdp)
+        try:
+            tvf = int(tad) / float(tdp)
+        except ZeroDivisionError as e:
+            sys.exit("Can't divide by zero. Please check tumor variant calculation values again.")
     else:
         tvf = 0
 
@@ -219,11 +247,14 @@ def _normal_variant_calculation(nrd,nad):
 
     ndp = nrd + nad
     if ndp != 0:
-        nvf = int(nad) / float(ndp)
+        try:
+            nvf = int(nad) / float(ndp)
+        except ZeroDivisionError as e:
+            sys.exit("Can't divide by zero. Please check normal variant calculation values again.")
     else:
         nvf = 0
 
-    return ndp,ndf
+    return ndp,nvf
 
 def _tvf_threshold_calculation(nvf,tnr):
     # nvfRF is one of the thresholds that the tumor variant fraction must exceed
@@ -231,13 +262,13 @@ def _tvf_threshold_calculation(nvf,tnr):
     
     # This threshold is equal to the normal variant fraction, multiplied by
     # the number of times greater we must see the mutation in the tumor (args.tnr):
-    nvfRF = int(args.tnr) * nvf
+    nvfRF = int(tnr) * nvf
 
     return nvfRF
 
-def _write_to_vcf(vcf_out,vcf_reader,allsamples,keepDict):
+def _write_to_vcf(outDir,vcf_out,vcf_reader,allsamples,tsampleName,keepDict):
     # This section uses the keepDict to write all passed mutations to the new VCF file
-    vcf_writer = vcf.Writer(open(vcf_out, 'w'), vcf_reader)
+    vcf_writer = vcf.Writer(open(f"{outDir}/{vcf_out}", 'w'), vcf_reader)
     for record in vcf_reader:
         key_for_tracking = str(record.CHROM) + ':' + str(record.POS) + ':' + str(record.REF) + ':' + str(record.ALT[0])
         if key_for_tracking in keepDict:
@@ -251,9 +282,9 @@ def _write_to_vcf(vcf_out,vcf_reader,allsamples,keepDict):
             record.add_info('set', 'MuTect')
 
             # If the caller reported the normal genotype column before the tumor, swap those around
-            if self.allsamples[1] == self.tsampleName:
-                self.vcf_reader.samples[0] = self.allsamples[1]
-                self.vcf_reader.samples[1] = self.allsamples[0]
+            if allsamples[1] == tsampleName:
+                vcf_reader.samples[0] = allsamples[1]
+                vcf_reader.samples[1] = allsamples[0]
 
             if record.FILTER == 'PASS':
                 vcf_writer.write_record(record)

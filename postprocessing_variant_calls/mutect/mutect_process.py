@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # imports 
-from __future__ import division
 import os
 import sys
+import pandas as pd 
 import vcf
 import time
 import logging
@@ -11,14 +11,10 @@ from typing import List, Optional
 import typer
 from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
 from .mutect_class import mutect_sample
+import typer
+from rich.console import Console
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p",
-    level=logging.DEBUG,
-)
-
-logger = logging.getLogger("filter")
+log_console = Console(stderr=True)
 
 app = typer.Typer(help="post-processing commands for MuTect version 1.1.5 VCFs.")
 # paired sample filter 
@@ -65,32 +61,38 @@ def filter(
         help="Input reference fasta",
     ),
     tsampleName: str = typer.Option(
+        ...,
         "--tsampleName", help="Name of the tumor sample."
     ), 
     totalDepth: int = typer.Option(
         20,
         "--totalDepth",
         "-dp",
-        min=20,
+        min=0,
+        clamp=True,
         help="Tumor total depth threshold",
     ),
     alleleDepth: int = typer.Option(
-        "",
+        1,
         "--alleledepth",
         "-ad",
-        min=1,
+        min=0,
         clamp=True,
     ),
     tnRatio: int = typer.Option(
         1,
         "--tnRatio",
         "-tnr",
+        min=0,
+        clamp=True,
         help="Tumor-Normal variant fraction ratio threshold",
     ),
     variantFraction: float = typer.Option(
-        5e-05,
+        0.00005,
         "--variantFraction",
         "-vf",
+        min=0,
+        clamp=True,
         help="Tumor variant fraction threshold",
     ),
     outputDir: str = typer.Option(
@@ -101,19 +103,20 @@ def filter(
     '''
     This tool helps to filter MuTect version 1.1.5 VCFs for case-control calling
     '''
-    logger.info("process_mutect1: Started the run for doing standard filter.")
+    log_console.print("process_mutect1: Started the run for doing standard filter.")
     # single sample case 
     # create mutect object 
     to_filter = mutect_sample(
-            inputVcf, inputTxt, refFasta, outputDir, sampleName,totalDepth, 
+            inputVcf, inputTxt, refFasta, outputDir, tsampleName,totalDepth, 
             alleleDepth, variantFraction, tnRatio
     )
+    
     # check for normal
     if to_filter.has_tumor_and_normal_cols():
-        logger.error('Tumor and normal columns not identified in input MuTect VCF file. Please check input file again.')
-    else: 
-        # filter single 
         vcf_out, txt_out = to_filter.filter_paired_sample()
+        log_console.print('process_mutect1: Filtering for MuTect VCFs has completed. Please refer to output directory for filtered MuTect VCF and text file.')
+    else: 
+        log_console.print('Tumor and normal columns not identified in input MuTect VCF file. Please check input file again.')
     return vcf_out,txt_out
 
 
