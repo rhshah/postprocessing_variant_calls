@@ -3,22 +3,27 @@
 import os
 import sys
 import vcf
-from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
+from vcf.parser import (
+    _Info as VcfInfo,
+    _Format as VcfFormat,
+    _vcf_metadata_parser as VcfMetadataParser,
+)
+
 
 class var_sample:
-    '''
-    @Description : The purpose of this class is to manage the variety of information specified about a vardict as well as 
-                    manage filtering one with both single and double sample 
+    """
+    @Description : The purpose of this class is to manage the variety of information specified about a vardict as well as
+                    manage filtering one with both single and double sample
     @Created : 04/20/2022
-    @author : Karthigayini Sivaprakasam, Eric Buehler 
-    -init: 
+    @author : Karthigayini Sivaprakasam, Eric Buehler
+    -init:
         -inputVcf
-        -sampleName 
-        -minQual 
-        -totalDepth 
-        -alleleDepth 
+        -sampleName
+        -minQual
+        -totalDepth
+        -alleleDepth
         -variantFraction
-        -tnRatio 
+        -tnRatio
         -filterGermline
         -outputDir
         -vcf_out
@@ -26,55 +31,65 @@ class var_sample:
         -vcf_reader
         -vcf_complex_out
         -txt_out
-    ''' 
-    def __init__(self, inputVcf, outputDir, sampleName, minQual, totalDepth, 
-                alleleDepth, variantFraction, tnRatio, filterGermline):
+    """
 
-        # specified by CLI tool 
+    def __init__(
+        self,
+        inputVcf,
+        outputDir,
+        sampleName,
+        minQual,
+        totalDepth,
+        alleleDepth,
+        variantFraction,
+        tnRatio,
+        filterGermline,
+    ):
+
+        # specified by CLI tool
         self.inputVcf = inputVcf
         self.outputDir = outputDir
-        self.sampleName = sampleName 
+        self.sampleName = sampleName
         self.minQual = minQual
         self.totalDepth = totalDepth
         self.alleleDepth = alleleDepth
         self.variantFraction = variantFraction
         self.tnRatio = tnRatio
         self.filterGermline = filterGermline
-        # custom info 
+        # custom info
         # vcf output name
         self.vcf_out = self.out_name()
-        self.txt_out = self.vcf_out + "_STDfilter.txt" 
+        self.txt_out = self.vcf_out + "_STDfilter.txt"
         self.vcf_complex_out = self.vcf_out + "_STDfilter_complex.vcf"
         self.vcf_out = self.vcf_out + "_STDfilter.vcf"
-        # vcf reader 
-        self.vcf_reader = self.set_reader() 
-        # sample list 
+        # vcf reader
+        self.vcf_reader = self.set_reader()
+        # sample list
         self.allsamples = list(self.vcf_reader.samples)
 
     def out_name(self):
-        '''
-        @Description : The purpose of this function is to define the output name of the vcf file 
+        """
+        @Description : The purpose of this function is to define the output name of the vcf file
         @Created : 04/20/2022
-        @author : Karthigayini Sivaprakasam, Eric Buehler 
-        -input: self 
-        -ouput: a string that specifies the name of the output vcf 
-        '''
+        @author : Karthigayini Sivaprakasam, Eric Buehler
+        -input: self
+        -ouput: a string that specifies the name of the output vcf
+        """
         vcf_out = os.path.basename(self.inputVcf)
         vcf_out = os.path.splitext(vcf_out)[0]
         if self.outputDir != "":
             vcf_out = os.path.join(self.outputDir, vcf_out)
         return vcf_out
 
-
-    def set_reader(self):  
-        # TODO: I probably need to dig a little deeper to see if everything here is still required 
-        '''
+    def set_reader(self):
+        # TODO: I probably need to dig a little deeper to see if everything here is still required
+        """
         @Description : The purpose of this function is to define and set-up a vcf reader
         @Created : 04/20/2022
-        @author : Karthigayini Sivaprakasam, Eric Buehler 
-        -input: self 
+        @author : Karthigayini Sivaprakasam, Eric Buehler
+        -input: self
         -ouput: a vcf reader
-        '''
+        """
         vcf_reader = vcf.Reader(open(self.inputVcf, "r"))
         vcf_reader.infos["set"] = VcfInfo(
             "set",
@@ -86,7 +101,10 @@ class var_sample:
             "vcf",
         )
         vcf_reader.formats["DP"] = VcfFormat(
-            "DP", "1", "Integer", "Total read depth at this site",
+            "DP",
+            "1",
+            "Integer",
+            "Total read depth at this site",
             "vcf",
         )
         vcf_reader.formats["AD"] = VcfFormat(
@@ -102,39 +120,41 @@ class var_sample:
         meta_parser = VcfMetadataParser()
         key, val = meta_parser.read_info(shift3_line)
         vcf_reader.infos[key] = val
-        return vcf_reader 
+        return vcf_reader
 
     def has_normal(self):
-        '''
+        """
         @Description : The purpose of this function is to check if a normal sample is present
         @Created : 04/20/2022
-        @author : Karthigayini Sivaprakasam, Eric Buehler 
-        -input: self 
+        @author : Karthigayini Sivaprakasam, Eric Buehler
+        -input: self
         -ouput: boolean representing whether a normal sample is present or not
-        '''
-        #TODO there might be more checks we want to add here 
+        """
+        # TODO there might be more checks we want to add here
         if len(self.allsamples) == 1:
-            return False  
-        else: 
+            return False
+        else:
             return True
 
     def filter_single(self):
-        # TODO: contiue work on method, check with Karthi / Ronak about single filter  
-        '''
-        @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
+        # TODO: contiue work on method, check with Karthi / Ronak about single filter
+        """
+        @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info
         @Created : 04/20/2022
-        @author : Karthigayini Sivaprakasam, Eric Buehler 
-        -input: self 
-        -ouput: 
+        @author : Karthigayini Sivaprakasam, Eric Buehler
+        -input: self
+        -ouput:
             - self.vcf_out
             - self.vcf_complex_out
             - self.txt_out
-        '''
+        """
         vcf_writer = vcf.Writer(open(self.vcf_out, "w"), self.vcf_reader)
-        vcf_complex_writer = vcf.Writer(open(self.vcf_complex_out, "w"), self.vcf_reader)
+        vcf_complex_writer = vcf.Writer(
+            open(self.vcf_complex_out, "w"), self.vcf_reader
+        )
         txt_fh = open(self.txt_out, "wb")
 
-        # mutations 
+        # mutations
 
         # Iterate through rows and filter mutations
         for record in self.vcf_reader:
@@ -176,30 +196,31 @@ class var_sample:
             else:
                 tvf = 0
             record.add_info("set", "VarDict")
-            if (      (tmq >= int(self.minQual))
-                    & (tdp >= int(self.totalDepth))
-                    & (tad >= int(self.alleleDepth))
-                    & (tvf >= float(self.variantFraction))
-                ):
-                    if complex_flag:
-                        vcf_complex_writer.write_record(record)
-                    else:
-                        vcf_writer.write_record(record)
-                    out_line = str.encode(
-                        self.sampleName
-                        + "\t"
-                        + record.CHROM
-                        + "\t"
-                        + str(record.POS)
-                        + "\t"
-                        + str(record.REF)
-                        + "\t"
-                        + str(record.ALT[0])
-                        + "\t"
-                        + "."
-                        + "\n"
-                    )
-                    txt_fh.write(out_line)
+            if (
+                (tmq >= int(self.minQual))
+                & (tdp >= int(self.totalDepth))
+                & (tad >= int(self.alleleDepth))
+                & (tvf >= float(self.variantFraction))
+            ):
+                if complex_flag:
+                    vcf_complex_writer.write_record(record)
+                else:
+                    vcf_writer.write_record(record)
+                out_line = str.encode(
+                    self.sampleName
+                    + "\t"
+                    + record.CHROM
+                    + "\t"
+                    + str(record.POS)
+                    + "\t"
+                    + str(record.REF)
+                    + "\t"
+                    + str(record.ALT[0])
+                    + "\t"
+                    + "."
+                    + "\n"
+                )
+                txt_fh.write(out_line)
 
         vcf_writer.close()
         vcf_complex_writer.close()
@@ -207,17 +228,17 @@ class var_sample:
         return self.vcf_out, self.vcf_complex_out, self.txt_out
 
     def filter_case_control(self):
-        # TODO: continue to simplify method since we are now only worried about tumor/control vcf 
-        '''
-        @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info 
+        # TODO: continue to simplify method since we are now only worried about tumor/control vcf
+        """
+        @Description : The purpose of this function is to filter VCFs output from vardict that contain control sample info
         @Created : 04/20/2022
-        @author : Karthigayini Sivaprakasam, Eric Buehler 
-        -input: self 
-        -ouput: 
+        @author : Karthigayini Sivaprakasam, Eric Buehler
+        -input: self
+        -ouput:
             - self.vcf_out
             - self.vcf_complex_out
             - self.txt_out
-        '''
+        """
         if_swap_sample = False
         # If the caller reported the normal genotype column before the tumor, swap those around
         if self.allsamples[1] == self.sampleName:
@@ -228,10 +249,12 @@ class var_sample:
         normal_sampleName = self.vcf_reader.samples[1]
 
         vcf_writer = vcf.Writer(open(self.vcf_out, "w"), self.vcf_reader)
-        vcf_complex_writer = vcf.Writer(open(self.vcf_complex_out, "w"), self.vcf_reader)
+        vcf_complex_writer = vcf.Writer(
+            open(self.vcf_complex_out, "w"), self.vcf_reader
+        )
         txt_fh = open(self.txt_out, "wb")
 
-        # mutations 
+        # mutations
 
         # Iterate through rows and filter mutations
         for record in self.vcf_reader:
@@ -271,7 +294,7 @@ class var_sample:
                     tmq = 0
             except:
                 tmq = int(record.INFO["QUAL"])
-          
+
             if tcall["DP"] is not None:
                 tdp = int(tcall["DP"][0])
             else:
@@ -284,7 +307,7 @@ class var_sample:
                 tvf = int(tad) / float(tdp)
             else:
                 tvf = 0
-            #### processing normal sample 
+            #### processing normal sample
             # Read record for normal sample
             ncall = record.genotype(normal_sampleName)
             if ncall:
@@ -307,20 +330,20 @@ class var_sample:
                 nvfRF = int(self.tnRatio) * nvf
 
             record.add_info("set", "VarDict")
-            if_swap_sample=False
+            if_swap_sample = False
             if self.allsamples[1] == self.sampleName:
                 if_swap_sample = True
                 self.vcf_reader.samples[0] = self.allsamples[1]
                 self.vcf_reader.samples[1] = self.allsamples[0]
             normal_sampleName = self.vcf_reader.samples[1]
-            '''
+            """
                 if if_swap_sample:
                 nrm = record.samples[0]
                 tum = record.samples[1]
                 record.samples[0] = tum
                 record.samples[1] = nrm
-            '''
-            if tvf > nvfRF: 
+            """
+            if tvf > nvfRF:
                 if (
                     keep_based_on_status
                     & (tmq >= int(self.minQual))

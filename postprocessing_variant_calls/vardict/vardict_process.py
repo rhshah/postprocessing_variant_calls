@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# imports 
+# imports
 from __future__ import division
 import os
 import sys
@@ -9,7 +9,11 @@ import logging
 from pathlib import Path
 from typing import List, Optional
 import typer
-from vcf.parser import _Info as VcfInfo, _Format as VcfFormat, _vcf_metadata_parser as VcfMetadataParser
+from vcf.parser import (
+    _Info as VcfInfo,
+    _Format as VcfFormat,
+    _vcf_metadata_parser as VcfMetadataParser,
+)
 from .vardict_class import var_sample
 
 logging.basicConfig(
@@ -21,13 +25,20 @@ logging.basicConfig(
 logger = logging.getLogger("filter")
 
 app = typer.Typer(help="post-processing commands for VarDict version 1.4.6 VCFs.")
-# single filter 
+# single filter
 single_app = typer.Typer()
-app.add_typer(single_app, name="single", help="Post-processing commands for a single sample VarDict version 1.4.6 VCFs")
-# case control filter 
+app.add_typer(
+    single_app,
+    name="single",
+    help="Post-processing commands for a single sample VarDict version 1.4.6 VCFs",
+)
+# case control filter
 case_control_app = typer.Typer()
-app.add_typer(case_control_app, name="case-control", help="Post-processing commands for a case-controlled VarDict version 1.4.6 VCFs")
-
+app.add_typer(
+    case_control_app,
+    name="case-control",
+    help="Post-processing commands for a case-controlled VarDict version 1.4.6 VCFs",
+)
 
 
 @single_app.command("filter")
@@ -48,7 +59,7 @@ def filter(
         ...,
         "--tsampleName",
         help="Name of the tumor Sample",
-    ), 
+    ),
     totalDepth: int = typer.Option(
         20,
         "--totalDepth",
@@ -91,22 +102,30 @@ def filter(
         "", "--outDir", "-o", help="Full Path to the output dir"
     ),
 ):
-
-    '''
+    """
     This tool helps to filter vardict version 1.4.6 VCFs for single sample calling
-    '''
+    """
     logger.info("process_vardict: Started the run for doing standard filter.")
-    # single sample case 
-    # create vardict object 
+    # single sample case
+    # create vardict object
     to_filter = var_sample(
-            inputVcf, outputDir, sampleName, minQual, totalDepth, 
-            alleleDepth, variantFraction, tnRatio, filterGermline
+        inputVcf,
+        outputDir,
+        sampleName,
+        minQual,
+        totalDepth,
+        alleleDepth,
+        variantFraction,
+        tnRatio,
+        filterGermline,
     )
     # check for normal
     if to_filter.has_normal():
-        logger.exception('`single filter` command was used, but a normal variant was detected. Did you mean to use `case_control filter`?')
-    else: 
-        # filter single 
+        logger.exception(
+            "`single filter` command was used, but a normal variant was detected. Did you mean to use `case_control filter`?"
+        )
+    else:
+        # filter single
         vcf_out, vcf_complex_out, txt_out = to_filter.filter_single()
     return vcf_out, vcf_complex_out, txt_out
 
@@ -129,7 +148,7 @@ def filter(
         ...,
         "--tsampleName",
         help="Name of the tumor Sample",
-    ), 
+    ),
     totalDepth: int = typer.Option(
         20,
         "--totalDepth",
@@ -172,25 +191,33 @@ def filter(
         "", "--outDir", "-o", help="Full Path to the output dir"
     ),
 ):
-
-    '''
+    """
     This tool helps to filter vardict version 1.4.6 VCFs for case control calling
-    '''
+    """
     logger.info("process_vardict: Started the run for doing standard filter.")
-    # single sample case 
-    # create vardict object 
+    # single sample case
+    # create vardict object
     to_filter = var_sample(
-            inputVcf, outputDir, sampleName, minQual, totalDepth, 
-            alleleDepth, variantFraction, tnRatio, filterGermline
+        inputVcf,
+        outputDir,
+        sampleName,
+        minQual,
+        totalDepth,
+        alleleDepth,
+        variantFraction,
+        tnRatio,
+        filterGermline,
     )
     # check for normal
     if to_filter.has_normal():
-        # filter with normal 
+        # filter with normal
         vcf_out, vcf_complex_out, txt_out = to_filter.filter_case_control()
-        
-    else: 
-        # raise exception 
-        logger.exception('`case_control filter` command was used, but no normal variant was detected. Did you mean to use `single filter`?')
+
+    else:
+        # raise exception
+        logger.exception(
+            "`case_control filter` command was used, but no normal variant was detected. Did you mean to use `single filter`?"
+        )
     return vcf_out, vcf_complex_out, txt_out
 
 

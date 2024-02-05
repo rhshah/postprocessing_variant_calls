@@ -10,6 +10,7 @@ import typer
 import pandas as pd
 from postprocessing_variant_calls.maf.concat.resources import acceptable_extensions
 
+
 def check_maf(files: List[Path]):
     # return non if argument is empty
     if files is None:
@@ -18,9 +19,13 @@ def check_maf(files: List[Path]):
     extensions = [os.path.splitext(f)[1] for f in files]
     for ext in extensions:
         if ext not in acceptable_extensions:
-            typer.secho(f"If using files argument, all files must be mafs using the same extension.", fg=typer.colors.RED)
+            typer.secho(
+                f"If using files argument, all files must be mafs using the same extension.",
+                fg=typer.colors.RED,
+            )
             raise typer.Abort()
     return files
+
 
 def check_txt(paths: Path):
     # return None if argument is empty, kind of unfortunate we have to handle this case
@@ -28,19 +33,27 @@ def check_txt(paths: Path):
         return None
     # check that we have a text file after reading off the cli
     extension = os.path.splitext(paths)[1]
-    if extension != '.txt':
-        typer.secho(f"If using paths argument, must provided an input txt file.", fg=typer.colors.RED)
+    if extension != ".txt":
+        typer.secho(
+            f"If using paths argument, must provided an input txt file.",
+            fg=typer.colors.RED,
+        )
         raise typer.Abort()
     return paths
 
+
 def check_separator(separator: str):
-    separator_dict = {"tsv":'\t', "csv":","}
+    separator_dict = {"tsv": "\t", "csv": ","}
     if separator in separator_dict.keys():
         sep = separator_dict[separator]
     else:
-        typer.secho(f"Separator for delimited file must be 'tsv' or 'csv', not '{separator}'", fg=typer.colors.RED)
+        typer.secho(
+            f"Separator for delimited file must be 'tsv' or 'csv', not '{separator}'",
+            fg=typer.colors.RED,
+        )
         raise typer.Abort()
     return sep
+
 
 def read_tsv(tsv, separator):
     """Read a tsv file
@@ -70,6 +83,7 @@ def get_row(tsv_file):
         skipped.extend(i for i, line in enumerate(FH) if line.startswith("#"))
     return skipped
 
+
 class MAFFile:
     def __init__(self, file_path, separator):
         self.file_path = file_path
@@ -84,7 +98,9 @@ class MAFFile:
         """
         typer.echo("Read Delimited file...")
         skip = self.get_row()
-        return pd.read_csv(self.file_path, sep=self.separator, skiprows=skip, low_memory=False)
+        return pd.read_csv(
+            self.file_path, sep=self.separator, skiprows=skip, low_memory=False
+        )
 
     def get_row(self):
         """Function to skip rows
