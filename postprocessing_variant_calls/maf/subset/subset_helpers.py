@@ -4,7 +4,9 @@ import typer
 import pandas as pd
 
 app = typer.Typer()
-#TODO need to make this accessible from all locations
+
+
+# TODO need to make this accessible from all locations
 def read_tsv(tsv, separator):
     """Read a tsv file
 
@@ -66,9 +68,11 @@ def filter_by_rows(sid, tsv_df, col_name):
     ns = set(sid)
     pattern = "|".join([r"\b{}\b".format(i) for i in ns])
     result = tsv_df[tsv_df[col_name].str.contains(pattern, regex=True, na=False)]
-    if result.empty: 
+    if result.empty:
         typer.echo("no rows containing the specified ids of: {ids}".format(ids=ns))
     return result.copy(deep=True)
+
+
 # preprocessing
 def get_row(tsv_file):
     """Function to skip rows
@@ -83,14 +87,20 @@ def get_row(tsv_file):
     with open(tsv_file, "r") as FH:
         skipped.extend(i for i, line in enumerate(FH) if line.startswith("#"))
     return skipped
+
+
 def check_separator(separator: str):
-    separator_dict = {"tsv":'\t', "csv":","}
+    separator_dict = {"tsv": "\t", "csv": ","}
     if separator in separator_dict.keys():
         sep = separator_dict[separator]
     else:
-        typer.secho(f"Separator for delimited file must be 'tsv' or 'csv', not '{separator}'", fg=typer.colors.RED)
+        typer.secho(
+            f"Separator for delimited file must be 'tsv' or 'csv', not '{separator}'",
+            fg=typer.colors.RED,
+        )
         raise typer.Abort()
     return sep
+
 
 if __name__ == "__main__":
     app()
