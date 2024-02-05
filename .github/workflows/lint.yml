@@ -1,4 +1,4 @@
-name:  Pytest CLI commands
+name:  Lint Package
 on:
     push:
         branches: [main, develop, release/*]
@@ -27,7 +27,7 @@ jobs:
               uses: actions/setup-python@v3
               with:
                   python-version: ${{ matrix.python-version }}
-            - name: Test Commands
+            - name: Lint Check
               run: |
                   make deps-install
                   poetry run black --check
