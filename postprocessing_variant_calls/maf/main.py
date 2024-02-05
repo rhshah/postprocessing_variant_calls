@@ -1,5 +1,4 @@
 from .annotate import annotate_process
-from .concat import concat_process
 from postprocessing_variant_calls.maf.helper import MAFFile
 from .tag import tag_process
 from .filter import filter_process
@@ -15,7 +14,6 @@ import typer
 import logging
 import time
 import os 
-import pkg_resources
 # dir path 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -60,10 +58,13 @@ def maf_maf(
         help="Maf output file name."
     ),
     header: Path = typer.Option(
-        pkg_resources.resource_filename(__name__, '../resources/maf_concat/default_header.txt'), 
+        None, 
         "--header",
         "-h",
-        help="a header file containing the headers for maf file",
+        help="A header file containing the columns to concatenate input mafs on. \
+              It must be a subset of: \
+              Hugo_Symbol, Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele2. \
+              These are also the default columns used for concatenation"
         callback = check_txt
     ),
     deduplicate: bool = typer.Option(
@@ -94,6 +95,8 @@ def maf_maf(
     # process our header file
     if header:
         header = process_header(header)
+    else:
+        header = minimal_maf_columns
     # concat maf files 
     # paths vs files is taken care of at this point
     concat_df = concat_mafs(files, output_maf, header, separator)

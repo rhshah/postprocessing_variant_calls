@@ -5,7 +5,6 @@ from .mutect import mutect_process
 # from .maf import main
 from .maf import main
 from .maf.annotate import annotate_process
-from .maf.concat import concat_process
 import logging
 import time
 # setup logger

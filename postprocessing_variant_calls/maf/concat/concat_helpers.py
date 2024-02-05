@@ -20,9 +20,10 @@ def process_paths(paths):
 
 def process_header(header):
     file = open(header, 'r')
-    line = file.readline().rstrip('\n').split(',')
+    header = file.readline().rstrip('\n').split(',')
     file.close
-    return line
+    header = check_headers(minimal_maf_columns, header)
+    return header
 
 def check_maf(files: List[Path]):
     # return non if argument is empty
@@ -47,13 +48,13 @@ def check_txt(paths: Path):
         raise typer.Abort()
     return paths
 
-def check_headers(maf, header):
-    columns_set = set(maf.columns)
-    if set(header).issubset(columns_set):
-            return maf[header]
+def check_headers(req_columns, header):
+    req_columns_set = set(req_columns)
+    if set(req_columns_set).issubset(header):
+            return header
     else:
-        list(set(header) - columns_set)
-        typer.secho(f"{columns_set} is not a subset of {header}. Please provide custom header file if the provided a header file or edit the current header file if you maf uses different columns names", 
+        missing = list(req_columns_set - set(header))
+        typer.secho(f"Header file is missing the following required column names: {missing}", 
                     fg=typer.colors.RED)
         raise typer.Abort()
     
@@ -75,7 +76,15 @@ def concat_mafs(files, output_maf, header, separator):
             typer.secho(f"Reading: {maf}", fg=typer.colors.BRIGHT_GREEN)
             maf_df = pd.read_csv(maf, sep=separator, low_memory=True)
             # header
-            maf_col_df = check_headers(maf_df, header)
+            df_cols = set(maf_df.columns)
+            if set(header).issubset(df_cols):
+                maf_col_df = maf_df[header]
+            else:
+                missing = list(set(header) - df_cols)
+                typer.secho(f"{maf} is missing the following columns specified in header: {missing}", 
+                            fg=typer.colors.RED)
+                raise typer.Abort()
+
             maf_list.append(maf_col_df)
         else:
             typer.secho(f"failed to open {maf}", fg=typer.colors.RED)

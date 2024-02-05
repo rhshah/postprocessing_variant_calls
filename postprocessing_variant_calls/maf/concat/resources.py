@@ -9,17 +9,6 @@ minimal_maf_columns = [
                 "End_Position", 
                 "Reference_Allele", 
                 "Tumor_Seq_Allele2", 
-                "Variant_Classification", 
-                "Variant_Type", 
-                "Tumor_Sample_Barcode", 
-                "Matched_Norm_Sample_Barcode", 
-                "HGVSc",
-                "HGVSp",
-                "HGVSp_Short",
-                "t_ref_count", 
-                "t_alt_count", 
-                "n_ref_count", 
-                "n_alt_count",
 ]
 
 de_duplication_columns = [

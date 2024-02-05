@@ -8,13 +8,13 @@ runner = CliRunner()
 maf_concat_files = [
         ['maf', 'concat', '-f', 'tests/data/maf/concat/maf2.maf' , 
         '-f', 'tests/data/maf/concat/maf1.maf', 
-        "-o", "tests/data/maf/concat/output_maf.maf", "-h" ,"resources/maf_concat/header.txt"] 
+        "-o", "tests/data/maf/concat/output_maf.maf", "-h" ,"postprocessing_variant_calls/resources/maf_concat/header.txt"] 
 
 ]
 
 maf_concat_paths = [
         ['maf', 'concat', '-p', 'tests/data/maf/concat/paths.txt' ,  
-        "-o", "tests/data/maf/concat/output_maf.maf", "-h", "resources/maf_concat/header.txt"] 
+        "-o", "tests/data/maf/concat/output_maf.maf", "-h", "postprocessing_variant_calls/resources/maf_concat/header.txt"] 
 
 ]
 
@@ -28,7 +28,7 @@ maf_annotate_maf_by_bed = [
         ]
 
 maf_subset = [
-    ['maf', 'subset', '-m', 'tests/data/maf/subset/example_input.maf', '--ids', 'resources/maf_subset/example_subset_ids.txt', '-o','tests/data/maf/subset/example_output.maf']
+    ['maf', 'subset', '-m', 'tests/data/maf/subset/example_input.maf', '--ids', 'postprocessing_variant_calls/resources/maf_subset/example_subset_ids.txt', '-o','tests/data/maf/subset/example_output.maf']
     ]
 
 maf_filter = [
@@ -76,8 +76,8 @@ def test_concat_files(call):
     result.stdout 
     assert result.exit_code == 0
     assert '' in result.stdout
-    assert os.path.exists("tests/data/maf/subset/output_subset.maf") == True
-    os.remove("tests/data/maf/subset/output_subset.maf")
+    assert os.path.exists("tests/data/maf/subset/example_output.maf") == True
+    os.remove("tests/data/maf/subset/example_output.maf")
 
 # Command Test
 @pytest.mark.parametrize("call", maf_annotate_maf_by_bed)
