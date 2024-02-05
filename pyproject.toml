@@ -10,7 +10,7 @@ packages = [
     { include = "utils" },
     { include = "postprocessing_variant_calls" }
 ]
-include = ["resource/resource.txt"]
+
 
 [tool.poetry.dependencies]
 python = ">=3.8"
@@ -23,6 +23,7 @@ numpy = "*"
 flake8 = "*"
 pytest = "*"
 typer-cli = "*"
+black = "*"
 
 [tool.poetry.scripts]
 pv = "postprocessing_variant_calls.main:app"
