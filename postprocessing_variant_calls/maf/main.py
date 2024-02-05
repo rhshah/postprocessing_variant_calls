@@ -64,7 +64,7 @@ def maf_maf(
         help="A header file containing the columns to concatenate input mafs on. \
               It must be a subset of: \
               Hugo_Symbol, Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele2. \
-              These are also the default columns used for concatenation"
+              These are also the default columns used for concatenation",
         callback = check_txt
     ),
     deduplicate: bool = typer.Option(
