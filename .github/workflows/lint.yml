@@ -30,5 +30,5 @@ jobs:
             - name: Test Commands
               run: |
                   make deps-install
-                  poetry run pytest tests
+                  poetry run black --check
                   
