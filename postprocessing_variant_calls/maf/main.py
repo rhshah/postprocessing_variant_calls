@@ -13,25 +13,15 @@ from .concat.resources import de_duplication_columns, minimal_maf_columns
 from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
 import typer
 from importlib import resources
-import logging
 from pathlib import Path
 from typing import List, Optional
 import typer
-import logging
 import time
 import os
 
 # dir path
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-# setup logger
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p",
-    level=logging.DEBUG,
-)
-
-logger = logging.getLogger("concat")
 
 app = typer.Typer()
 
@@ -46,11 +36,13 @@ app.add_typer(tag_process.app, name="tag", help="tag maf files based on a given 
 app.add_typer(
     filter_process.app, name="filter", help="filter maf files based on a given input."
 )
+from .traceback import traceback_process
+app.add_typer(traceback_process.app, name="traceback", help="commands for manipulating traceback mafs")
 
 
 # Concat Features: This needs to be in main since we it doesn't have sub-commands
 @app.command("concat", help="row-wise concatenation for maf files.")
-def maf_maf(
+def concat(
     files: List[Path] = typer.Option(
         None,
         "--files",
@@ -92,7 +84,6 @@ def maf_maf(
         callback=check_separator,
     ),
 ):
-    logger.info("started concat")
     # make sure files or paths was specified
     # as of < 0.7.0 does not support mutually exclusive arguments
     if not (files or paths):

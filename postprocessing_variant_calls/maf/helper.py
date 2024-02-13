@@ -151,6 +151,7 @@ class MAFFile:
                 "Reference_Allele",
                 "Tumor_Seq_Allele2",
             ],
+            "standard": ['t_vaf_fragment_simplex_duplex', 't_alt_count_fragment_simplex_duplex', 't_total_count_fragment_simplex_duplex', 't_ref_count_fragment_simplex_duplex']
         }
         self.gen_id()
         self.tsg_genes = tsg_genes

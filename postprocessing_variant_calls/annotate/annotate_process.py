@@ -27,9 +27,6 @@ logger = logging.getLogger("filter")
 app = typer.Typer(
     help="annotations for genomic files based on some criteria in a reference file"
 )
-# single filter
-# maf_maf = typer.Typer()
-# app.add_typer(maf_maf, name="maf_maf", help="annotate a maf based on another maf")
 
 
 @app.command("maf_maf")
