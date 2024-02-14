@@ -68,6 +68,7 @@ maf_tag = [
     ["maf", "tag", "germline_status", "--help"],
     ["maf", "tag", "prevalence_in_cosmicDB", "--help"],
     ["maf", "tag", "truncating_mut_in_TSG", "--help"],
+    ["maf", "tag", "traceback", "--help"]
 ]
 
 

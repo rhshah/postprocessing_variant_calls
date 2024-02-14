@@ -108,10 +108,9 @@ def gen_id_tsv(df):
 
 
 class MAFFile:
-    def __init__(self, file_path, separator):
+    def __init__(self, file_path, separator,header=None):
         self.file_path = file_path
         self.separator = separator
-        self.data_frame = self.read_tsv()
         self.cols = {
             "general": [
                 "Chromosome",
@@ -151,12 +150,20 @@ class MAFFile:
                 "Reference_Allele",
                 "Tumor_Seq_Allele2",
             ],
-            "standard": ['t_vaf_fragment_simplex_duplex', 't_alt_count_fragment_simplex_duplex', 't_total_count_fragment_simplex_duplex', 't_ref_count_fragment_simplex_duplex']
+            "traceback": ['t_ref_count_standard', 
+                          't_alt_count_standard', 
+                          't_total_count_standard', 
+                          't_ref_count_fragment_simplex_duplex',
+                          't_alt_count_fragment_simplex_duplex',
+                          't_total_count_fragment_simplex_duplex',
+                          ]
         }
-        self.gen_id()
+        self.header =  self.__process_header(header) if header is not None else None
+        self.data_frame = self.__read_tsv()
+        self.__gen_id()
         self.tsg_genes = tsg_genes
 
-    def read_tsv(self):
+    def __read_tsv(self):
         """Read the tsv file and store it in the instance variable 'data_frame'.
 
         Args:
@@ -165,11 +172,22 @@ class MAFFile:
         Returns:
             pd.DataFrame: Output a data frame containing the MAF/tsv
         """
-        typer.echo("Read Delimited file...")
-        skip = self.get_row()
-        return pd.read_csv(
-            self.file_path, sep=self.separator, skiprows=skip, low_memory=True
-        )
+        if Path(self.file_path).is_file():
+            typer.secho(f"Reading Delimited file: {self.file_path}", fg=typer.colors.BRIGHT_GREEN)
+            skip = self.get_row()
+            df = pd.read_csv(
+                self.file_path, 
+                sep=self.separator, 
+                skiprows=skip, 
+                low_memory=True
+            )
+            if self.header:
+                df = df[df.columns.intersection(self.header)]
+            return df
+        else:
+            typer.secho(f"failed to open {self.file_path}", fg=typer.colors.RED)
+            raise typer.Abort() 
+
 
     def get_row(self):
         """Function to skip rows
@@ -186,16 +204,10 @@ class MAFFile:
         maf_df = self.data_frame.merge(maf, on=id, how=how)
         return maf_df
 
-    def gen_id(self):
+    def __gen_id(self):
         # TODO need to add better controls for values inputs
         # TODO need to check that column can be found in both mafs
-        cols = [
-            "Chromosome",
-            "Start_Position",
-            "End_Position",
-            "Reference_Allele",
-            "Tumor_Seq_Allele2",
-        ]
+        cols = self.cols["general"]
         if set(cols).issubset(set(self.data_frame.columns.tolist())):
             self.data_frame["id"] = self.data_frame[cols].apply(
                 lambda x: "_".join(x.replace("-", "").astype(str)), axis=1
@@ -262,6 +274,11 @@ class MAFFile:
                     "yes",
                     "no",
                 )
+            if tagging == "traceback":
+                self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_standard"].combine_first(self.data_frame["t_ref_count_fragment_simplex_duplex"])
+                self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_standard"].combine_first(self.data_frame["t_alt_count_fragment_simplex_duplex"])
+                self.data_frame["t_total_count"] = self.data_frame["t_total_count_standard"].combine_first(self.data_frame["t_total_count_fragment_simplex_duplex"])
+
         else:
             typer.secho(
                 f"missing columns expected for {tagging} tagging expects: {set(cols).difference(set(self.data_frame.columns.tolist()))}, which was missing from the input",
@@ -351,3 +368,35 @@ class MAFFile:
             )
             raise typer.Abort()
         return self.data_frame
+    def concat_mafs(self, mafa, mafb):
+        """main function for annotation a bed file
+
+        Args:
+            files (List string): a list of strings pointing to maf files
+            output_maf (string/path): name of output maf
+            header (List string): the header names by which the mafs will be row-wise concatenated
+
+        Returns:
+            float: returns zero if concatenated maf successfully written
+        """
+        return 0 
+    
+
+    def __process_header(self, header):
+        file = open(header, "r")
+        header = file.readline().rstrip("\n").split(",")
+        file.close
+        header = self.__check_headers(header)
+        return header
+    
+    def __check_headers(self, header):
+        req_columns_set = set(self.cols["general"])
+        if set(req_columns_set).issubset(header):
+            return header
+        else:
+            missing = list(req_columns_set - set(header))
+            typer.secho(
+                f"Header file is missing the following required column names: {missing}",
+                fg=typer.colors.RED,
+            )
+            raise typer.Abort()

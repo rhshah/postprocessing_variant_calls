@@ -18,6 +18,7 @@ from typing import List, Optional
 import typer
 import time
 import os
+import pandas as pd
 
 # dir path
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -36,9 +37,6 @@ app.add_typer(tag_process.app, name="tag", help="tag maf files based on a given 
 app.add_typer(
     filter_process.app, name="filter", help="filter maf files based on a given input."
 )
-from .traceback import traceback_process
-app.add_typer(traceback_process.app, name="traceback", help="commands for manipulating traceback mafs")
-
 
 # Concat Features: This needs to be in main since we it doesn't have sub-commands
 @app.command("concat", help="row-wise concatenation for maf files.")
@@ -84,25 +82,16 @@ def concat(
         callback=check_separator,
     ),
 ):
-    # make sure files or paths was specified
-    # as of < 0.7.0 does not support mutually exclusive arguments
-    if not (files or paths):
-        typer.secho(
-            f"Either paths, or files must be specified for concatenation to run.",
-            fg=typer.colors.RED,
-        )
-        raise typer.Abort()
-    # process our paths txt file
+    # option to get files from text file 
     if paths:
         files = process_paths(paths)
-    # process our header file
-    if header:
-        header = process_header(header)
-    else:
-        header = minimal_maf_columns
-    # concat maf files
-    # paths vs files is taken care of at this point
-    concat_df = concat_mafs(files, output_maf, header, separator)
+    # create maf files
+    maf_list = []
+    for maf in files:
+            maf = MAFFile(maf, separator, header)
+            maf_list.append(maf.data_frame)
+    # concat 
+    concat_df = pd.concat(maf_list, axis=0, ignore_index=True)
     # deduplicate
     if deduplicate:
         concat_df = concat_df[de_duplication_columns].drop_duplicates()
