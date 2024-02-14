@@ -212,6 +212,8 @@ class MAFFile:
             self.data_frame["id"] = self.data_frame[cols].apply(
                 lambda x: "_".join(x.replace("-", "").astype(str)), axis=1
             )
+            first_column = self.data_frame.pop('id') 
+            self.data_frame.insert(0, 'id', first_column) 
         else:
             typer.secho(
                 f"maf file must include {cols} columns to generate an id for annotating the input maf.",
