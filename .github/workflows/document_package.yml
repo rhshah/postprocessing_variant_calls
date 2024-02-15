@@ -1,5 +1,7 @@
 name: Document package 
 on:
+    push:
+        branches: [main, release/*]
 jobs:
     update_cli_doc:
         # The type of runner that the job will run on
