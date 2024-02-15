@@ -1,4 +1,4 @@
-# imports 
+# imports
 from postprocessing_variant_calls.maf.helper import (
     MAFFile,
     check_maf,
@@ -19,25 +19,22 @@ import pandas as pd
 # dir path
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-# Main app 
+# Main app
 app = typer.Typer()
 
-# Declared apps 
+# Declared apps
 from .annotate import annotate_process
 from .tag import tag_process
 from .filter import filter_process
+
 app.add_typer(
     annotate_process.app,
     name="annotate",
     help="annotate maf files based on a given input.",
 )
-app.add_typer(tag_process.app, 
-              name="tag", 
-              help="tag maf files based on a given input.")
+app.add_typer(tag_process.app, name="tag", help="tag maf files based on a given input.")
 app.add_typer(
-    filter_process.app, 
-    name="filter", 
-    help="filter maf files based on a given input."
+    filter_process.app, name="filter", help="filter maf files based on a given input."
 )
 
 
