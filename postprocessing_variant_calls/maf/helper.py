@@ -436,7 +436,6 @@ class MAFFile:
             raise typer.Abort()
         return self.data_frame
 
-
     def __process_header(self, header):
         file = open(header, "r")
         header = file.readline().rstrip("\n").split(",")

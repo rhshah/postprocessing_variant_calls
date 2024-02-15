@@ -24,7 +24,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 app = typer.Typer()
 
 
-
 app.add_typer(tag_process.app, name="tag", help="tag maf files based on a given input.")
 app.add_typer(
     filter_process.app, name="filter", help="filter maf files based on a given input."
@@ -84,7 +83,10 @@ def concat(
         maf = MAFFile(maf, separator, header)
         maf_list.append(maf.data_frame)
     # concat
-    typer.secho(f"Concatenating maf files.",fg=typer.colors.BRIGHT_GREEN,)
+    typer.secho(
+        f"Concatenating maf files.",
+        fg=typer.colors.BRIGHT_GREEN,
+    )
     concat_df = pd.concat(maf_list, axis=0, ignore_index=True)
     # deduplicate
     if deduplicate:
