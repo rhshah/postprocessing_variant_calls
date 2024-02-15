@@ -1,3 +1,4 @@
+# imports 
 from postprocessing_variant_calls.maf.helper import (
     MAFFile,
     check_maf,
@@ -5,8 +6,6 @@ from postprocessing_variant_calls.maf.helper import (
     process_paths,
     maf_duplicates,
 )
-from .tag import tag_process
-from .filter import filter_process
 from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
 import typer
 from importlib import resources
@@ -20,13 +19,25 @@ import pandas as pd
 # dir path
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-
+# Main app 
 app = typer.Typer()
 
-
-app.add_typer(tag_process.app, name="tag", help="tag maf files based on a given input.")
+# Declared apps 
+from .annotate import annotate_process
+from .tag import tag_process
+from .filter import filter_process
 app.add_typer(
-    filter_process.app, name="filter", help="filter maf files based on a given input."
+    annotate_process.app,
+    name="annotate",
+    help="annotate maf files based on a given input.",
+)
+app.add_typer(tag_process.app, 
+              name="tag", 
+              help="tag maf files based on a given input.")
+app.add_typer(
+    filter_process.app, 
+    name="filter", 
+    help="filter maf files based on a given input."
 )
 
 
