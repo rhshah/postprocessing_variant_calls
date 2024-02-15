@@ -150,13 +150,16 @@ class MAFFile:
                 "Reference_Allele",
                 "Tumor_Seq_Allele2",
             ],
-            "traceback": ['t_ref_count_standard', 
+            "traceback": {'standard': ['t_ref_count_standard', 
                           't_alt_count_standard', 
-                          't_total_count_standard', 
-                          't_ref_count_fragment_simplex_duplex',
+                          't_total_count_standard',
+                          ],
+                          'access':[
+                            't_ref_count_fragment_simplex_duplex',
                           't_alt_count_fragment_simplex_duplex',
                           't_total_count_fragment_simplex_duplex',
                           ]
+            }
         }
         self.header =  self.__process_header(header) if header is not None else None
         self.data_frame = self.__read_tsv()
@@ -231,7 +234,9 @@ class MAFFile:
 
     def tag(self, tagging):
         cols = self.cols[tagging]
-        if set(cols).issubset(set(self.data_frame.columns.tolist())):
+        if isinstance(cols, dict):
+            dictionary = True
+        if set(cols).issubset(set(self.data_frame.columns.tolist())) or dictionary:
             if tagging == "germline_status":
                 self.data_frame["t_alt_freq"] = pd.to_numeric(
                     (self.data_frame["t_alt_count"])
@@ -276,10 +281,19 @@ class MAFFile:
                     "yes",
                     "no",
                 )
-            if tagging == "traceback":
-                self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_standard"].combine_first(self.data_frame["t_ref_count_fragment_simplex_duplex"])
-                self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_standard"].combine_first(self.data_frame["t_alt_count_fragment_simplex_duplex"])
-                self.data_frame["t_total_count"] = self.data_frame["t_total_count_standard"].combine_first(self.data_frame["t_total_count_fragment_simplex_duplex"])
+            if tagging == "traceback" and dictionary:
+                if set(cols['standard'] + cols['access']).issubset(set(self.data_frame.columns.tolist())):
+                    self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_standard"].combine_first(self.data_frame["t_ref_count_fragment_simplex_duplex"])
+                    self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_standard"].combine_first(self.data_frame["t_alt_count_fragment_simplex_duplex"])
+                    self.data_frame["t_total_count"] = self.data_frame["t_total_count_standard"].combine_first(self.data_frame["t_total_count_fragment_simplex_duplex"])
+                if set(cols['standard']).issubset(set(self.data_frame.columns.tolist())):
+                    self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_standard"]
+                    self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_standard"]
+                    self.data_frame["t_total_count"] = self.data_frame["t_total_count_standard"]
+                if set(cols['access']).issubset(set(self.data_frame.columns.tolist())):
+                    self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_fragment_simplex_duplex"]
+                    self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_fragment_simplex_duplex"]
+                    self.data_frame["t_total_count"] = self.data_frame["t_total_count_fragment_simplex_duplex"]
 
         else:
             typer.secho(
