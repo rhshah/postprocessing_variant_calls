@@ -69,7 +69,9 @@ def germline_status(
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
-    typer.secho(f"Tagging Maf with germline_status columns", fg=typer.colors.BRIGHT_GREEN)
+    typer.secho(
+        f"Tagging Maf with germline_status columns", fg=typer.colors.BRIGHT_GREEN
+    )
     mafa = mafa.tag("germline_status")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
@@ -106,7 +108,9 @@ def common_variant(
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
-    typer.secho(f"Tagging Maf with common_variant columns", fg=typer.colors.BRIGHT_GREEN)
+    typer.secho(
+        f"Tagging Maf with common_variant columns", fg=typer.colors.BRIGHT_GREEN
+    )
     mafa = mafa.tag("common_variant")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
@@ -143,7 +147,9 @@ def prevalence_in_cosmicDB(
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
-    typer.secho(f"Tagging Maf with prevalence_in_cosmicDB columns", fg=typer.colors.BRIGHT_GREEN)
+    typer.secho(
+        f"Tagging Maf with prevalence_in_cosmicDB columns", fg=typer.colors.BRIGHT_GREEN
+    )
     mafa = mafa.tag("prevalence_in_cosmicDB")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
@@ -180,7 +186,9 @@ def truncating_mut_in_TSG(
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
-    typer.secho(f"Tagging Maf with truncating_mut_in_TSG columns", fg=typer.colors.BRIGHT_GREEN)
+    typer.secho(
+        f"Tagging Maf with truncating_mut_in_TSG columns", fg=typer.colors.BRIGHT_GREEN
+    )
     mafa = mafa.tag("truncating_mut_in_TSG")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
@@ -224,7 +232,8 @@ def cmo_ch(
 
 
 @app.command(
-    "traceback", help="Generate combined count columns between standard and simplex/duplex mafs"
+    "traceback",
+    help="Generate combined count columns between standard and simplex/duplex mafs",
 )
 def traceback(
     maf: Path = typer.Option(
@@ -257,6 +266,7 @@ def traceback(
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
+
 
 if __name__ == "__main__":
     app()

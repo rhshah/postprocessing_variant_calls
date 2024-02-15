@@ -8,7 +8,8 @@ import typer
 import pandas as pd
 import numpy as np
 from typing import Tuple
-#TODO import helpers and file class
+
+# TODO import helpers and file class
 from postprocessing_variant_calls.maf.helper import (
     check_maf,
     check_txt,
@@ -19,13 +20,15 @@ from postprocessing_variant_calls.maf.helper import (
 )
 
 
-#TODO add help and sub-command name 
+# TODO add help and sub-command name
 app = typer.Typer(help="post-processing command tagging maf files")
+
+
 @app.command(
     "common_variant",
     help="Tag a variant in a MAF file as common variant based on GNOMAD AF",
 )
-#TODO update sub-command function name
+# TODO update sub-command function name
 def common_variant(
     maf: Path = typer.Option(
         ...,
@@ -56,9 +59,9 @@ def common_variant(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
-#TODO add more sub-commands using the template provided above
 
-# main function 
+# TODO add more sub-commands using the template provided above
+
+# main function
 if __name__ == "__main__":
     app()
-

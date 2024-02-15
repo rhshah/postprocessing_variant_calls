@@ -1,15 +1,12 @@
-from .annotate import annotate_process
-from postprocessing_variant_calls.maf.helper import MAFFile
-from .tag import tag_process
-from .filter import filter_process
-from .concat.concat_helpers import (
-    concat_mafs,
+from postprocessing_variant_calls.maf.helper import (
+    MAFFile,
     check_maf,
     check_txt,
     process_paths,
-    process_header,
+    maf_duplicates,
 )
-from .concat.resources import de_duplication_columns, minimal_maf_columns
+from .tag import tag_process
+from .filter import filter_process
 from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
 import typer
 from importlib import resources
@@ -27,16 +24,12 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 app = typer.Typer()
 
 
-# Add Annote App
-app.add_typer(
-    annotate_process.app,
-    name="annotate",
-    help="annotate maf files based on a given input.",
-)
+
 app.add_typer(tag_process.app, name="tag", help="tag maf files based on a given input.")
 app.add_typer(
     filter_process.app, name="filter", help="filter maf files based on a given input."
 )
+
 
 # Concat Features: This needs to be in main since we it doesn't have sub-commands
 @app.command("concat", help="row-wise concatenation for maf files.")
@@ -82,19 +75,20 @@ def concat(
         callback=check_separator,
     ),
 ):
-    # option to get files from text file 
+    # option to get files from text file
     if paths:
         files = process_paths(paths)
     # create maf files
     maf_list = []
     for maf in files:
-            maf = MAFFile(maf, separator, header)
-            maf_list.append(maf.data_frame)
-    # concat 
+        maf = MAFFile(maf, separator, header)
+        maf_list.append(maf.data_frame)
+    # concat
+    typer.secho(f"Concatenating maf files.",fg=typer.colors.BRIGHT_GREEN,)
     concat_df = pd.concat(maf_list, axis=0, ignore_index=True)
     # deduplicate
     if deduplicate:
-        concat_df = concat_df[de_duplication_columns].drop_duplicates()
+        concat_df = maf_duplicates(concat_df)
     # write out paths
     concat_df.to_csv(output_maf, index=False, sep="\t")
     return 0

@@ -9,11 +9,20 @@ from typing import List, Optional
 import typer
 import pandas as pd
 import numpy as np
-from postprocessing_variant_calls.maf.concat import acceptable_extensions
 from .resources import tsg_genes
 
 
+def process_paths(paths):
+    file = open(paths, "r")
+    files = []
+    for line in file.readlines():
+        files.append(line.rstrip("\n"))
+    file.close
+    return files
+
+
 def check_maf(files: List[Path]):
+    acceptable_extensions = [".maf", ".txt", ".csv", "tsv"]
     # return non if argument is empty
     if files is None:
         return None
@@ -27,6 +36,23 @@ def check_maf(files: List[Path]):
             )
             raise typer.Abort()
     return files
+
+
+def maf_duplicates(data_frame):
+    de_duplication_columns = [
+        "Hugo_Symbol",
+        "Chromosome",
+        "Start_Position",
+        "End_Position",
+        "Reference_Allele",
+        "Tumor_Seq_Allele2",
+        "Variant_Classification",
+        "Variant_Type",
+        "HGVSc",
+        "HGVSp",
+        "HGVSp_Short",
+    ]
+    return data_frame.drop_duplicates(subset=de_duplication_columns)
 
 
 def check_txt(paths: Path):
@@ -108,7 +134,7 @@ def gen_id_tsv(df):
 
 
 class MAFFile:
-    def __init__(self, file_path, separator,header=None):
+    def __init__(self, file_path, separator, header=None):
         self.file_path = file_path
         self.separator = separator
         self.cols = {
@@ -150,18 +176,20 @@ class MAFFile:
                 "Reference_Allele",
                 "Tumor_Seq_Allele2",
             ],
-            "traceback": {'standard': ['t_ref_count_standard', 
-                          't_alt_count_standard', 
-                          't_total_count_standard',
-                          ],
-                          'access':[
-                            't_ref_count_fragment_simplex_duplex',
-                          't_alt_count_fragment_simplex_duplex',
-                          't_total_count_fragment_simplex_duplex',
-                          ]
-            }
+            "traceback": {
+                "standard": [
+                    "t_ref_count_standard",
+                    "t_alt_count_standard",
+                    "t_total_count_standard",
+                ],
+                "access": [
+                    "t_ref_count_fragment_simplex_duplex",
+                    "t_alt_count_fragment_simplex_duplex",
+                    "t_total_count_fragment_simplex_duplex",
+                ],
+            },
         }
-        self.header =  self.__process_header(header) if header is not None else None
+        self.header = self.__process_header(header) if header is not None else None
         self.data_frame = self.__read_tsv()
         self.__gen_id()
         self.tsg_genes = tsg_genes
@@ -176,21 +204,20 @@ class MAFFile:
             pd.DataFrame: Output a data frame containing the MAF/tsv
         """
         if Path(self.file_path).is_file():
-            typer.secho(f"Reading Delimited file: {self.file_path}", fg=typer.colors.BRIGHT_GREEN)
+            typer.secho(
+                f"Reading Delimited file: {self.file_path}",
+                fg=typer.colors.BRIGHT_GREEN,
+            )
             skip = self.get_row()
             df = pd.read_csv(
-                self.file_path, 
-                sep=self.separator, 
-                skiprows=skip, 
-                low_memory=True
+                self.file_path, sep=self.separator, skiprows=skip, low_memory=True
             )
             if self.header:
                 df = df[df.columns.intersection(self.header)]
             return df
         else:
             typer.secho(f"failed to open {self.file_path}", fg=typer.colors.RED)
-            raise typer.Abort() 
-
+            raise typer.Abort()
 
     def get_row(self):
         """Function to skip rows
@@ -208,15 +235,13 @@ class MAFFile:
         return maf_df
 
     def __gen_id(self):
-        # TODO need to add better controls for values inputs
-        # TODO need to check that column can be found in both mafs
         cols = self.cols["general"]
         if set(cols).issubset(set(self.data_frame.columns.tolist())):
             self.data_frame["id"] = self.data_frame[cols].apply(
                 lambda x: "_".join(x.replace("-", "").astype(str)), axis=1
             )
-            first_column = self.data_frame.pop('id') 
-            self.data_frame.insert(0, 'id', first_column) 
+            first_column = self.data_frame.pop("id")
+            self.data_frame.insert(0, "id", first_column)
         else:
             typer.secho(
                 f"maf file must include {cols} columns to generate an id for annotating the input maf.",
@@ -225,8 +250,6 @@ class MAFFile:
             raise typer.Abort()
 
     def annotate_maf_maf(self, maf_df_a, cname, values):
-        # TODO need to add better controls for values inputs
-        # TODO need to check that column can be found in both mafs
         self.data_frame[cname] = np.where(
             self.data_frame["id"].isin(maf_df_a["id"]), values[0], values[1]
         )
@@ -282,18 +305,46 @@ class MAFFile:
                     "no",
                 )
             if tagging == "traceback" and dictionary:
-                if set(cols['standard'] + cols['access']).issubset(set(self.data_frame.columns.tolist())):
-                    self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_standard"].combine_first(self.data_frame["t_ref_count_fragment_simplex_duplex"])
-                    self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_standard"].combine_first(self.data_frame["t_alt_count_fragment_simplex_duplex"])
-                    self.data_frame["t_total_count"] = self.data_frame["t_total_count_standard"].combine_first(self.data_frame["t_total_count_fragment_simplex_duplex"])
-                if set(cols['standard']).issubset(set(self.data_frame.columns.tolist())):
-                    self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_standard"]
-                    self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_standard"]
-                    self.data_frame["t_total_count"] = self.data_frame["t_total_count_standard"]
-                if set(cols['access']).issubset(set(self.data_frame.columns.tolist())):
-                    self.data_frame["t_ref_count"] =  self.data_frame["t_ref_count_fragment_simplex_duplex"]
-                    self.data_frame["t_alt_count"] =  self.data_frame["t_alt_count_fragment_simplex_duplex"]
-                    self.data_frame["t_total_count"] = self.data_frame["t_total_count_fragment_simplex_duplex"]
+                if set(cols["standard"] + cols["access"]).issubset(
+                    set(self.data_frame.columns.tolist())
+                ):
+                    self.data_frame["t_ref_count"] = self.data_frame[
+                        "t_ref_count_standard"
+                    ].combine_first(
+                        self.data_frame["t_ref_count_fragment_simplex_duplex"]
+                    )
+                    self.data_frame["t_alt_count"] = self.data_frame[
+                        "t_alt_count_standard"
+                    ].combine_first(
+                        self.data_frame["t_alt_count_fragment_simplex_duplex"]
+                    )
+                    self.data_frame["t_total_count"] = self.data_frame[
+                        "t_total_count_standard"
+                    ].combine_first(
+                        self.data_frame["t_total_count_fragment_simplex_duplex"]
+                    )
+                if set(cols["standard"]).issubset(
+                    set(self.data_frame.columns.tolist())
+                ):
+                    self.data_frame["t_ref_count"] = self.data_frame[
+                        "t_ref_count_standard"
+                    ]
+                    self.data_frame["t_alt_count"] = self.data_frame[
+                        "t_alt_count_standard"
+                    ]
+                    self.data_frame["t_total_count"] = self.data_frame[
+                        "t_total_count_standard"
+                    ]
+                if set(cols["access"]).issubset(set(self.data_frame.columns.tolist())):
+                    self.data_frame["t_ref_count"] = self.data_frame[
+                        "t_ref_count_fragment_simplex_duplex"
+                    ]
+                    self.data_frame["t_alt_count"] = self.data_frame[
+                        "t_alt_count_fragment_simplex_duplex"
+                    ]
+                    self.data_frame["t_total_count"] = self.data_frame[
+                        "t_total_count_fragment_simplex_duplex"
+                    ]
 
         else:
             typer.secho(
@@ -384,19 +435,7 @@ class MAFFile:
             )
             raise typer.Abort()
         return self.data_frame
-    def concat_mafs(self, mafa, mafb):
-        """main function for annotation a bed file
 
-        Args:
-            files (List string): a list of strings pointing to maf files
-            output_maf (string/path): name of output maf
-            header (List string): the header names by which the mafs will be row-wise concatenated
-
-        Returns:
-            float: returns zero if concatenated maf successfully written
-        """
-        return 0 
-    
 
     def __process_header(self, header):
         file = open(header, "r")
@@ -404,7 +443,7 @@ class MAFFile:
         file.close
         header = self.__check_headers(header)
         return header
-    
+
     def __check_headers(self, header):
         req_columns_set = set(self.cols["general"])
         if set(req_columns_set).issubset(header):
