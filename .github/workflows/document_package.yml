@@ -24,6 +24,10 @@ jobs:
               run: |
                     make deps-install
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
+            - name: Add README
+              run: | 
+                    rm docs/README.md
+                    cp README.md docs/README.md
             - name: Commit Doc Changes
               run: |
                     git config --global user.name 'buehlere'
