@@ -14,10 +14,12 @@ or a tagged version with `pip install git+https://github.com/msk-access/postproc
 For setting up a development environment please see the [Setting up a Dev Environment](#Setting-up-a-Dev-Environment) section.
 
 # Usage
+
 See [CLI](docs/CLI.md) for commmand line usage of the package.
 
 # Setting up a Dev Environment 
-#### Install External Dependencies
+
+## Install External Dependencies
 Have an environment with python >= 3.8 installed. 
 
 Install poetry: 
@@ -26,7 +28,7 @@ Install poetry:
 pip install poetry
 ```
 
-#### Install Package Dependencies
+## Install Package Dependencies
 
 Then install project dependencies with Poetry.
 
@@ -35,10 +37,11 @@ cd /path/to/postprocessing_variant_calls
 poetry install .
 ```
 
-#### Accessing Environment
+## Accessing Environment
 
 To access the environment after initial setup up run: 
 
 ```bash
 poetry shell
 ```
+changes 
