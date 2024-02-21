@@ -1,6 +1,6 @@
 ### VarDictJava
 
-The sub-command `pv vardict` allows users to perform post-processing on VarDictJava output. The two supported inputs to `pv vardict` from VarDictJava are `single` and `case-control` vcfs. 
+The sub-command `pv vardict` allows users to perform post-processing on VarDictJava output. The two supported inputs to `pv vardict` from VarDictJava are `single` and `case-control` vcfs. Currently, [VarDictJava 1.8.2](https://github.com/AstraZeneca-NGS/VarDictJava/releases/tag/v1.8.2) is supported. 
 
 To specify to `pv vardict`, which input type will be used one of the following sub-commands may be used: 
 - `pv vardict single` for single sample vcfs 

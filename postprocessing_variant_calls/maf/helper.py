@@ -9,11 +9,20 @@ from typing import List, Optional
 import typer
 import pandas as pd
 import numpy as np
-from postprocessing_variant_calls.maf.concat import acceptable_extensions
 from .resources import tsg_genes
 
 
+def process_paths(paths):
+    file = open(paths, "r")
+    files = []
+    for line in file.readlines():
+        files.append(line.rstrip("\n"))
+    file.close
+    return files
+
+
 def check_maf(files: List[Path]):
+    acceptable_extensions = [".maf", ".txt", ".csv", "tsv"]
     # return non if argument is empty
     if files is None:
         return None
@@ -27,6 +36,23 @@ def check_maf(files: List[Path]):
             )
             raise typer.Abort()
     return files
+
+
+def maf_duplicates(data_frame):
+    de_duplication_columns = [
+        "Hugo_Symbol",
+        "Chromosome",
+        "Start_Position",
+        "End_Position",
+        "Reference_Allele",
+        "Tumor_Seq_Allele2",
+        "Variant_Classification",
+        "Variant_Type",
+        "HGVSc",
+        "HGVSp",
+        "HGVSp_Short",
+    ]
+    return data_frame.drop_duplicates(subset=de_duplication_columns)
 
 
 def check_txt(paths: Path):
@@ -108,10 +134,9 @@ def gen_id_tsv(df):
 
 
 class MAFFile:
-    def __init__(self, file_path, separator):
+    def __init__(self, file_path, separator, header=None):
         self.file_path = file_path
         self.separator = separator
-        self.data_frame = self.read_tsv()
         self.cols = {
             "general": [
                 "Chromosome",
@@ -151,11 +176,25 @@ class MAFFile:
                 "Reference_Allele",
                 "Tumor_Seq_Allele2",
             ],
+            "traceback": {
+                "standard": [
+                    "t_ref_count_standard",
+                    "t_alt_count_standard",
+                    "t_total_count_standard",
+                ],
+                "access": [
+                    "t_ref_count_fragment_simplex_duplex",
+                    "t_alt_count_fragment_simplex_duplex",
+                    "t_total_count_fragment_simplex_duplex",
+                ],
+            },
         }
-        self.gen_id()
+        self.header = self.__process_header(header) if header is not None else None
+        self.data_frame = self.__read_tsv()
+        self.__gen_id()
         self.tsg_genes = tsg_genes
 
-    def read_tsv(self):
+    def __read_tsv(self):
         """Read the tsv file and store it in the instance variable 'data_frame'.
 
         Args:
@@ -164,11 +203,21 @@ class MAFFile:
         Returns:
             pd.DataFrame: Output a data frame containing the MAF/tsv
         """
-        typer.echo("Read Delimited file...")
-        skip = self.get_row()
-        return pd.read_csv(
-            self.file_path, sep=self.separator, skiprows=skip, low_memory=True
-        )
+        if Path(self.file_path).is_file():
+            typer.secho(
+                f"Reading Delimited file: {self.file_path}",
+                fg=typer.colors.BRIGHT_GREEN,
+            )
+            skip = self.get_row()
+            df = pd.read_csv(
+                self.file_path, sep=self.separator, skiprows=skip, low_memory=True
+            )
+            if self.header:
+                df = df[df.columns.intersection(self.header)]
+            return df
+        else:
+            typer.secho(f"failed to open {self.file_path}", fg=typer.colors.RED)
+            raise typer.Abort()
 
     def get_row(self):
         """Function to skip rows
@@ -185,20 +234,14 @@ class MAFFile:
         maf_df = self.data_frame.merge(maf, on=id, how=how)
         return maf_df
 
-    def gen_id(self):
-        # TODO need to add better controls for values inputs
-        # TODO need to check that column can be found in both mafs
-        cols = [
-            "Chromosome",
-            "Start_Position",
-            "End_Position",
-            "Reference_Allele",
-            "Tumor_Seq_Allele2",
-        ]
+    def __gen_id(self):
+        cols = self.cols["general"]
         if set(cols).issubset(set(self.data_frame.columns.tolist())):
             self.data_frame["id"] = self.data_frame[cols].apply(
                 lambda x: "_".join(x.replace("-", "").astype(str)), axis=1
             )
+            first_column = self.data_frame.pop("id")
+            self.data_frame.insert(0, "id", first_column)
         else:
             typer.secho(
                 f"maf file must include {cols} columns to generate an id for annotating the input maf.",
@@ -207,8 +250,6 @@ class MAFFile:
             raise typer.Abort()
 
     def annotate_maf_maf(self, maf_df_a, cname, values):
-        # TODO need to add better controls for values inputs
-        # TODO need to check that column can be found in both mafs
         self.data_frame[cname] = np.where(
             self.data_frame["id"].isin(maf_df_a["id"]), values[0], values[1]
         )
@@ -216,7 +257,9 @@ class MAFFile:
 
     def tag(self, tagging):
         cols = self.cols[tagging]
-        if set(cols).issubset(set(self.data_frame.columns.tolist())):
+        if isinstance(cols, dict):
+            dictionary = True
+        if set(cols).issubset(set(self.data_frame.columns.tolist())) or dictionary:
             if tagging == "germline_status":
                 self.data_frame["t_alt_freq"] = pd.to_numeric(
                     (self.data_frame["t_alt_count"])
@@ -261,6 +304,48 @@ class MAFFile:
                     "yes",
                     "no",
                 )
+            if tagging == "traceback" and dictionary:
+                if set(cols["standard"] + cols["access"]).issubset(
+                    set(self.data_frame.columns.tolist())
+                ):
+                    self.data_frame["t_ref_count"] = self.data_frame[
+                        "t_ref_count_standard"
+                    ].combine_first(
+                        self.data_frame["t_ref_count_fragment_simplex_duplex"]
+                    )
+                    self.data_frame["t_alt_count"] = self.data_frame[
+                        "t_alt_count_standard"
+                    ].combine_first(
+                        self.data_frame["t_alt_count_fragment_simplex_duplex"]
+                    )
+                    self.data_frame["t_total_count"] = self.data_frame[
+                        "t_total_count_standard"
+                    ].combine_first(
+                        self.data_frame["t_total_count_fragment_simplex_duplex"]
+                    )
+                if set(cols["standard"]).issubset(
+                    set(self.data_frame.columns.tolist())
+                ):
+                    self.data_frame["t_ref_count"] = self.data_frame[
+                        "t_ref_count_standard"
+                    ]
+                    self.data_frame["t_alt_count"] = self.data_frame[
+                        "t_alt_count_standard"
+                    ]
+                    self.data_frame["t_total_count"] = self.data_frame[
+                        "t_total_count_standard"
+                    ]
+                if set(cols["access"]).issubset(set(self.data_frame.columns.tolist())):
+                    self.data_frame["t_ref_count"] = self.data_frame[
+                        "t_ref_count_fragment_simplex_duplex"
+                    ]
+                    self.data_frame["t_alt_count"] = self.data_frame[
+                        "t_alt_count_fragment_simplex_duplex"
+                    ]
+                    self.data_frame["t_total_count"] = self.data_frame[
+                        "t_total_count_fragment_simplex_duplex"
+                    ]
+
         else:
             typer.secho(
                 f"missing columns expected for {tagging} tagging expects: {set(cols).difference(set(self.data_frame.columns.tolist()))}, which was missing from the input",
@@ -350,3 +435,22 @@ class MAFFile:
             )
             raise typer.Abort()
         return self.data_frame
+
+    def __process_header(self, header):
+        file = open(header, "r")
+        header = file.readline().rstrip("\n").split(",")
+        file.close
+        header = self.__check_headers(header)
+        return header
+
+    def __check_headers(self, header):
+        req_columns_set = set(self.cols["general"])
+        if set(req_columns_set).issubset(header):
+            return header
+        else:
+            missing = list(req_columns_set - set(header))
+            typer.secho(
+                f"Header file is missing the following required column names: {missing}",
+                fg=typer.colors.RED,
+            )
+            raise typer.Abort()

@@ -1,42 +1,32 @@
-from .annotate import annotate_process
-from postprocessing_variant_calls.maf.helper import MAFFile
-from .tag import tag_process
-from .filter import filter_process
-from .concat.concat_helpers import (
-    concat_mafs,
+# imports
+from postprocessing_variant_calls.maf.helper import (
+    MAFFile,
     check_maf,
     check_txt,
     process_paths,
-    process_header,
+    maf_duplicates,
 )
-from .concat.resources import de_duplication_columns, minimal_maf_columns
 from .subset.subset_helpers import read_tsv, read_ids, filter_by_rows, check_separator
 import typer
 from importlib import resources
-import logging
 from pathlib import Path
 from typing import List, Optional
 import typer
-import logging
 import time
 import os
+import pandas as pd
 
 # dir path
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-# setup logger
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    datefmt="%m/%d/%Y %I:%M:%S %p",
-    level=logging.DEBUG,
-)
-
-logger = logging.getLogger("concat")
-
+# Main app
 app = typer.Typer()
 
+# Declared apps
+from .annotate import annotate_process
+from .tag import tag_process
+from .filter import filter_process
 
-# Add Annote App
 app.add_typer(
     annotate_process.app,
     name="annotate",
@@ -50,7 +40,7 @@ app.add_typer(
 
 # Concat Features: This needs to be in main since we it doesn't have sub-commands
 @app.command("concat", help="row-wise concatenation for maf files.")
-def maf_maf(
+def concat(
     files: List[Path] = typer.Option(
         None,
         "--files",
@@ -92,29 +82,23 @@ def maf_maf(
         callback=check_separator,
     ),
 ):
-    logger.info("started concat")
-    # make sure files or paths was specified
-    # as of < 0.7.0 does not support mutually exclusive arguments
-    if not (files or paths):
-        typer.secho(
-            f"Either paths, or files must be specified for concatenation to run.",
-            fg=typer.colors.RED,
-        )
-        raise typer.Abort()
-    # process our paths txt file
+    # option to get files from text file
     if paths:
         files = process_paths(paths)
-    # process our header file
-    if header:
-        header = process_header(header)
-    else:
-        header = minimal_maf_columns
-    # concat maf files
-    # paths vs files is taken care of at this point
-    concat_df = concat_mafs(files, output_maf, header, separator)
+    # create maf files
+    maf_list = []
+    for maf in files:
+        maf = MAFFile(maf, separator, header)
+        maf_list.append(maf.data_frame)
+    # concat
+    typer.secho(
+        f"Concatenating maf files.",
+        fg=typer.colors.BRIGHT_GREEN,
+    )
+    concat_df = pd.concat(maf_list, axis=0, ignore_index=True)
     # deduplicate
     if deduplicate:
-        concat_df = concat_df[de_duplication_columns].drop_duplicates()
+        concat_df = maf_duplicates(concat_df)
     # write out paths
     concat_df.to_csv(output_maf, index=False, sep="\t")
     return 0
