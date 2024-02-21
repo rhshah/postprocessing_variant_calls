@@ -20,11 +20,10 @@ jobs:
                   python-version: ${{ matrix.python-version }}
             - name: Check for changes
               id: git_changes
-              run: |
-                echo ::set-output name=has_changes::$(if git diff --quiet; then echo "false"; else echo "true"; fi)
-              
+              run: echo "HAS_CHANGES=$(if git diff --quiet; then echo 'false'; else echo 'true'; fi)" >> $GITHUB_ENV
+            
             - name: Document CLI and write to folder
-              if: steps.git_changes.outputs.has_changes == 'true'
+              if: env.HAS_CHANGES == 'true'
               run: |
                     make deps-install
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
