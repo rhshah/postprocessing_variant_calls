@@ -9,8 +9,7 @@ from .maf.annotate import annotate_process
 import logging
 import time
 
-# setup logger
-logger = logging.getLogger("filter")
+# app
 app = typer.Typer()
 
 # Vardict filter App
@@ -33,6 +32,26 @@ app.add_typer(
     name="maf",
     help="operations for manipulating maf files based on a given input.",
 )
+
+# versioning
+__version__ = "0.2.4"
+
+
+def version_callback(value: bool):
+    if value:
+        typer.echo(f"pv: {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: bool = typer.Option(
+        None, "--version", callback=version_callback, is_eager=True
+    ),
+):
+    # Do other global stuff, handle other global options here
+    return
+
 
 # Main App
 if __name__ == "__main__":
