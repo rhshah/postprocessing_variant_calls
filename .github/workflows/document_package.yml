@@ -1,7 +1,7 @@
 name: Document package 
 on:
     push:
-        branches: [main, develop]
+        branches: [main]
 jobs:
     update_cli_doc:
         # The type of runner that the job will run on
@@ -28,8 +28,6 @@ jobs:
             - name: Check for changes
               id: git_changes
               run: echo "HAS_CHANGES=$(if git diff --quiet; then echo 'false'; else echo 'true'; fi)" >> $GITHUB_ENV
-            - name: Debug HAS_CHANGES
-              run: echo $HAS_CHANGES
             - name: Push Changes
               if: env.HAS_CHANGES == 'true'
               run: |
