@@ -34,7 +34,7 @@ app.add_typer(
 )
 
 # versioning
-__version__ = "0.2.6"
+__version__ = "0.2.7"
 
 
 def version_callback(value: bool):
