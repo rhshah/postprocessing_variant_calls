@@ -1,7 +1,7 @@
 name: Document package 
 on:
     push:
-        branches: [main, release/*]
+        branches: [main]
 jobs:
     update_cli_doc:
         # The type of runner that the job will run on
@@ -13,8 +13,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v3
               with:
-                repository: ${{ github.event.pull_request.head.repo.full_name }}
-                ref: ${{ github.event.pull_request.head.ref }}
+                token: ${{ secrets.PAT }}
 
             - name: Set up Python 
               uses: actions/setup-python@v3
