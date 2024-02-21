@@ -18,13 +18,7 @@ jobs:
               uses: actions/setup-python@v3
               with:
                   python-version: ${{ matrix.python-version }}
-            - name: Check for changes
-              id: git_changes
-              run: echo "HAS_CHANGES=$(if git diff --quiet; then echo 'false'; else echo 'true'; fi)" >> $GITHUB_ENV
-                # Debug output
-            - name: Debug HAS_CHANGES
-              run: echo $HAS_CHANGES
-              
+
             - name: Document CLI and write to folder
               if: env.HAS_CHANGES == 'true'
               run: |
@@ -32,6 +26,13 @@ jobs:
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
                     rm docs/README.md
                     cp README.md docs/README.md
+            - name: Check for changes
+              id: git_changes
+              run: echo "HAS_CHANGES=$(if git diff --quiet; then echo 'false'; else echo 'true'; fi)" >> $GITHUB_ENV
+            - name: Debug HAS_CHANGES
+              run: echo $HAS_CHANGES
+            - name: Push Changes
+              run: |
                     git config --global user.name 'buehlere'
                     git config --global user.email 'buehlere77@gmail.com'
                     git add ./docs
