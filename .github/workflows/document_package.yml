@@ -21,7 +21,10 @@ jobs:
             - name: Check for changes
               id: git_changes
               run: echo "HAS_CHANGES=$(if git diff --quiet; then echo 'false'; else echo 'true'; fi)" >> $GITHUB_ENV
-            
+                # Debug output
+            - name: Debug HAS_CHANGES
+              run: echo $HAS_CHANGES
+              
             - name: Document CLI and write to folder
               if: env.HAS_CHANGES == 'true'
               run: |
