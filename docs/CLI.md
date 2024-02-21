@@ -1,13 +1,14 @@
-# CLI
+# `main`
 
 **Usage**:
 
 ```console
-$ [OPTIONS] COMMAND [ARGS]...
+$ main [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
 
+* `--version`
 * `--install-completion`: Install completion for the current shell.
 * `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
 * `--help`: Show this message and exit.
@@ -15,16 +16,17 @@ $ [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 * `maf`: operations for manipulating maf files...
+* `mutect1`: post-processing commands for MuTect...
 * `vardict`: post-processing commands for VarDict...
 
-## `maf`
+## `main maf`
 
 operations for manipulating maf files based on a given input.
 
 **Usage**:
 
 ```console
-$ maf [OPTIONS] COMMAND [ARGS]...
+$ main maf [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -40,14 +42,14 @@ $ maf [OPTIONS] COMMAND [ARGS]...
 * `subset`: subset maf files.
 * `tag`: tag maf files based on a given input.
 
-### `maf annotate`
+### `main maf annotate`
 
 annotate maf files based on a given input.
 
 **Usage**:
 
 ```console
-$ maf annotate [OPTIONS] COMMAND [ARGS]...
+$ main maf annotate [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -59,14 +61,14 @@ $ maf annotate [OPTIONS] COMMAND [ARGS]...
 * `mafbybed`: annotate a maf column by a bed file.
 * `mafbytsv`: annotate a maf column by a bed file.
 
-#### `maf annotate mafbybed`
+#### `main maf annotate mafbybed`
 
 annotate a maf column by a bed file.
 
 **Usage**:
 
 ```console
-$ maf annotate mafbybed [OPTIONS]
+$ main maf annotate mafbybed [OPTIONS]
 ```
 
 **Options**:
@@ -77,14 +79,14 @@ $ maf annotate mafbybed [OPTIONS]
 * `-c, --cname TEXT`: name for annotation column  [default: annotation]
 * `--help`: Show this message and exit.
 
-#### `maf annotate mafbytsv`
+#### `main maf annotate mafbytsv`
 
 annotate a maf column by a bed file.
 
 **Usage**:
 
 ```console
-$ maf annotate mafbytsv [OPTIONS]
+$ main maf annotate mafbytsv [OPTIONS]
 ```
 
 **Options**:
@@ -97,14 +99,14 @@ $ maf annotate mafbytsv [OPTIONS]
 * `-v, --values <TEXT TEXT>...`: name for annotation column. Defaults to (Yes, No)  [default: yes, no]
 * `--help`: Show this message and exit.
 
-### `maf concat`
+### `main maf concat`
 
 row-wise concatenation for maf files.
 
 **Usage**:
 
 ```console
-$ maf concat [OPTIONS]
+$ main maf concat [OPTIONS]
 ```
 
 **Options**:
@@ -112,19 +114,19 @@ $ maf concat [OPTIONS]
 * `-f, --files PATH`: MAF file to concatenate. Default assumes MAFs are tsv. MAF inputs are specified here, or using paths parameter
 * `-p, --paths PATH`: A text file containing paths of maf files to concatenate. Default assumes MAFs are tsv. MAF files are specified here, or using files parameter.
 * `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-h, --header PATH`: a header file containing the headers for maf file  [default: /Users/ebuehler/Library/CloudStorage/OneDrive-MemorialSloanKetteringCancerCenter/postprocessing_variant_calls/postprocessing_variant_calls/maf/../../resources/maf_concat/default_header.txt]
+* `-h, --header PATH`: A header file containing the columns to concatenate input mafs on.               It must be a subset of:               Hugo_Symbol, Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele2.               These are also the default columns used for concatenation
 * `-de, --deduplicate`: deduplicate outputted maf file.
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-### `maf filter`
+### `main maf filter`
 
 filter maf files based on a given input.
 
 **Usage**:
 
 ```console
-$ maf filter [OPTIONS] COMMAND [ARGS]...
+$ main maf filter [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -140,14 +142,14 @@ $ maf filter [OPTIONS] COMMAND [ARGS]...
 * `non_hotspot`: filter a MAF file based on the presence of...
 * `not_complex`: Filter a MAF filter for complex variants...
 
-#### `maf filter cmo_ch`
+#### `main maf filter cmo_ch`
 
 Filter a MAF file based on all the parameters
 
 **Usage**:
 
 ```console
-$ maf filter cmo_ch [OPTIONS]
+$ main maf filter cmo_ch [OPTIONS]
 ```
 
 **Options**:
@@ -157,14 +159,14 @@ $ maf filter cmo_ch [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf filter hotspot`
+#### `main maf filter hotspot`
 
 filter a MAF file based on the presence of Hotspot variants
 
 **Usage**:
 
 ```console
-$ maf filter hotspot [OPTIONS]
+$ main maf filter hotspot [OPTIONS]
 ```
 
 **Options**:
@@ -174,14 +176,14 @@ $ maf filter hotspot [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf filter mappable`
+#### `main maf filter mappable`
 
 Filter a MAF file to retain only mappable variants
 
 **Usage**:
 
 ```console
-$ maf filter mappable [OPTIONS]
+$ main maf filter mappable [OPTIONS]
 ```
 
 **Options**:
@@ -191,14 +193,14 @@ $ maf filter mappable [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf filter non_common_variant`
+#### `main maf filter non_common_variant`
 
 Filter a MAF file for common variants and retain only uncommo variants
 
 **Usage**:
 
 ```console
-$ maf filter non_common_variant [OPTIONS]
+$ main maf filter non_common_variant [OPTIONS]
 ```
 
 **Options**:
@@ -208,14 +210,14 @@ $ maf filter non_common_variant [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf filter non_hotspot`
+#### `main maf filter non_hotspot`
 
 filter a MAF file based on the presence of Hotspot variants
 
 **Usage**:
 
 ```console
-$ maf filter non_hotspot [OPTIONS]
+$ main maf filter non_hotspot [OPTIONS]
 ```
 
 **Options**:
@@ -225,14 +227,14 @@ $ maf filter non_hotspot [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf filter not_complex`
+#### `main maf filter not_complex`
 
 Filter a MAF filter for complex variants and retain only simple variants
 
 **Usage**:
 
 ```console
-$ maf filter not_complex [OPTIONS]
+$ main maf filter not_complex [OPTIONS]
 ```
 
 **Options**:
@@ -242,14 +244,14 @@ $ maf filter not_complex [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-### `maf mergetsv`
+### `main maf mergetsv`
 
 merge a tsv file onto a maf by a shared id column.
 
 **Usage**:
 
 ```console
-$ maf mergetsv [OPTIONS]
+$ main maf mergetsv [OPTIONS]
 ```
 
 **Options**:
@@ -262,14 +264,14 @@ $ maf mergetsv [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-### `maf subset`
+### `main maf subset`
 
 subset maf files.
 
 **Usage**:
 
 ```console
-$ maf subset [OPTIONS]
+$ main maf subset [OPTIONS]
 ```
 
 **Options**:
@@ -282,14 +284,14 @@ $ maf subset [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-### `maf tag`
+### `main maf tag`
 
 tag maf files based on a given input.
 
 **Usage**:
 
 ```console
-$ maf tag [OPTIONS] COMMAND [ARGS]...
+$ main maf tag [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -302,16 +304,17 @@ $ maf tag [OPTIONS] COMMAND [ARGS]...
 * `common_variant`: Tag a variant in a MAF file as common...
 * `germline_status`: Tag a variant in a MAF file as germline...
 * `prevalence_in_cosmicDB`: Tag a variant in a MAF file with...
+* `traceback`: Generate combined count columns between...
 * `truncating_mut_in_TSG`: Tag a truncating mutating variant in a MAF...
 
-#### `maf tag cmo_ch`
+#### `main maf tag cmo_ch`
 
 Tag a variant in MAF file based on all the parameters listed
 
 **Usage**:
 
 ```console
-$ maf tag cmo_ch [OPTIONS]
+$ main maf tag cmo_ch [OPTIONS]
 ```
 
 **Options**:
@@ -321,14 +324,14 @@ $ maf tag cmo_ch [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf tag common_variant`
+#### `main maf tag common_variant`
 
 Tag a variant in a MAF file as common variant based on GNOMAD AF
 
 **Usage**:
 
 ```console
-$ maf tag common_variant [OPTIONS]
+$ main maf tag common_variant [OPTIONS]
 ```
 
 **Options**:
@@ -338,14 +341,14 @@ $ maf tag common_variant [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf tag germline_status`
+#### `main maf tag germline_status`
 
 Tag a variant in a MAF file as germline based on VAF value
 
 **Usage**:
 
 ```console
-$ maf tag germline_status [OPTIONS]
+$ main maf tag germline_status [OPTIONS]
 ```
 
 **Options**:
@@ -355,14 +358,14 @@ $ maf tag germline_status [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf tag prevalence_in_cosmicDB`
+#### `main maf tag prevalence_in_cosmicDB`
 
 Tag a variant in a MAF file with prevalence in COSMIC DB 
 
 **Usage**:
 
 ```console
-$ maf tag prevalence_in_cosmicDB [OPTIONS]
+$ main maf tag prevalence_in_cosmicDB [OPTIONS]
 ```
 
 **Options**:
@@ -372,14 +375,31 @@ $ maf tag prevalence_in_cosmicDB [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-#### `maf tag truncating_mut_in_TSG`
+#### `main maf tag traceback`
+
+Generate combined count columns between standard and simplex/duplex mafs
+
+**Usage**:
+
+```console
+$ main maf tag traceback [OPTIONS]
+```
+
+**Options**:
+
+* `-m, --maf FILE`: MAF file to tag  [required]
+* `-o, --output PATH`: Maf output file name.  [default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `--help`: Show this message and exit.
+
+#### `main maf tag truncating_mut_in_TSG`
 
 Tag a  truncating mutating variant in a MAF file based on its presence in the Tumor Suppressor Gene 
 
 **Usage**:
 
 ```console
-$ maf tag truncating_mut_in_TSG [OPTIONS]
+$ main maf tag truncating_mut_in_TSG [OPTIONS]
 ```
 
 **Options**:
@@ -389,14 +409,73 @@ $ maf tag truncating_mut_in_TSG [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
-## `vardict`
+## `main mutect1`
+
+post-processing commands for MuTect version 1.1.5 VCFs.
+
+**Usage**:
+
+```console
+$ main mutect1 [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `case-control`: Post-processing commands for case-control...
+
+### `main mutect1 case-control`
+
+Post-processing commands for case-control filtering of MuTect version 1.1.5 VCF input file.
+
+**Usage**:
+
+```console
+$ main mutect1 case-control [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `filter`: This tool helps to filter MuTect version...
+
+#### `main mutect1 case-control filter`
+
+This tool helps to filter MuTect version 1.1.5 VCFs for case-control calling
+
+**Usage**:
+
+```console
+$ main mutect1 case-control filter [OPTIONS]
+```
+
+**Options**:
+
+* `-i, --inputVcf FILE`: Input vcf generated by MuTect which needs to be processed  [required]
+* `-i, --inputTxt FILE`: Input Txt file generated by MuTect which needs to be processed  [required]
+* `--refFasta FILE`: Input reference fasta  [required]
+* `--tsampleName TEXT`: Name of the tumor sample.  [required]
+* `-dp, --totalDepth INTEGER RANGE`: Tumor total depth threshold  [default: 20; x>=0]
+* `-ad, --alleledepth INTEGER RANGE`: [default: 1; x>=0]
+* `-tnr, --tnRatio INTEGER RANGE`: Tumor-Normal variant fraction ratio threshold  [default: 1; x>=0]
+* `-vf, --variantFraction FLOAT RANGE`: Tumor variant fraction threshold  [default: 5e-05; x>=0]
+* `-o, --outDir TEXT`: Full Path to the output dir
+* `--help`: Show this message and exit.
+
+## `main vardict`
 
 post-processing commands for VarDict version 1.4.6 VCFs.
 
 **Usage**:
 
 ```console
-$ vardict [OPTIONS] COMMAND [ARGS]...
+$ main vardict [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -408,14 +487,14 @@ $ vardict [OPTIONS] COMMAND [ARGS]...
 * `case-control`: Post-processing commands for a...
 * `single`: Post-processing commands for a single...
 
-### `vardict case-control`
+### `main vardict case-control`
 
 Post-processing commands for a case-controlled VarDict version 1.4.6 VCFs
 
 **Usage**:
 
 ```console
-$ vardict case-control [OPTIONS] COMMAND [ARGS]...
+$ main vardict case-control [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -426,14 +505,14 @@ $ vardict case-control [OPTIONS] COMMAND [ARGS]...
 
 * `filter`: This tool helps to filter vardict version...
 
-#### `vardict case-control filter`
+#### `main vardict case-control filter`
 
 This tool helps to filter vardict version 1.4.6 VCFs for case control calling
 
 **Usage**:
 
 ```console
-$ vardict case-control filter [OPTIONS]
+$ main vardict case-control filter [OPTIONS]
 ```
 
 **Options**:
@@ -449,14 +528,14 @@ $ vardict case-control filter [OPTIONS]
 * `-o, --outDir TEXT`: Full Path to the output dir
 * `--help`: Show this message and exit.
 
-### `vardict single`
+### `main vardict single`
 
 Post-processing commands for a single sample VarDict version 1.4.6 VCFs
 
 **Usage**:
 
 ```console
-$ vardict single [OPTIONS] COMMAND [ARGS]...
+$ main vardict single [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -467,14 +546,14 @@ $ vardict single [OPTIONS] COMMAND [ARGS]...
 
 * `filter`: This tool helps to filter vardict version...
 
-#### `vardict single filter`
+#### `main vardict single filter`
 
 This tool helps to filter vardict version 1.4.6 VCFs for single sample calling
 
 **Usage**:
 
 ```console
-$ vardict single filter [OPTIONS]
+$ main vardict single filter [OPTIONS]
 ```
 
 **Options**:
