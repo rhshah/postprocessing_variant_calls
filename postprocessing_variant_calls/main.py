@@ -39,7 +39,7 @@ __version__ = "0.2.4"
 
 def version_callback(value: bool):
     if value:
-        typer.echo(f"pv: {__version__}")
+        typer.echo(f"{__version__}")
         raise typer.Exit()
 
 
@@ -49,7 +49,6 @@ def main(
         None, "--version", callback=version_callback, is_eager=True
     ),
 ):
-    # Do other global stuff, handle other global options here
     return
 
 
