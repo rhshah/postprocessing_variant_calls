@@ -1,7 +1,7 @@
 name: Document package 
 on:
     push:
-        branches: [main]
+        branches: [main, develop]
 jobs:
     update_cli_doc:
         # The type of runner that the job will run on
@@ -14,21 +14,22 @@ jobs:
               uses: actions/checkout@v3
               with:
                 token: ${{ secrets.PAT }}
-
             - name: Set up Python 
               uses: actions/setup-python@v3
               with:
                   python-version: ${{ matrix.python-version }}
+            - name: Check for changes
+              id: git_changes
+              run: |
+                echo ::set-output name=has_changes::$(if git diff --quiet; then echo "false"; else echo "true"; fi)
+              
             - name: Document CLI and write to folder
+              if: steps.git_changes.outputs.has_changes == 'true'
               run: |
                     make deps-install
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
-            - name: Add README
-              run: | 
                     rm docs/README.md
                     cp README.md docs/README.md
-            - name: Commit Doc Changes
-              run: |
                     git config --global user.name 'buehlere'
                     git config --global user.email 'buehlere77@gmail.com'
                     git add ./docs
