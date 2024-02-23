@@ -304,47 +304,9 @@ class MAFFile:
                     "yes",
                     "no",
                 )
-            if tagging == "traceback" and dictionary:
-                if set(cols["standard"] + cols["access"]).issubset(
-                    set(self.data_frame.columns.tolist())
-                ):
-                    self.data_frame["t_ref_count"] = self.data_frame[
-                        "t_ref_count_standard"
-                    ].combine_first(
-                        self.data_frame["t_ref_count_fragment_simplex_duplex"]
-                    )
-                    self.data_frame["t_alt_count"] = self.data_frame[
-                        "t_alt_count_standard"
-                    ].combine_first(
-                        self.data_frame["t_alt_count_fragment_simplex_duplex"]
-                    )
-                    self.data_frame["t_total_count"] = self.data_frame[
-                        "t_total_count_standard"
-                    ].combine_first(
-                        self.data_frame["t_total_count_fragment_simplex_duplex"]
-                    )
-                if set(cols["standard"]).issubset(
-                    set(self.data_frame.columns.tolist())
-                ):
-                    self.data_frame["t_ref_count"] = self.data_frame[
-                        "t_ref_count_standard"
-                    ]
-                    self.data_frame["t_alt_count"] = self.data_frame[
-                        "t_alt_count_standard"
-                    ]
-                    self.data_frame["t_total_count"] = self.data_frame[
-                        "t_total_count_standard"
-                    ]
-                if set(cols["access"]).issubset(set(self.data_frame.columns.tolist())):
-                    self.data_frame["t_ref_count"] = self.data_frame[
-                        "t_ref_count_fragment_simplex_duplex"
-                    ]
-                    self.data_frame["t_alt_count"] = self.data_frame[
-                        "t_alt_count_fragment_simplex_duplex"
-                    ]
-                    self.data_frame["t_total_count"] = self.data_frame[
-                        "t_total_count_fragment_simplex_duplex"
-                    ]
+            if tagging == "traceback":
+                self.tag_traceback(cols, tagging)
+
 
         else:
             typer.secho(
@@ -361,6 +323,54 @@ class MAFFile:
             self.tag("prevalence_in_cosmicDB")
             self.tag("truncating_mut_in_TSG")
         return self.data_frame
+    
+    def tag_traceback(self, cols, tagging):
+        if set(cols["standard"] + cols["access"]).issubset(
+                set(self.data_frame.columns.tolist())
+            ):
+                self.data_frame["t_ref_count"] = self.data_frame[
+                    "t_ref_count_standard"
+                ].combine_first(
+                    self.data_frame["t_ref_count_fragment_simplex_duplex"]
+                )
+                self.data_frame["t_alt_count"] = self.data_frame[
+                    "t_alt_count_standard"
+                ].combine_first(
+                    self.data_frame["t_alt_count_fragment_simplex_duplex"]
+                )
+                self.data_frame["t_total_count"] = self.data_frame[
+                    "t_total_count_standard"
+                ].combine_first(
+                    self.data_frame["t_total_count_fragment_simplex_duplex"]
+                )
+        elif set(cols["standard"]).issubset(
+            set(self.data_frame.columns.tolist())
+        ):
+            self.data_frame["t_ref_count"] = self.data_frame[
+                "t_ref_count_standard"
+            ]
+            self.data_frame["t_alt_count"] = self.data_frame[
+                "t_alt_count_standard"
+            ]
+            self.data_frame["t_total_count"] = self.data_frame[
+                "t_total_count_standard"
+            ]
+        elif set(cols["access"]).issubset(set(self.data_frame.columns.tolist())):
+            self.data_frame["t_ref_count"] = self.data_frame[
+                "t_ref_count_fragment_simplex_duplex"
+            ]
+            self.data_frame["t_alt_count"] = self.data_frame[
+                "t_alt_count_fragment_simplex_duplex"
+            ]
+            self.data_frame["t_total_count"] = self.data_frame[
+                "t_total_count_fragment_simplex_duplex"
+            ]
+        else:
+            typer.secho(
+                f"missing columns expected for {tagging} tagging expects: {set(cols['standard']).difference(set(self.data_frame.columns.tolist()))} or {set(cols['access']).difference(set(self.data_frame.columns.tolist()))}, which were missing from the input",
+                fg=typer.colors.RED,
+            )
+            raise typer.Abort()
 
     def filter(self, filter):
         cols = self.cols[filter]
