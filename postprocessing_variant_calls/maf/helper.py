@@ -10,6 +10,7 @@ import typer
 import pandas as pd
 import numpy as np
 from .resources import tsg_genes
+from .resources import keep_exonic
 
 
 def process_paths(paths):
@@ -193,6 +194,7 @@ class MAFFile:
         self.data_frame = self.__read_tsv()
         self.__gen_id()
         self.tsg_genes = tsg_genes
+        self.keep_exonic = keep_exonic
 
     def __read_tsv(self):
         """Read the tsv file and store it in the instance variable 'data_frame'.
@@ -306,6 +308,18 @@ class MAFFile:
                 )
             if tagging == "traceback":
                 self.tag_traceback(cols, tagging)
+            
+            # if tagging == "MET_variant":
+            #     self.tag_met_variant(cols, tagging)
+            
+            # if tagging == "TERT_variant":
+            #     self.tag_tert_variant(cols, tagging)
+            
+            # if tagging == "genomic_pos":
+            #     self.tag_variant_by_genomic_pos(cols, tagging)
+
+            # if tagging == "transcripts":
+            #     self.tag_variant_by_transcript_id(cols, tagging)
 
 
         else:
@@ -323,6 +337,7 @@ class MAFFile:
             self.tag("prevalence_in_cosmicDB")
             self.tag("truncating_mut_in_TSG")
         return self.data_frame
+
     
     def tag_traceback(self, cols, tagging):
         if set(cols["standard"] + cols["access"]).issubset(
@@ -445,6 +460,46 @@ class MAFFile:
             )
             raise typer.Abort()
         return self.data_frame
+
+
+    def tag_exonic_variant(self):
+        self.data_frame["is_exonic_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in self.keep_exonic else 'no')
+        return self.data_frame
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def __process_header(self, header):
         file = open(header, "r")

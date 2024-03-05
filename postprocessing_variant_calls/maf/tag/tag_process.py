@@ -268,5 +268,198 @@ def traceback(
     return 0
 
 
+@app.command(
+    "exonic_variant", help="Tag a variant in a MAF file if it is classified as exonic."
+)
+def exonic_variant(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # prep maf
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging MAF with column for presence of exonic variant", fg=typer.colors.BRIGHT_GREEN
+    )
+    mafa = mafa.tag_exonic_variant()
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    return 0
+
+
+
+@app.command(
+    "MET_variant", help="Tag a variant in a MAF file if it is classified as a MET variant."
+)
+def MET_variant(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # prep maf
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging Maf with column for presence of MET variant", fg=typer.colors.BRIGHT_GREEN
+    )
+    mafa = mafa.tag("MET_variant")
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    return 0
+
+
+
+@app.command(
+    "TERT_variant", help="Tag a variant in a MAF file if it is classified as a TERT variant."
+)
+def TERT_variant(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # prep maf
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging Maf with column for presence of TERT variant", fg=typer.colors.BRIGHT_GREEN
+    )
+    mafa = mafa.tag("TERT_variant")
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    return 0
+
+
+
+@app.command(
+    "genomic_pos", help="Tag a variant in a MAF file if it is classified within the specific genomic positional range provided."
+)
+def genomic_pos(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # prep maf
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging Maf with column for presence of variant within the specified genomic positional range.", fg=typer.colors.BRIGHT_GREEN
+    )
+    mafa = mafa.tag("genomic_pos")
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    return 0
+
+
+@app.command(
+    "transcripts", help="Tag a variant in a MAF file if it includes relevant RefSeq transcript IDs"
+)
+def transcripts(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # prep maf
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging Maf with column for presence of variants with relevant RefSeq Transcript IDs.", fg=typer.colors.BRIGHT_GREEN
+    )
+    mafa = mafa.tag("transcripts")
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    return 0
+
+
 if __name__ == "__main__":
     app()

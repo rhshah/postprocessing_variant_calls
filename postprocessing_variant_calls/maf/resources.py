@@ -276,3 +276,5 @@ tsg_genes = [
     "CALR",
     "FLT3",
 ]
+
+keep_exonic = ["Missense_Mutation", "Nonsense_Mutation", "Splice_Site", "Frame_Shift_Ins", "Frame_Shift_Del", "In_Frame_Ins", "In_Frame_Del", "Translation_Start_Site", "Nonstop_Mutation", "Silent"]
