@@ -466,6 +466,39 @@ class MAFFile:
         self.data_frame["is_exonic_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in self.keep_exonic else 'no')
         return self.data_frame
 
+    def tag_tert_variant(self):
+        self.data_frame['is_tert_variant'] = (self.data_frame['Variant_Classification'] == "5'Flank") & (self.data_frame['Hugo_Symbol']== 'TERT')
+        custom_values = {False: 'no', True: 'yes'}
+        self.data_frame['is_tert_variant'] = self.data_frame['is_tert_variant'].replace(custom_values)
+        return self.data_frame
+
+    
+    # def tag_met_variant(self):
+    #     self.data_frame['is_met_variant'] = self.data_frame['Variant_Classification'].isin(["Splice_Region", "Intron"])
+    #     print(self.data_frame['is_met_variant'].unique())
+    #     #custom_values = {False: 'no', True: 'yes'}
+    #     #self.data_frame['is_met_variant'] = self.data_frame['is_met_variant'].replace(custom_values)
+    #     return self.data_frame
+
+
+
+    # def tag_met_variant(self):
+    #     self.data_frame["is_met_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in ['Splice_Region', 'Intron'] and row['Hugo_Symbol'] == 'MET' and ((row['Start_Position'] >= 116411903-100 & row['Start_Position'] <= 116412043+100)| (row['End_Position'] >= 116411903-100 & row['End_Position'] <= 116412043+100)) else 'no')
+        
+    #     print(self.data_frame['is_met_variant'].unique())
+
+    #     return self.data_frame
+        # met_df = self.data_frame
+        # met_df["is_met_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in ['Splice_Region', 'Intron'] else 'no')
+        
+        # met_condition2 = met_df['Hugo_Symbol'] == 'MET'
+        # met_condition3 = (((met_df['Start_Position'] >= 116411903-100) & (met_df['Start_Position'] <= 116412043+100)) | ((met_df['End_Position'] >= 116411903-100) & (met_df['End_Position'] <= 116412043+100)))
+
+        # if met_condition2 && met_condition3:
+        #     met_df['is_met_variant'] = 'yes'
+        # else:
+        #     met_df['is_met_variant'] = 'no'
+
 
 
 

@@ -337,9 +337,9 @@ def MET_variant(
     # prep maf
     mafa = MAFFile(maf, separator)
     typer.secho(
-        f"Tagging Maf with column for presence of MET variant", fg=typer.colors.BRIGHT_GREEN
+        f"Tagging MAF with column for presence of MET variant", fg=typer.colors.BRIGHT_GREEN
     )
-    mafa = mafa.tag("MET_variant")
+    mafa = mafa.tag_met_variant()
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
@@ -378,7 +378,7 @@ def TERT_variant(
     typer.secho(
         f"Tagging Maf with column for presence of TERT variant", fg=typer.colors.BRIGHT_GREEN
     )
-    mafa = mafa.tag("TERT_variant")
+    mafa = mafa.tag_tert_variant()
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
