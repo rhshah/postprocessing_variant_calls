@@ -242,5 +242,49 @@ def cmo_ch(
     return 0
 
 
+@app.command("access_remove_variants", help="Filter a MAF file based on all the parameters satisfied by the remove variants by annotations CWL script in the ACCESS pipeline")
+def access_remove_variants(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to subset",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # prep maf
+    mafa = MAFFile(maf, separator)
+    exonic_maf = mafa.tag_exonic_variant() 
+    exonic_met_maf = mafa.tag_met_variant()
+    exonic_met_tert_maf = mafa.tag_tert_variant()
+    
+    subset_df = exonic_met_tert_maf[
+    (exonic_met_tert_maf['is_met_variant'] == 'yes') |
+    (exonic_met_tert_maf['is_exonic_variant'] == 'yes') |
+    (exonic_met_tert_maf['is_tert_variant'] == 'yes')
+    ]
+
+    final_df = subset_df.drop(['is_met_variant', 'is_exonic_variant','is_tert_variant'], axis=1)
+    
+    final_df.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    
+    return 0
+
+
 if __name__ == "__main__":
     app()

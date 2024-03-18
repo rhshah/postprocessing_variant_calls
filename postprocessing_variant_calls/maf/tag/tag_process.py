@@ -386,9 +386,9 @@ def TERT_variant(
 
 
 @app.command(
-    "genomic_pos", help="Tag a variant in a MAF file if it is classified within the specific genomic positional range provided."
+    "tag_by_intervals", help="Tag a variant in a MAF file if it includes relevant RefSeq transcript IDs located in intervals file"
 )
-def genomic_pos(
+def tag_by_intervals(
     maf: Path = typer.Option(
         ...,
         "--maf",
@@ -401,43 +401,17 @@ def genomic_pos(
         resolve_path=True,
         help="MAF file to tag",
     ),
-    output_maf: Path = typer.Option(
-        "output.maf", "--output", "-o", help="Maf output file name."
-    ),
-    separator: str = typer.Option(
-        "tsv",
-        "--separator",
-        "-sep",
-        help="Specify a separator for delimited data.",
-        callback=check_separator,
-    ),
-):
-    # prep maf
-    mafa = MAFFile(maf, separator)
-    typer.secho(
-        f"Tagging Maf with column for presence of variant within the specified genomic positional range.", fg=typer.colors.BRIGHT_GREEN
-    )
-    mafa = mafa.tag("genomic_pos")
-    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
-    return 0
-
-
-@app.command(
-    "transcripts", help="Tag a variant in a MAF file if it includes relevant RefSeq transcript IDs"
-)
-def transcripts(
-    maf: Path = typer.Option(
+    intervals_file: Path = typer.Option(
         ...,
-        "--maf",
-        "-m",
+        "--intervals",
+        "-i",
         exists=True,
         file_okay=True,
         dir_okay=False,
         writable=False,
         readable=True,
         resolve_path=True,
-        help="MAF file to tag",
+        help="Intervals file containing list of transcript IDs to tag.",
     ),
     output_maf: Path = typer.Option(
         "output.maf", "--output", "-o", help="Maf output file name."
@@ -455,7 +429,7 @@ def transcripts(
     typer.secho(
         f"Tagging Maf with column for presence of variants with relevant RefSeq Transcript IDs.", fg=typer.colors.BRIGHT_GREEN
     )
-    mafa = mafa.tag("transcripts")
+    mafa = mafa.tag_variant_by_intervals(intervals_file)
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0

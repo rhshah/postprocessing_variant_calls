@@ -472,66 +472,34 @@ class MAFFile:
         self.data_frame['is_tert_variant'] = self.data_frame['is_tert_variant'].replace(custom_values)
         return self.data_frame
 
-    
-    # def tag_met_variant(self):
-    #     self.data_frame['is_met_variant'] = self.data_frame['Variant_Classification'].isin(["Splice_Region", "Intron"])
-    #     print(self.data_frame['is_met_variant'].unique())
-    #     #custom_values = {False: 'no', True: 'yes'}
-    #     #self.data_frame['is_met_variant'] = self.data_frame['is_met_variant'].replace(custom_values)
-    #     return self.data_frame
+
+## NOTE: keeping this function commented out until we know what we can substitute for the "all_effects" column
+    # def tag_variant_by_intervals(self,intervals_file):
+    #     if not self.data_frame.empty:
+    #         intervals = pd.read_csv(intervals_file,sep='\t')
+    #         Bool_inGenomicRange = self.data_frame['all_effects'].fillna('NA').apply(lambda x: any([y in intervals for y in re.split(',|;',x)]))
+    #         print(Bool_inGenomicRange)
+    #     else:
+    #         #add error handling
+    #         print("false")
+
+    #     sys.exit()
 
 
-
-    # def tag_met_variant(self):
-    #     self.data_frame["is_met_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in ['Splice_Region', 'Intron'] and row['Hugo_Symbol'] == 'MET' and ((row['Start_Position'] >= 116411903-100 & row['Start_Position'] <= 116412043+100)| (row['End_Position'] >= 116411903-100 & row['End_Position'] <= 116412043+100)) else 'no')
+    def tag_met_variant(self):
         
-    #     print(self.data_frame['is_met_variant'].unique())
+        conditions = (
+        (self.data_frame["Variant_Classification"].isin(['Splice_Region', 'Intron'])) &
+        (self.data_frame['Hugo_Symbol'] == 'MET') &
+        (((self.data_frame['Start_Position'] >= 116411903-100) & (self.data_frame['Start_Position'] <= 116412043+100)) |
+        ((self.data_frame['End_Position'] >= 116411903-100) & (self.data_frame['End_Position'] <= 116412043+100)))
+        )
 
-    #     return self.data_frame
-        # met_df = self.data_frame
-        # met_df["is_met_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in ['Splice_Region', 'Intron'] else 'no')
+        self.data_frame.loc[conditions, "is_met_variant"] = 'yes'
+        self.data_frame.loc[~conditions, "is_met_variant"] = 'no'
+
+        return self.data_frame
         
-        # met_condition2 = met_df['Hugo_Symbol'] == 'MET'
-        # met_condition3 = (((met_df['Start_Position'] >= 116411903-100) & (met_df['Start_Position'] <= 116412043+100)) | ((met_df['End_Position'] >= 116411903-100) & (met_df['End_Position'] <= 116412043+100)))
-
-        # if met_condition2 && met_condition3:
-        #     met_df['is_met_variant'] = 'yes'
-        # else:
-        #     met_df['is_met_variant'] = 'no'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def __process_header(self, header):
