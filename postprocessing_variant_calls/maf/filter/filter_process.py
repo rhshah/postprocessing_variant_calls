@@ -2,6 +2,8 @@
 # imports
 from __future__ import division
 import os
+import functools
+import re 
 import sys
 import vcf
 import time
@@ -256,6 +258,18 @@ def access_remove_variants(
         resolve_path=True,
         help="MAF file to subset",
     ),
+    intervals_file: Path = typer.Option(
+        ...,
+        "--intervals",
+        "-i",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Intervals file containing rows of criterion to tag input MAF by",
+    ),
     output_maf: Path = typer.Option(
         "output.maf", "--output", "-o", help="Maf output file name."
     ),
@@ -269,20 +283,17 @@ def access_remove_variants(
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
-    exonic_maf = mafa.tag_exonic_variant() 
-    exonic_met_maf = mafa.tag_met_variant()
-    exonic_met_tert_maf = mafa.tag_tert_variant()
-    
-    subset_df = exonic_met_tert_maf[
-    (exonic_met_tert_maf['is_met_variant'] == 'yes') |
-    (exonic_met_tert_maf['is_exonic_variant'] == 'yes') |
-    (exonic_met_tert_maf['is_tert_variant'] == 'yes')
-    ]
+    maf_df = mafa.tag_variant_by_intervals(intervals_file)
 
-    final_df = subset_df.drop(['is_met_variant', 'is_exonic_variant','is_tert_variant'], axis=1)
+    variant_col_pattern = re.compile(r'^is_.*_variant$')
+    variant_columns = [col for col in maf_df.columns if variant_col_pattern.match(col)]
+    query_string = ' | '.join([f"{column} == 'Yes'" for column in variant_columns])
+    subset_df = maf_df.query(query_string)
+
+    final_maf_df = subset_df.drop(columns=variant_columns)
     
-    final_df.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
-    
+    final_maf_df.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+
     return 0
 
 
