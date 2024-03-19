@@ -306,7 +306,6 @@ def traceback(
 #     return 0
 
 
-
 # @app.command(
 #     "MET_variant", help="Tag a variant in a MAF file if it is classified as a MET variant."
 # )
@@ -343,7 +342,6 @@ def traceback(
 #     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
 #     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
 #     return 0
-
 
 
 # @app.command(
@@ -384,9 +382,9 @@ def traceback(
 #     return 0
 
 
-
 @app.command(
-    "tag_by_maf", help="Tag a variant in a MAF file based on criterion provided by input file"
+    "tag_by_maf",
+    help="Tag a variant in a MAF file based on criterion provided by input file",
 )
 def tag_by_maf(
     maf: Path = typer.Option(
@@ -427,7 +425,8 @@ def tag_by_maf(
     # prep maf
     mafa = MAFFile(maf, separator)
     typer.secho(
-        f"Tagging Maf with criteria from input intervals file", fg=typer.colors.BRIGHT_GREEN
+        f"Tagging Maf with criteria from input intervals file",
+        fg=typer.colors.BRIGHT_GREEN,
     )
     mafa = mafa.tag_variant_by_intervals(intervals_file)
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)

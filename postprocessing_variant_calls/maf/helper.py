@@ -308,19 +308,18 @@ class MAFFile:
                 )
             if tagging == "traceback":
                 self.tag_traceback(cols, tagging)
-            
+
             # if tagging == "MET_variant":
             #     self.tag_met_variant(cols, tagging)
-            
+
             # if tagging == "TERT_variant":
             #     self.tag_tert_variant(cols, tagging)
-            
+
             # if tagging == "genomic_pos":
             #     self.tag_variant_by_genomic_pos(cols, tagging)
 
             # if tagging == "transcripts":
             #     self.tag_variant_by_transcript_id(cols, tagging)
-
 
         else:
             typer.secho(
@@ -338,38 +337,23 @@ class MAFFile:
             self.tag("truncating_mut_in_TSG")
         return self.data_frame
 
-    
     def tag_traceback(self, cols, tagging):
         if set(cols["standard"] + cols["access"]).issubset(
-                set(self.data_frame.columns.tolist())
-            ):
-                self.data_frame["t_ref_count"] = self.data_frame[
-                    "t_ref_count_standard"
-                ].combine_first(
-                    self.data_frame["t_ref_count_fragment_simplex_duplex"]
-                )
-                self.data_frame["t_alt_count"] = self.data_frame[
-                    "t_alt_count_standard"
-                ].combine_first(
-                    self.data_frame["t_alt_count_fragment_simplex_duplex"]
-                )
-                self.data_frame["t_total_count"] = self.data_frame[
-                    "t_total_count_standard"
-                ].combine_first(
-                    self.data_frame["t_total_count_fragment_simplex_duplex"]
-                )
-        elif set(cols["standard"]).issubset(
             set(self.data_frame.columns.tolist())
         ):
             self.data_frame["t_ref_count"] = self.data_frame[
                 "t_ref_count_standard"
-            ]
+            ].combine_first(self.data_frame["t_ref_count_fragment_simplex_duplex"])
             self.data_frame["t_alt_count"] = self.data_frame[
                 "t_alt_count_standard"
-            ]
+            ].combine_first(self.data_frame["t_alt_count_fragment_simplex_duplex"])
             self.data_frame["t_total_count"] = self.data_frame[
                 "t_total_count_standard"
-            ]
+            ].combine_first(self.data_frame["t_total_count_fragment_simplex_duplex"])
+        elif set(cols["standard"]).issubset(set(self.data_frame.columns.tolist())):
+            self.data_frame["t_ref_count"] = self.data_frame["t_ref_count_standard"]
+            self.data_frame["t_alt_count"] = self.data_frame["t_alt_count_standard"]
+            self.data_frame["t_total_count"] = self.data_frame["t_total_count_standard"]
         elif set(cols["access"]).issubset(set(self.data_frame.columns.tolist())):
             self.data_frame["t_ref_count"] = self.data_frame[
                 "t_ref_count_fragment_simplex_duplex"
@@ -461,7 +445,6 @@ class MAFFile:
             raise typer.Abort()
         return self.data_frame
 
-
     # def tag_exonic_variant(self):
     #     self.data_frame["is_exonic_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in self.keep_exonic else 'no')
     #     return self.data_frame
@@ -472,44 +455,46 @@ class MAFFile:
     #     self.data_frame['is_tert_variant'] = self.data_frame['is_tert_variant'].replace(custom_values)
     #     return self.data_frame
 
-
-
-    def tag_variant_by_intervals(self,intervals_file):
+    def tag_variant_by_intervals(self, intervals_file):
         rules_df = pd.read_csv(intervals_file)
 
-        rules_df.fillna('none', inplace=True)
-        
+        rules_df.fillna("none", inplace=True)
+
         for index, row in rules_df.iterrows():
-            variant_type, hugo_symbol, variant_classification, start, end = row[['variant_type', 'hugo_symbol', 'variant_classification', 'start', 'end']]
+            variant_type, hugo_symbol, variant_classification, start, end = row[
+                [
+                    "variant_type",
+                    "hugo_symbol",
+                    "variant_classification",
+                    "start",
+                    "end",
+                ]
+            ]
 
-            values = variant_classification.split(',')
+            values = variant_classification.split(",")
             variant_classification_lst = [value.strip() for value in values]
-
 
             condition = True
 
-            
+            if hugo_symbol != "none":
+                condition &= self.data_frame["Hugo_Symbol"] == hugo_symbol
+            if variant_classification_lst != "none":
+                condition &= self.data_frame["Variant_Classification"].isin(
+                    variant_classification_lst
+                )
+            if start != "none":
+                condition &= self.data_frame["Start_Position"] >= float(start)
+            if end != "none":
+                condition &= self.data_frame["End_Position"] <= float(end)
 
-            if hugo_symbol != 'none':
-                condition &= (self.data_frame['Hugo_Symbol'] == hugo_symbol)
-            if variant_classification_lst != 'none':
-                condition &= self.data_frame['Variant_Classification'].isin(variant_classification_lst)
-            if start != 'none':
-                condition &= (self.data_frame['Start_Position'] >= float(start))
-            if end != 'none':
-                condition &= (self.data_frame['End_Position'] <= float(end))
-
-            
-            
             column_name = f"is_{variant_type}_variant"
-            self.data_frame[column_name] = 'No'
-            self.data_frame.loc[condition, column_name] = 'Yes'
+            self.data_frame[column_name] = "No"
+            self.data_frame.loc[condition, column_name] = "Yes"
 
         return self.data_frame
 
-
     # def tag_met_variant(self):
-        
+
     #     conditions = (
     #     (self.data_frame["Variant_Classification"].isin(['Splice_Region', 'Intron'])) &
     #     (self.data_frame['Hugo_Symbol'] == 'MET') &
@@ -521,8 +506,6 @@ class MAFFile:
     #     self.data_frame.loc[~conditions, "is_met_variant"] = 'no'
 
     #     return self.data_frame
-        
-
 
     def __process_header(self, header):
         file = open(header, "r")

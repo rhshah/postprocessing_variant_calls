@@ -3,7 +3,7 @@
 from __future__ import division
 import os
 import functools
-import re 
+import re
 import sys
 import vcf
 import time
@@ -244,7 +244,10 @@ def cmo_ch(
     return 0
 
 
-@app.command("access_remove_variants", help="Filter a MAF file based on all the parameters satisfied by the remove variants by annotations CWL script in the ACCESS pipeline")
+@app.command(
+    "access_remove_variants",
+    help="Filter a MAF file based on all the parameters satisfied by the remove variants by annotations CWL script in the ACCESS pipeline",
+)
 def access_remove_variants(
     maf: Path = typer.Option(
         ...,
@@ -285,14 +288,16 @@ def access_remove_variants(
     mafa = MAFFile(maf, separator)
     maf_df = mafa.tag_variant_by_intervals(intervals_file)
 
-    variant_col_pattern = re.compile(r'^is_.*_variant$')
+    variant_col_pattern = re.compile(r"^is_.*_variant$")
     variant_columns = [col for col in maf_df.columns if variant_col_pattern.match(col)]
-    query_string = ' | '.join([f"{column} == 'Yes'" for column in variant_columns])
+    query_string = " | ".join([f"{column} == 'Yes'" for column in variant_columns])
     subset_df = maf_df.query(query_string)
 
     final_maf_df = subset_df.drop(columns=variant_columns)
-    
-    final_maf_df.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+
+    final_maf_df.to_csv(
+        f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t"
+    )
 
     return 0
 
