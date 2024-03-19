@@ -462,43 +462,65 @@ class MAFFile:
         return self.data_frame
 
 
-    def tag_exonic_variant(self):
-        self.data_frame["is_exonic_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in self.keep_exonic else 'no')
-        return self.data_frame
+    # def tag_exonic_variant(self):
+    #     self.data_frame["is_exonic_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in self.keep_exonic else 'no')
+    #     return self.data_frame
 
-    def tag_tert_variant(self):
-        self.data_frame['is_tert_variant'] = (self.data_frame['Variant_Classification'] == "5'Flank") & (self.data_frame['Hugo_Symbol']== 'TERT')
-        custom_values = {False: 'no', True: 'yes'}
-        self.data_frame['is_tert_variant'] = self.data_frame['is_tert_variant'].replace(custom_values)
-        return self.data_frame
-
-
-## NOTE: keeping this function commented out until we know what we can substitute for the "all_effects" column
-    # def tag_variant_by_intervals(self,intervals_file):
-    #     if not self.data_frame.empty:
-    #         intervals = pd.read_csv(intervals_file,sep='\t')
-    #         Bool_inGenomicRange = self.data_frame['all_effects'].fillna('NA').apply(lambda x: any([y in intervals for y in re.split(',|;',x)]))
-    #         print(Bool_inGenomicRange)
-    #     else:
-    #         #add error handling
-    #         print("false")
-
-    #     sys.exit()
+    # def tag_tert_variant(self):
+    #     self.data_frame['is_tert_variant'] = (self.data_frame['Variant_Classification'] == "5'Flank") & (self.data_frame['Hugo_Symbol']== 'TERT')
+    #     custom_values = {False: 'no', True: 'yes'}
+    #     self.data_frame['is_tert_variant'] = self.data_frame['is_tert_variant'].replace(custom_values)
+    #     return self.data_frame
 
 
-    def tag_met_variant(self):
+
+    def tag_variant_by_intervals(self,intervals_file):
+        rules_df = pd.read_csv(intervals_file)
+
+        rules_df.fillna('none', inplace=True)
         
-        conditions = (
-        (self.data_frame["Variant_Classification"].isin(['Splice_Region', 'Intron'])) &
-        (self.data_frame['Hugo_Symbol'] == 'MET') &
-        (((self.data_frame['Start_Position'] >= 116411903-100) & (self.data_frame['Start_Position'] <= 116412043+100)) |
-        ((self.data_frame['End_Position'] >= 116411903-100) & (self.data_frame['End_Position'] <= 116412043+100)))
-        )
+        for index, row in rules_df.iterrows():
+            variant_type, hugo_symbol, variant_classification, start, end = row[['variant_type', 'hugo_symbol', 'variant_classification', 'start', 'end']]
 
-        self.data_frame.loc[conditions, "is_met_variant"] = 'yes'
-        self.data_frame.loc[~conditions, "is_met_variant"] = 'no'
+            values = variant_classification.split(',')
+            variant_classification_lst = [value.strip() for value in values]
+
+
+            condition = True
+
+            
+
+            if hugo_symbol != 'none':
+                condition &= (self.data_frame['Hugo_Symbol'] == hugo_symbol)
+            if variant_classification_lst != 'none':
+                condition &= self.data_frame['Variant_Classification'].isin(variant_classification_lst)
+            if start != 'none':
+                condition &= (self.data_frame['Start_Position'] >= float(start))
+            if end != 'none':
+                condition &= (self.data_frame['End_Position'] <= float(end))
+
+            
+            
+            column_name = f"is_{variant_type}_variant"
+            self.data_frame[column_name] = 'No'
+            self.data_frame.loc[condition, column_name] = 'Yes'
 
         return self.data_frame
+
+
+    # def tag_met_variant(self):
+        
+    #     conditions = (
+    #     (self.data_frame["Variant_Classification"].isin(['Splice_Region', 'Intron'])) &
+    #     (self.data_frame['Hugo_Symbol'] == 'MET') &
+    #     (((self.data_frame['Start_Position'] >= 116411903-100) & (self.data_frame['Start_Position'] <= 116412043+100)) |
+    #     ((self.data_frame['End_Position'] >= 116411903-100) & (self.data_frame['End_Position'] <= 116412043+100)))
+    #     )
+
+    #     self.data_frame.loc[conditions, "is_met_variant"] = 'yes'
+    #     self.data_frame.loc[~conditions, "is_met_variant"] = 'no'
+
+    #     return self.data_frame
         
 
 
