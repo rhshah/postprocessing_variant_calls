@@ -268,125 +268,11 @@ def traceback(
     return 0
 
 
-# @app.command(
-#     "exonic_variant", help="Tag a variant in a MAF file if it is classified as exonic."
-# )
-# def exonic_variant(
-#     maf: Path = typer.Option(
-#         ...,
-#         "--maf",
-#         "-m",
-#         exists=True,
-#         file_okay=True,
-#         dir_okay=False,
-#         writable=False,
-#         readable=True,
-#         resolve_path=True,
-#         help="MAF file to tag",
-#     ),
-#     output_maf: Path = typer.Option(
-#         "output.maf", "--output", "-o", help="Maf output file name."
-#     ),
-#     separator: str = typer.Option(
-#         "tsv",
-#         "--separator",
-#         "-sep",
-#         help="Specify a separator for delimited data.",
-#         callback=check_separator,
-#     ),
-# ):
-#     # prep maf
-#     mafa = MAFFile(maf, separator)
-#     typer.secho(
-#         f"Tagging MAF with column for presence of exonic variant", fg=typer.colors.BRIGHT_GREEN
-#     )
-#     mafa = mafa.tag_exonic_variant()
-#     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-#     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
-#     return 0
-
-
-# @app.command(
-#     "MET_variant", help="Tag a variant in a MAF file if it is classified as a MET variant."
-# )
-# def MET_variant(
-#     maf: Path = typer.Option(
-#         ...,
-#         "--maf",
-#         "-m",
-#         exists=True,
-#         file_okay=True,
-#         dir_okay=False,
-#         writable=False,
-#         readable=True,
-#         resolve_path=True,
-#         help="MAF file to tag",
-#     ),
-#     output_maf: Path = typer.Option(
-#         "output.maf", "--output", "-o", help="Maf output file name."
-#     ),
-#     separator: str = typer.Option(
-#         "tsv",
-#         "--separator",
-#         "-sep",
-#         help="Specify a separator for delimited data.",
-#         callback=check_separator,
-#     ),
-# ):
-#     # prep maf
-#     mafa = MAFFile(maf, separator)
-#     typer.secho(
-#         f"Tagging MAF with column for presence of MET variant", fg=typer.colors.BRIGHT_GREEN
-#     )
-#     mafa = mafa.tag_met_variant()
-#     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-#     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
-#     return 0
-
-
-# @app.command(
-#     "TERT_variant", help="Tag a variant in a MAF file if it is classified as a TERT variant."
-# )
-# def TERT_variant(
-#     maf: Path = typer.Option(
-#         ...,
-#         "--maf",
-#         "-m",
-#         exists=True,
-#         file_okay=True,
-#         dir_okay=False,
-#         writable=False,
-#         readable=True,
-#         resolve_path=True,
-#         help="MAF file to tag",
-#     ),
-#     output_maf: Path = typer.Option(
-#         "output.maf", "--output", "-o", help="Maf output file name."
-#     ),
-#     separator: str = typer.Option(
-#         "tsv",
-#         "--separator",
-#         "-sep",
-#         help="Specify a separator for delimited data.",
-#         callback=check_separator,
-#     ),
-# ):
-#     # prep maf
-#     mafa = MAFFile(maf, separator)
-#     typer.secho(
-#         f"Tagging Maf with column for presence of TERT variant", fg=typer.colors.BRIGHT_GREEN
-#     )
-#     mafa = mafa.tag_tert_variant()
-#     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-#     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
-#     return 0
-
-
 @app.command(
-    "tag_by_maf",
-    help="Tag a variant in a MAF file based on criterion provided by input file",
+    "by_rules",
+    help="Tag a variant in a MAF file based on criterion provided by input rules JSON file",
 )
-def tag_by_maf(
+def by_maf(
     maf: Path = typer.Option(
         ...,
         "--maf",
@@ -399,17 +285,17 @@ def tag_by_maf(
         resolve_path=True,
         help="MAF file to tag",
     ),
-    intervals_file: Path = typer.Option(
+    rules_file: Path = typer.Option(
         ...,
-        "--intervals",
-        "-i",
+        "--rules_file",
+        "-r",
         exists=True,
         file_okay=True,
         dir_okay=False,
         writable=False,
         readable=True,
         resolve_path=True,
-        help="Intervals file containing rows of criterion to tag input MAF by",
+        help="Intervals JSON file containing criterion to tag input MAF by",
     ),
     output_maf: Path = typer.Option(
         "output.maf", "--output", "-o", help="Maf output file name."
@@ -425,10 +311,10 @@ def tag_by_maf(
     # prep maf
     mafa = MAFFile(maf, separator)
     typer.secho(
-        f"Tagging Maf with criteria from input intervals file",
+        f"Tagging Maf with criteria from input rules JSON file",
         fg=typer.colors.BRIGHT_GREEN,
     )
-    mafa = mafa.tag_variant_by_intervals(intervals_file)
+    mafa = mafa.tag_variant_by_rules(intervals_file)
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0

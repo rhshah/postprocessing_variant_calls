@@ -445,20 +445,10 @@ class MAFFile:
             raise typer.Abort()
         return self.data_frame
 
-    # def tag_exonic_variant(self):
-    #     self.data_frame["is_exonic_variant"] = self.data_frame["Variant_Classification"].apply(lambda x: 'yes' if x in self.keep_exonic else 'no')
-    #     return self.data_frame
+    def tag_variant_by_rules(self, rules_file):
+        #rules_df = pd.read_csv(rules_file)
 
-    # def tag_tert_variant(self):
-    #     self.data_frame['is_tert_variant'] = (self.data_frame['Variant_Classification'] == "5'Flank") & (self.data_frame['Hugo_Symbol']== 'TERT')
-    #     custom_values = {False: 'no', True: 'yes'}
-    #     self.data_frame['is_tert_variant'] = self.data_frame['is_tert_variant'].replace(custom_values)
-    #     return self.data_frame
-
-    def tag_variant_by_intervals(self, intervals_file):
-        rules_df = pd.read_csv(intervals_file)
-
-        rules_df.fillna("none", inplace=True)
+        #rules_df.fillna("none", inplace=True)
 
         for index, row in rules_df.iterrows():
             variant_type, hugo_symbol, variant_classification, start, end = row[
@@ -492,20 +482,6 @@ class MAFFile:
             self.data_frame.loc[condition, column_name] = "Yes"
 
         return self.data_frame
-
-    # def tag_met_variant(self):
-
-    #     conditions = (
-    #     (self.data_frame["Variant_Classification"].isin(['Splice_Region', 'Intron'])) &
-    #     (self.data_frame['Hugo_Symbol'] == 'MET') &
-    #     (((self.data_frame['Start_Position'] >= 116411903-100) & (self.data_frame['Start_Position'] <= 116412043+100)) |
-    #     ((self.data_frame['End_Position'] >= 116411903-100) & (self.data_frame['End_Position'] <= 116412043+100)))
-    #     )
-
-    #     self.data_frame.loc[conditions, "is_met_variant"] = 'yes'
-    #     self.data_frame.loc[~conditions, "is_met_variant"] = 'no'
-
-    #     return self.data_frame
 
     def __process_header(self, header):
         file = open(header, "r")
