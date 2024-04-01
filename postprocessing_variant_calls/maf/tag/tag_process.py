@@ -317,11 +317,9 @@ def by_maf(
     )
     rules_file = RulesFile(rules)
     tagged_by_rules_maf = mafa.tag_by_rules(rules_file.data_frame)
-
+    
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    tagged_by_rules_maf.to_csv(
-        f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t"
-    )
+    tagged_by_rules_maf.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -373,10 +371,18 @@ def by_access(
     )
     rules_file = RulesFile(rules)
     tagged_by_rules_maf = mafa.tag_by_rules(rules_file.data_frame)
-
+    
     # run tag_by_hotspots
+    # example output hotspots
+    # run tag by artifacts 
+    # run tag by germ baseline (if applicable)
+    # run tag by artifact (taken from access filters)
+    
+    
+    # split into df_keep and df_drop 
+    #typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    
 
-    # typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
 
 
 if __name__ == "__main__":
