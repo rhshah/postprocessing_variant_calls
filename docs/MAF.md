@@ -32,6 +32,8 @@ maf tag examples:
 - `pv maf tag germline_status -m path/to/maf.maf -o output/path/file -sep "tsv"`
 - `pv maf tag prevalence_in_cosmicDB -m path/to/maf.maf -o output/path/file -sep "tsv"`
 - `pv maf tag truncating_mut_in_TSG -m path/to/maf.maf -o output/path/file -sep "tsv"`
+- `pv maf tag by_rules -m path/to/maf.maf -r /path/to/rules.json -o output/path/file -sep "tsv"`
+- `pv maf tag by_access -m path/to/maf.maf -r /path/to/rules.json -h path/to/hotspots_file.maf -o output/path/file -sep "tsv"`
 
 maf filter examples:
 - `pv maf filter cmo_ch -m path/to/maf.maf -o output/path/file -sep "tsv"`

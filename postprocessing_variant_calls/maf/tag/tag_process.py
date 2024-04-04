@@ -372,11 +372,14 @@ def by_access(
     rules_file = RulesFile(rules)
     tagged_by_rules_maf = mafa.tag_by_rules(rules_file.data_frame)
     
+    # run tag by refseq IDs 
     # run tag_by_hotspots
-    # example output hotspots
+    # pv mag annotate mafbytsv
     # run tag by artifacts 
+    #xpv mag annotate mafbytsv
+    
+    
     # run tag by germ baseline (if applicable)
-    # run tag by artifact (taken from access filters)
     
     
     # split into df_keep and df_drop 
