@@ -23,7 +23,7 @@ jobs:
             - name: Document CLI and write to folder
               run: |
                     pip install poetry
-                    (cd ${{ github.workspace }} && poetry install) 
+                    (cd ${{ github.workspace }}/.. && poetry install) 
                     poetry run typer ${{ github.workspace }}/postprocessing_variant_calls.main utils docs > CLI.md
             - uses: EndBug/add-and-commit@v9
               with:
