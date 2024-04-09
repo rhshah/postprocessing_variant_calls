@@ -26,5 +26,5 @@ jobs:
               with:
                 default_author: github_actions
                 message: "add doc for CLI"
-                add: '["docs/*.md --force"]'
+                add: '["temp/*.md --force"]'
                 push: 'origin docs --force'
