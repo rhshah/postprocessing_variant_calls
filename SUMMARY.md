@@ -1,3 +1,6 @@
 # Table of contents
 
-* [README](README.md)
+* [main](README.md)
+* [MAF](maf.md)
+* [README](docs/README.md)
+* [VarDictJava](vardict.md)
