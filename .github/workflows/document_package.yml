@@ -16,15 +16,13 @@ jobs:
               uses: actions/setup-python@v3
               with:
                   python-version: ${{ matrix.python-version }}
-            - name: Document CLI and write to folder
-              run: |
-                    cd ${{ github.workspace }}
-                    make deps-install
-                    poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
-                    mv docs/* .
             - uses: actions/checkout@v4
               with:
                 ref: docs
+            - name: Document CLI and write to folder
+              run: |
+                    make deps-install
+                    poetry run typer ${{ github.workspace }}/postprocessing_variant_calls.main utils docs > CLI.md
             - uses: EndBug/add-and-commit@v9
               with:
                 default_author: github_actions
