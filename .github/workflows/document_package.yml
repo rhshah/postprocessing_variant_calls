@@ -21,9 +21,7 @@ jobs:
                 ref: docs
             - name: Document CLI and write to folder
               run: |
-                    ls ${{ github.workspace }}
-                    ls ${{ github.workspace }}/..
-                    make --directory ${{ github.workspace }}/.. deps-install
+                    make --directory ${{ github.workspace }} deps-install
                     poetry run typer ${{ github.workspace }}/postprocessing_variant_calls.main utils docs > CLI.md
             - uses: EndBug/add-and-commit@v9
               with:
