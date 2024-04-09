@@ -20,6 +20,7 @@ jobs:
             - name: Document CLI and write to folder
               run: |
                     make deps-install
+                    mkdir -p docs
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/cli.md
             - uses: EndBug/add-and-commit@v9
               with:
