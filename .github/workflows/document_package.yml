@@ -1,7 +1,7 @@
 name: Document package 
 on:
     push:
-        branches: [main]
+        branches: [feature/sync_docs]
 jobs:
     update_cli_doc:
         # The type of runner that the job will run on
@@ -18,21 +18,16 @@ jobs:
               uses: actions/setup-python@v3
               with:
                   python-version: ${{ matrix.python-version }}
-
             - name: Document CLI and write to folder
               run: |
                     make deps-install
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
-                    rm docs/README.md
-                    cp README.md docs/README.md
-            - name: Check for changes
-              id: git_changes
-              run: echo "HAS_CHANGES=$(if git diff --quiet; then echo 'false'; else echo 'true'; fi)" >> $GITHUB_ENV
-            - name: Push Changes
-              if: env.HAS_CHANGES == 'true'
-              run: |
-                    git config --global user.name 'buehlere'
-                    git config --global user.email 'buehlere77@gmail.com'
-                    git add ./docs
-                    git commit -m "Updating the repository GitHub MD documentation in the docs folder"
-                    git push -f origin           
+            - uses: actions/checkout@v4
+              with:
+                ref: docs
+            - uses: EndBug/add-and-commit@v9
+              with:
+                default_author: github_actions
+                message: "add doc for CLI"
+                add: '["docs/*.md --force", "SUMMARY.md --force"]'
+                cwd: "./"
