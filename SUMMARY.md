@@ -3,4 +3,3 @@
 * [main](README.md)
 * [MAF](maf.md)
 * [VarDictJava](vardict.md)
-* [README](readme-1.md)
