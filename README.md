@@ -1,49 +1,12 @@
-# README
+# Postprocessing Variant Calls Module
 
-## Post-processing of variant calls
+## Introduction
 
-This package provides a variety of commands for manipulating different types of common outputs (e.g. mafs, vcf and txt files) from different bioinformatic variant callers such as mutect and vardict.
+This package provides a variety of commands for manipulating different types of common outputs (e.g. mafs, vcf and txt files) from bioinformatic variant callers such as mutect and vardict. In general, there are 3 commands that PV module supports
 
-Supported File Types:
+1. maf
+2. mutect1 vcf
+3. vardict vcf
 
-* [maf](https://github.com/msk-access/postprocessing\_variant\_calls/blob/main/docs/docs/MAF.md)
-* [vardict](https://github.com/msk-access/postprocessing\_variant\_calls/blob/main/docs/docs/VARDICT.md)
+These in-turns hold multiple sub-commands for processing the MAF and VCF files. Installation and usage of each of the commands and sub-commands will be described in detail in the following sections.&#x20;
 
-## Installation
-
-For general use you can run: `pip install postprocessing_variant_calls` or a tagged version with `pip install git+https://github.com/msk-access/postprocessing_variant_calls.git@<version>`
-
-For setting up a development environment please see the [Setting up a Dev Environment](./#Setting-up-a-Dev-Environment) section.
-
-## Usage
-
-See [CLI](https://github.com/msk-access/postprocessing\_variant\_calls/blob/main/docs/docs/CLI.md) for commmand line usage of the package.
-
-## Setting up a Dev Environment
-
-### Install External Dependencies
-
-Have an environment with python >= 3.8 installed.
-
-Install poetry:
-
-```bash
-pip install poetry
-```
-
-### Install Package Dependencies
-
-Then install project dependencies with Poetry.
-
-```bash
-cd /path/to/postprocessing_variant_calls
-poetry install .
-```
-
-### Accessing Environment
-
-To access the environment after initial setup up run:
-
-```bash
-poetry shell
-```

@@ -1,4 +1,4 @@
-# `main`
+# Command Line Usage
 
 **Usage**:
 
@@ -73,10 +73,10 @@ $ main maf annotate mafbybed [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: input maf file  [required]
-* `-b, --bed FILE`: bed file to annotate maf  [required]
-* `-o, --output TEXT`: output maf file  [default: output.maf]
-* `-c, --cname TEXT`: name for annotation column  [default: annotation]
+* `-m, --maf FILE`: input maf file \[required]
+* `-b, --bed FILE`: bed file to annotate maf \[required]
+* `-o, --output TEXT`: output maf file \[default: output.maf]
+* `-c, --cname TEXT`: name for annotation column \[default: annotation]
 * `--help`: Show this message and exit.
 
 #### `main maf annotate mafbytsv`
@@ -91,12 +91,12 @@ $ main maf annotate mafbytsv [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-t, --tsv FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
-* `-oc, --outcome_column TEXT`: name for outcome column  [default: hotspot]
-* `-v, --values <TEXT TEXT>...`: name for annotation column. Defaults to (Yes, No)  [default: yes, no]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-t, --tsv FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
+* `-oc, --outcome_column TEXT`: name for outcome column \[default: hotspot]
+* `-v, --values <TEXT TEXT>...`: name for annotation column. Defaults to (Yes, No) \[default: yes, no]
 * `--help`: Show this message and exit.
 
 ### `main maf concat`
@@ -113,10 +113,10 @@ $ main maf concat [OPTIONS]
 
 * `-f, --files PATH`: MAF file to concatenate. Default assumes MAFs are tsv. MAF inputs are specified here, or using paths parameter
 * `-p, --paths PATH`: A text file containing paths of maf files to concatenate. Default assumes MAFs are tsv. MAF files are specified here, or using files parameter.
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-h, --header PATH`: A header file containing the columns to concatenate input mafs on.               It must be a subset of:               Hugo_Symbol, Chromosome, Start_Position, End_Position, Reference_Allele, Tumor_Seq_Allele2.               These are also the default columns used for concatenation
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-h, --header PATH`: A header file containing the columns to concatenate input mafs on. It must be a subset of: Hugo\_Symbol, Chromosome, Start\_Position, End\_Position, Reference\_Allele, Tumor\_Seq\_Allele2. These are also the default columns used for concatenation
 * `-de, --deduplicate`: deduplicate outputted maf file.
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 ### `main maf filter`
@@ -154,9 +154,9 @@ $ main maf filter cmo_ch [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf filter hotspot`
@@ -171,9 +171,9 @@ $ main maf filter hotspot [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf filter mappable`
@@ -188,9 +188,9 @@ $ main maf filter mappable [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf filter non_common_variant`
@@ -205,9 +205,9 @@ $ main maf filter non_common_variant [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf filter non_hotspot`
@@ -222,9 +222,9 @@ $ main maf filter non_hotspot [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf filter not_complex`
@@ -239,9 +239,9 @@ $ main maf filter not_complex [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 ### `main maf mergetsv`
@@ -258,10 +258,10 @@ $ main maf mergetsv [OPTIONS]
 
 * `-ma, --mafa FILE`: MAF file to subset
 * `-mb, --mafb FILE`: MAF
-* `-o, --output PATH`: Maf output file name.  [default: merged.maf]
-* `-id, --merge_id TEXT`: id to merge mafs on.  [default: id]
-* `-h, --how TEXT`: Type of merge to be performed on mafs. Defaults to left.  [default: left]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-o, --output PATH`: Maf output file name. \[default: merged.maf]
+* `-id, --merge_id TEXT`: id to merge mafs on. \[default: id]
+* `-h, --how TEXT`: Type of merge to be performed on mafs. Defaults to left. \[default: left]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 ### `main maf subset`
@@ -277,11 +277,11 @@ $ main maf subset [OPTIONS]
 **Options**:
 
 * `-m, --maf FILE`: MAF file to subset
-* `-i, --ids PATH`: List of ids to search for in the Tumor_Sample_Barcode column. Header of this file is sample_id
-* `--sid TEXT`: Identifiers to search for in the Tumor_Sample_Barcode column. Can be given multiple times
-* `-o, --output TEXT`: Name of the output file  [default: output_subset.maf]
-* `-c, --cname TEXT`: Name of the column header to be used for sub-setting  [default: Tumor_Sample_Barcode]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-i, --ids PATH`: List of ids to search for in the 'Tumor\_Sample\_Barcode' column. Header of this file is 'sample\_id'
+* `--sid TEXT`: Identifiers to search for in the 'Tumor\_Sample\_Barcode' column. Can be given multiple times
+* `-o, --output TEXT`: Name of the output file \[default: output\_subset.maf]
+* `-c, --cname TEXT`: Name of the column header to be used for sub-setting \[default: Tumor\_Sample\_Barcode]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 ### `main maf tag`
@@ -319,9 +319,9 @@ $ main maf tag cmo_ch [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf tag common_variant`
@@ -336,9 +336,9 @@ $ main maf tag common_variant [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf tag germline_status`
@@ -353,14 +353,14 @@ $ main maf tag germline_status [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf tag prevalence_in_cosmicDB`
 
-Tag a variant in a MAF file with prevalence in COSMIC DB 
+Tag a variant in a MAF file with prevalence in COSMIC DB
 
 **Usage**:
 
@@ -370,9 +370,9 @@ $ main maf tag prevalence_in_cosmicDB [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf tag traceback`
@@ -387,14 +387,14 @@ $ main maf tag traceback [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to tag  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to tag \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf tag truncating_mut_in_TSG`
 
-Tag a  truncating mutating variant in a MAF file based on its presence in the Tumor Suppressor Gene 
+Tag a truncating mutating variant in a MAF file based on its presence in the Tumor Suppressor Gene
 
 **Usage**:
 
@@ -404,9 +404,9 @@ $ main maf tag truncating_mut_in_TSG [OPTIONS]
 
 **Options**:
 
-* `-m, --maf FILE`: MAF file to subset  [required]
-* `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-m, --maf FILE`: MAF file to subset \[required]
+* `-o, --output PATH`: Maf output file name. \[default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data. \[default: tsv]
 * `--help`: Show this message and exit.
 
 ## `main mutect1`
@@ -457,14 +457,14 @@ $ main mutect1 case-control filter [OPTIONS]
 
 **Options**:
 
-* `-i, --inputVcf FILE`: Input vcf generated by MuTect which needs to be processed  [required]
-* `-i, --inputTxt FILE`: Input Txt file generated by MuTect which needs to be processed  [required]
-* `--refFasta FILE`: Input reference fasta  [required]
-* `--tsampleName TEXT`: Name of the tumor sample.  [required]
-* `-dp, --totalDepth INTEGER RANGE`: Tumor total depth threshold  [default: 20; x>=0]
-* `-ad, --alleledepth INTEGER RANGE`: [default: 1; x>=0]
-* `-tnr, --tnRatio INTEGER RANGE`: Tumor-Normal variant fraction ratio threshold  [default: 1; x>=0]
-* `-vf, --variantFraction FLOAT RANGE`: Tumor variant fraction threshold  [default: 5e-05; x>=0]
+* `-i, --inputVcf FILE`: Input vcf generated by MuTect which needs to be processed \[required]
+* `-i, --inputTxt FILE`: Input Txt file generated by MuTect which needs to be processed \[required]
+* `--refFasta FILE`: Input reference fasta \[required]
+* `--tsampleName TEXT`: Name of the tumor sample. \[required]
+* `-dp, --totalDepth INTEGER RANGE`: Tumor total depth threshold \[default: 20; x>=0]
+* `-ad, --alleledepth INTEGER RANGE`: \[default: 1; x>=0]
+* `-tnr, --tnRatio INTEGER RANGE`: Tumor-Normal variant fraction ratio threshold \[default: 1; x>=0]
+* `-vf, --variantFraction FLOAT RANGE`: Tumor variant fraction threshold \[default: 5e-05; x>=0]
 * `-o, --outDir TEXT`: Full Path to the output dir
 * `--help`: Show this message and exit.
 
@@ -517,14 +517,14 @@ $ main vardict case-control filter [OPTIONS]
 
 **Options**:
 
-* `-i, --inputVcf FILE`: Input vcf generated by vardict which needs to be processed  [required]
-* `--tsampleName TEXT`: Name of the tumor Sample  [required]
-* `-dp, --totalDepth INTEGER RANGE`: Tumor total depth threshold  [default: 20; x>=20]
-* `-ad, --alleledepth INTEGER RANGE`: [x>=1]
-* `-tnr, --tnRatio INTEGER`: Tumor-Normal variant fraction ratio threshold  [default: 1]
-* `-vf, --variantFraction FLOAT`: Tumor variant fraction threshold  [default: 5e-05]
-* `-mq, --minQual INTEGER`: Minimum variant call quality  [default: 0]
-* `-fg, --filterGermline`: Whether to remove calls without somatic status
+* `-i, --inputVcf FILE`: Input vcf generated by vardict which needs to be processed \[required]
+* `--tsampleName TEXT`: Name of the tumor Sample \[required]
+* `-dp, --totalDepth INTEGER RANGE`: Tumor total depth threshold \[default: 20; x>=20]
+* `-ad, --alleledepth INTEGER RANGE`: \[x>=1]
+* `-tnr, --tnRatio INTEGER`: Tumor-Normal variant fraction ratio threshold \[default: 1]
+* `-vf, --variantFraction FLOAT`: Tumor variant fraction threshold \[default: 5e-05]
+* `-mq, --minQual INTEGER`: Minimum variant call quality \[default: 0]
+* `-fg, --filterGermline`: Whether to remove calls without 'somatic' status
 * `-o, --outDir TEXT`: Full Path to the output dir
 * `--help`: Show this message and exit.
 
@@ -558,15 +558,13 @@ $ main vardict single filter [OPTIONS]
 
 **Options**:
 
-* `-i, --inputVcf FILE`: Input vcf generated by vardict which needs to be processed  [required]
-* `--tsampleName TEXT`: Name of the tumor Sample  [required]
-* `-dp, --totalDepth INTEGER RANGE`: Tumor total depth threshold  [default: 20; x>=20]
-* `-ad, --alleledepth INTEGER RANGE`: [x>=1]
-* `-tnr, --tnRatio INTEGER`: Tumor-Normal variant fraction ratio threshold  [default: 1]
-* `-vf, --variantFraction FLOAT`: Tumor variant fraction threshold  [default: 5e-05]
-* `-mq, --minQual INTEGER`: Minimum variant call quality  [default: 0]
-* `-fg, --filterGermline`: Whether to remove calls without somatic status
+* `-i, --inputVcf FILE`: Input vcf generated by vardict which needs to be processed \[required]
+* `--tsampleName TEXT`: Name of the tumor Sample \[required]
+* `-dp, --totalDepth INTEGER RANGE`: Tumor total depth threshold \[default: 20; x>=20]
+* `-ad, --alleledepth INTEGER RANGE`: \[x>=1]
+* `-tnr, --tnRatio INTEGER`: Tumor-Normal variant fraction ratio threshold \[default: 1]
+* `-vf, --variantFraction FLOAT`: Tumor variant fraction threshold \[default: 5e-05]
+* `-mq, --minQual INTEGER`: Minimum variant call quality \[default: 0]
+* `-fg, --filterGermline`: Whether to remove calls without 'somatic' status
 * `-o, --outDir TEXT`: Full Path to the output dir
 * `--help`: Show this message and exit.
-
-

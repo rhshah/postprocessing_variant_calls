@@ -2,6 +2,29 @@
 
 The sub-command `pv maf` allows users to perform post-processing on maf files. It has has six sub-commands: `annotate`, `concat`, `filter`, `mergetsv`, `subset`, `tag`.
 
+## IN**PUT AND OUTPUT DESCRIPTION**
+
+### INPUT
+
+At a minimum, each of these commands assumes a MAF file to be a well-defined object with the following characteristics:
+
+* a delimited file where the delimiter is either a '\t' or a ','
+* the file uses one of the following extension: '.maf', '.txt', '.csv', 'tsv'
+* The delimited file at A minimum includes the following columns: "Chromosome","Start\_Position","End\_Position","Reference\_Allele","Tumor\_Seq\_Allele2"
+* The minimum listed columns can be combined into a unique ID for each row.
+
+However, some commands and their sub-commands may require additional columns and may use specific rules in their processing of the MAF file.
+
+### OUTPUT
+
+Output is a MAF file which is modified as per the operation of each command,&#x20;
+
+## USAGE
+
+For specifics on these criteria and rules, please find additional documentation on these commands below:
+
+The sub-command `pv maf` allows users to perform post-processing on maf files. It has has six sub-commands: `annotate`, `concat`, `filter`, `mergetsv`, `subset`, `tag`.
+
 At minimum each of these commands assumes a maf file to be a well-defined object with the following characteristics:
 
 * a delimited file where the delimiter is either a '\t' or a ','
