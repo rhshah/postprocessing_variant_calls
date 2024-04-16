@@ -1,7 +1,7 @@
 name: Document package 
 on:
     push:
-        branches: [main]
+        branches: [main, feature/update_docs]
 jobs:
     update_cli_doc:
         # The type of runner that the job will run on
@@ -22,11 +22,12 @@ jobs:
                     make deps-install
                     mkdir -p docs
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/cli.md
+                    mv README.md docs/README.md
             - uses: EndBug/add-and-commit@v9
               with:
                 default_author: github_actions
                 message: "add doc for cli"
-                add: '["docs/cli.md --force"]'
+                add: '["docs/*.md --force"]'
             - uses: actions/checkout@v4
               with:
                 ref: docs
@@ -34,8 +35,8 @@ jobs:
               id: cat_file_module
               with:
                 branch: ${{ github.ref }}
-                path: docs/cli.md
-            - name: Write Module yaml to temp
+                path: docs/*.md
+            - name: Write Docs
               if: ${{ steps.cat_file_module.outputs.size }}
               id: write_yml_module
               run: |
@@ -44,5 +45,5 @@ jobs:
               with:
                 default_author: github_actions
                 message: "add doc for cli"
-                add: '["cli.md --force"]'
+                add: '["*.md --force"]'
                 push: 'origin docs --set-upstream --force'
