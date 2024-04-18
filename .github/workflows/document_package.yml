@@ -44,7 +44,8 @@ jobs:
             - name: Write Docs
               id: write_yml_module
               if: ${{ steps.cli.outputs.size == '' }}
-              run: echo '${{ steps.cli.outputs.content }}' > ${{ github.workspace }}/cli.md
+              run: |
+                    echo '${{ steps.readme.outputs.content }}' > ${{ github.workspace }}/README.md
             - uses: EndBug/add-and-commit@v9
               with:
                 default_author: github_actions
