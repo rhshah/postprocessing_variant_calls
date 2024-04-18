@@ -12,7 +12,7 @@ For general use you can run: Collecting postprocessing_variant_calls
   Downloading postprocessing_variant_calls-0.2.8-py3-none-any.whl.metadata (2.0 kB)
 Collecting PyVCF3 (from postprocessing_variant_calls)
   Downloading PyVCF3-1.0.3.tar.gz (977 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 977.6/977.6 kB 10.5 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 977.6/977.6 kB 10.2 MB/s eta 0:00:00
   Installing build dependencies: started
   Installing build dependencies: finished with status 'done'
   Getting requirements to build wheel: started
@@ -23,7 +23,7 @@ Collecting PyVCF3 (from postprocessing_variant_calls)
   Preparing metadata (pyproject.toml): finished with status 'done'
 Collecting numpy (from postprocessing_variant_calls)
   Downloading numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.0/61.0 kB 12.0 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.0/61.0 kB 17.0 MB/s eta 0:00:00
 Collecting pandas (from postprocessing_variant_calls)
   Downloading pandas-2.2.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
 Collecting typer[all] (from postprocessing_variant_calls)
@@ -52,32 +52,32 @@ Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=10.11.0->typer[all]->po
   Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
 Downloading postprocessing_variant_calls-0.2.8-py3-none-any.whl (30 kB)
 Downloading numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.2/18.2 MB 63.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.2/18.2 MB 63.7 MB/s eta 0:00:00
 Downloading pandas-2.2.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (13.0 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 63.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.0/13.0 MB 105.9 MB/s eta 0:00:00
 Downloading click-8.1.7-py3-none-any.whl (97 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 97.9/97.9 kB 22.5 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 97.9/97.9 kB 26.2 MB/s eta 0:00:00
 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 229.9/229.9 kB 40.5 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 229.9/229.9 kB 41.2 MB/s eta 0:00:00
 Downloading pytz-2024.1-py2.py3-none-any.whl (505 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 505.5/505.5 kB 62.5 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 505.5/505.5 kB 79.2 MB/s eta 0:00:00
 Downloading rich-13.7.1-py3-none-any.whl (240 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 240.7/240.7 kB 49.1 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 240.7/240.7 kB 59.2 MB/s eta 0:00:00
 Downloading typing_extensions-4.11.0-py3-none-any.whl (34 kB)
 Downloading tzdata-2024.1-py2.py3-none-any.whl (345 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 345.4/345.4 kB 50.7 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 345.4/345.4 kB 70.8 MB/s eta 0:00:00
 Downloading typer-0.12.3-py3-none-any.whl (47 kB)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.2/47.2 kB 13.0 MB/s eta 0:00:00
 Downloading markdown_it_py-3.0.0-py3-none-any.whl (87 kB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.5/87.5 kB 22.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.5/87.5 kB 25.2 MB/s eta 0:00:00
 Downloading pygments-2.17.2-py3-none-any.whl (1.2 MB)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 70.9 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 95.5 MB/s eta 0:00:00
 Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
 Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
 Building wheels for collected packages: PyVCF3
   Building wheel for PyVCF3 (pyproject.toml): started
   Building wheel for PyVCF3 (pyproject.toml): finished with status 'done'
-  Created wheel for PyVCF3: filename=PyVCF3-1.0.3-py3-none-any.whl size=988536 sha256=0735a6d6b0a89075b9f381bfd31fae9d1eefece699ea35594932dc9a8670f63a
+  Created wheel for PyVCF3: filename=PyVCF3-1.0.3-py3-none-any.whl size=988536 sha256=d0aeb3fcfe9bff04c6a198c7ab032256a607ff7bfc2db41fd716a470bdcc4892
   Stored in directory: /home/runner/.cache/pip/wheels/12/2e/72/c03483bc49d13b24ec16d0878e17df5e9d2cd9a088935acdda
 Successfully built PyVCF3
 Installing collected packages: pytz, tzdata, typing-extensions, six, PyVCF3, pygments, numpy, mdurl, click, python-dateutil, markdown-it-py, rich, pandas, typer, postprocessing_variant_calls
