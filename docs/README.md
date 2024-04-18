@@ -8,7 +8,8 @@ Supported File Types:
 
 # Installation  
 
-
+For general use you can run: `pip install postprocessing_variant_calls`
+or a tagged version with `pip install git+https://github.com/msk-access/postprocessing_variant_calls.git@<version>`
 
 For setting up a development environment please see the [Setting up a Dev Environment](#Setting-up-a-Dev-Environment) section.
 
