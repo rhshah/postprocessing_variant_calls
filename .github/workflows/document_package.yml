@@ -22,7 +22,6 @@ jobs:
                     make deps-install
                     mkdir -p docs
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/cli.md
-                    cp README.md docs/README.md
             - uses: EndBug/add-and-commit@v9
               with:
                 default_author: github_actions
@@ -40,7 +39,7 @@ jobs:
               id: readme
               with:
                 branch: ${{ github.ref }}
-                path: docs/README.md
+                path: README.md
             - name: Write Docs
               id: write_yml_module
               run: |
