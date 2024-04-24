@@ -37,7 +37,7 @@ jobs:
             - name: Write Docs
               id: write_docs
               run: |
-                    git show ${{ steps.extract_branch.outputs.branch }}:README.md > README.md
+                    git show "${{ steps.extract_branch.outputs.branch }}":README.md > README.md
 
             - uses: EndBug/add-and-commit@v9
               with:
