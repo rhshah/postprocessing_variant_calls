@@ -23,16 +23,13 @@ See [CLI](docs/CLI.md) for commmand line usage of the package.
 Have an environment with python >= 3.8 installed. 
 
 Install poetry: 
-
-```bash
+```
 pip install poetry
 ```
-
 ## Install Package Dependencies
 
 Then install project dependencies with Poetry.
-
-```bash
+```
 cd /path/to/postprocessing_variant_calls
 poetry install .
 ```
