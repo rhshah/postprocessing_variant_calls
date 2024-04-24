@@ -33,7 +33,7 @@ jobs:
             - name: Write Docs
               id: write_docs
               run: |
-                    git show ${{ github.head_ref }}:README.md > ${{ github.workspace }}/README.md
+                    git show ${{ github.ref }}:README.md > ${{ github.workspace }}/README.md
 
             - uses: EndBug/add-and-commit@v9
               with:
