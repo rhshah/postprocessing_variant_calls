@@ -32,7 +32,9 @@ jobs:
                 ref: docs
             - name: Write Docs
               id: write_docs
-              run: cp -f $GITHUB_WORKSPACE/README.md .
+              run: |
+                    mv $GITHUB_WORKSPACE/README.md ./README_tmp.md
+                    README_tmp.md > README.md
             - uses: EndBug/add-and-commit@v9
               with:
                 default_author: github_actions
