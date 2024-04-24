@@ -30,14 +30,12 @@ jobs:
             - uses: actions/checkout@v4
               with:
                 ref: docs
-            - name: Extract branch name
-              shell: bash
-              run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-              id: extract_branch
-            - name: Write Docs
-              id: write_docs
-              run: |
-                    git checkout ${{ steps.extract_branch.outputs.branch }} README.md
+            - uses: actions/checkout@v4
+              with:
+                ref: ${{ github.event.ref }}
+                sparse-checkout: |
+                    README.md
+                sparse-checkout-cone-mode: false
             - uses: EndBug/add-and-commit@v9
               with:
                 default_author: github_actions
