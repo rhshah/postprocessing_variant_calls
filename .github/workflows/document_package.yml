@@ -42,7 +42,7 @@ jobs:
                 path: README.md
             - name: Write Docs
               id: write_docs
-              run:
+              run: |
                 rm -f README.md
                 echo "${{ steps.readme.outputs.content }}" >  ${{ github.workspace }}/README.md
 
