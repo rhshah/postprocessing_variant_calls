@@ -42,7 +42,7 @@ jobs:
                 path: README.md
             - name: Write Docs
               id: write_docs
-              run: echo "${{ steps.readme.outputs.content }}" >  ${{ github.workspace }}/README.md
+              run: echo "${{ steps.cli.outputs.content }}" >  ${{ github.workspace }}/README.md
 
             - uses: EndBug/add-and-commit@v9
               with:
