@@ -38,7 +38,7 @@ jobs:
               id: write_docs
               run: |
                     git fetch
-                    git checkout ${{ steps.extract_branch.outputs.branch }} README.md
+                    git checkout ${{ steps.extract_branch.outputs.branch }} -- README.md
             - uses: EndBug/add-and-commit@v9
               with:
                 default_author: github_actions
