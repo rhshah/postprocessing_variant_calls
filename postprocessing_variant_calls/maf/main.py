@@ -42,7 +42,7 @@ app.add_typer(
 @app.command("concat", help="row-wise concatenation for maf files.")
 def concat(
     files: List[Path] = typer.Option(
-        None,
+        [],
         "--files",
         "-f",
         help="MAF file to concatenate. Default assumes MAFs are tsv. MAF inputs are specified here, or using paths parameter",
@@ -85,22 +85,26 @@ def concat(
     # option to get files from text file
     if paths:
         files = process_paths(paths)
-    # create maf files
-    maf_list = []
-    for maf in files:
-        maf = MAFFile(maf, separator, header)
-        maf_list.append(maf.data_frame)
-    # concat
-    typer.secho(
-        f"Concatenating maf files.",
-        fg=typer.colors.BRIGHT_GREEN,
-    )
-    concat_df = pd.concat(maf_list, axis=0, ignore_index=True)
-    # deduplicate
-    if deduplicate:
-        concat_df = maf_duplicates(concat_df)
-    # write out paths
-    concat_df.to_csv(output_maf, index=False, sep="\t")
+    if files:
+        # create maf files
+        maf_list = []
+        for maf in files:
+            maf = MAFFile(maf, separator, header)
+            maf_list.append(maf.data_frame)
+        # concat
+        typer.secho(
+            f"Concatenating maf files.",
+            fg=typer.colors.BRIGHT_GREEN,
+        )
+        concat_df = pd.concat(maf_list, axis=0, ignore_index=True)
+        # deduplicate
+        if deduplicate:
+            concat_df = maf_duplicates(concat_df)
+        # write out paths
+        concat_df.to_csv(output_maf, index=False, sep="\t")
+    else:
+        typer.echo("--files or --path argument must be provided.")
+        raise typer.Abort()
     return 0
 
 
