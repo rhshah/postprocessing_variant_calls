@@ -31,10 +31,13 @@ jobs:
               shell: bash
               run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
               id: extract_branch
+            - uses: actions/checkout@v4
+              with:
+                ref: docs
+                fetch-depth: 0
             - name: Write Docs
               id: write_docs
               run: |
-                    git checkout docs
                     git show ${{ steps.extract_branch.outputs.branch }} README.md > README.md
             - uses: EndBug/add-and-commit@v9
               with:
