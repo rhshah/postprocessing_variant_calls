@@ -86,7 +86,6 @@ def test_concat_files(call):
 @pytest.mark.parametrize("call", maf_concat_paths)
 def test_concat_paths(call):
     result = runner.invoke(app, call)
-    result.stdout
     assert result.exit_code == 0
     assert "" in result.stdout
     assert os.path.exists("tests/data/maf/concat/output_maf.maf") == True
