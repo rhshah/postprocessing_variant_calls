@@ -37,7 +37,7 @@ jobs:
             - name: Write Docs
               id: write_docs
               run: |
-                    git checkout docs 
+                    git checkout docs --
                     git checkout ${{ steps.extract_branch.outputs.branch }} -- README.md
             - uses: EndBug/add-and-commit@v9
               with:
