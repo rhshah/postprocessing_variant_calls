@@ -85,7 +85,7 @@ def concat(
     # option to get files from text file
     if paths:
         files = process_paths(paths)
-    if files: 
+    if files:
         # create maf files
         maf_list = []
         for maf in files:
@@ -102,7 +102,7 @@ def concat(
             concat_df = maf_duplicates(concat_df)
         # write out paths
         concat_df.to_csv(output_maf, index=False, sep="\t")
-    else: 
+    else:
         typer.echo("--files or --path argument must be provided.")
         raise typer.Abort()
     return 0
