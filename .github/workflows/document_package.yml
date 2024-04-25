@@ -12,6 +12,12 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+            - name: Extract branch name
+              shell: bash
+              run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+              id: extract_branch
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - name: setup python
               uses: actions/setup-python@v4
@@ -19,6 +25,7 @@ jobs:
                 python-version: "3.10" # install the python version needed
             - name: Document CLI and write to folder
               run: |
+                    git checkout ${{ steps.extract_branch.outputs.branch }}
                     make deps-install
                     mkdir -p docs
                     poetry run typer postprocessing_variant_calls.main utils docs > docs/cli.md
@@ -27,17 +34,10 @@ jobs:
                 default_author: github_actions
                 message: "add doc for cli"
                 add: '["docs/*.md --force"]'
-            - name: Extract branch name
-              shell: bash
-              run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-              id: extract_branch
-            - uses: actions/checkout@v4
-              with:
-                ref: docs
-                fetch-depth: 0
             - name: Write Docs
               id: write_docs
               run: |
+                    git checkout docs 
                     git checkout ${{ steps.extract_branch.outputs.branch }} README.md
             - uses: EndBug/add-and-commit@v9
               with:
