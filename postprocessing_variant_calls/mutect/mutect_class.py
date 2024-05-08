@@ -176,7 +176,7 @@ class mutect_sample:
 
         # Filter each row (Mutation)
         txtDF = pd.read_table(self.inputTxt, skiprows=1, dtype=str)
-        txt_fh = open(f"{self.outputDir}/{self.txt_out}", "wb")
+        txt_fh = open(f"{self.txt_out}", "wb")
         for index, row in txtDF.iterrows():
             chr = row.loc["contig"]
             pos = row.loc["position"]
