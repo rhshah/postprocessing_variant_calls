@@ -314,7 +314,7 @@ def _tvf_threshold_calculation(nvf, tnr):
 
 def _write_to_vcf(outDir, vcf_out, vcf_reader, allsamples, tsampleName, keepDict):
     # This section uses the keepDict to write all passed mutations to the new VCF file
-    vcf_writer = vcf.Writer(open(f"{vcf_out}", "wb"), vcf_reader)
+    vcf_writer = vcf.Writer(open(f"{outDir}/{vcf_out}", "w"), vcf_reader)
     for record in vcf_reader:
         key_for_tracking = (
             str(record.CHROM)
