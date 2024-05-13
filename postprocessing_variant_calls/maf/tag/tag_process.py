@@ -270,7 +270,7 @@ def traceback(
 
 
 @app.command(
-    "by_rules",
+    "by_variant_annotations",
     help="Tag a variant in a MAF file based on criterion provided by input rules JSON file",
 )
 def by_maf(
@@ -316,10 +316,10 @@ def by_maf(
         fg=typer.colors.BRIGHT_GREEN,
     )
     rules_file = RulesFile(rules)
-    tagged_by_rules_maf = mafa.tag_by_rules(rules_file.data_frame)
+    tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
     
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    tagged_by_rules_maf.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    tagged_by_variant_annot_maf.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -363,14 +363,14 @@ def by_access(
         callback=check_separator,
     ),
 ):
-    # run tag by_rules
+    # run tag by_variant_annotations
     mafa = MAFFile(maf, separator)
     typer.secho(
         f"Tagging Maf with criteria from input rules JSON file",
         fg=typer.colors.BRIGHT_GREEN,
     )
     rules_file = RulesFile(rules)
-    tagged_by_rules_maf = mafa.tag_by_rules(rules_file.data_frame)
+    tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
     
     # run tag by refseq IDs 
     # run tag_by_hotspots

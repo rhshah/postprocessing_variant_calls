@@ -357,7 +357,7 @@ class MAFFile:
             )
             raise typer.Abort()
 
-    def tag_by_rules(self, rules_df):
+    def tag_by_variant_annotations(self, rules_df):
         if rules_df is not None:
             for index, row in rules_df.iterrows():
                 condition = True
