@@ -479,25 +479,27 @@ class MAFFile:
         return self.data_frame
 
     def __process_header(self, header):
-        possible_delimiters=[",", "\t", " "]
-        
-        with open(header,"r") as file:
+        possible_delimiters = [",", "\t", " "]
+
+        with open(header, "r") as file:
             first_line = file.read().rstrip("\n")
             delimiter = None
             try:
                 for delim in possible_delimiters:
                     if delim in first_line:
                         delimiter = delim
-                        break 
+                        break
                 if delim is None:
-                    raise ValueError("No delimiter found in the header file. Please ensure your header file is either in CSV or TSV format.")
+                    raise ValueError(
+                        "No delimiter found in the header file. Please ensure your header file is either in CSV or TSV format."
+                    )
             except ValueError as e:
                 raise
-            
+
         file = open(header, "r")
         header = file.readline().rstrip("\n").split(delimiter)
         header = self.__check_headers(header)
-        return header 
+        return header
 
     def __check_headers(self, header):
         req_columns_set = set(self.cols["general"])

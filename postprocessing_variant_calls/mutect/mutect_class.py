@@ -336,7 +336,7 @@ def _write_to_vcf(outDir, vcf_out, vcf_reader, allsamples, tsampleName, keepDict
             record.add_info("set", "MuTect")
 
             # If the caller reported the normal genotype column before the tumor, swap those around
-            
+
             if allsamples[1] == tsampleName:
                 vcf_writer.samples[0] = allsamples[1]
                 vcf_writer.samples[1] = allsamples[0]

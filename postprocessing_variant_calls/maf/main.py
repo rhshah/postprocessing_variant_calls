@@ -102,10 +102,10 @@ def concat(
             concat_df = maf_duplicates(concat_df)
         # write out paths
         # code to remove id column and verify it doesn't exist before writing output maf
-        if 'id' in list(concat_df.columns):
+        if "id" in list(concat_df.columns):
             try:
-                concat_df = concat_df.drop(columns=['id'])
-                concat_df.to_csv(output_maf, index=False, sep="\t")  
+                concat_df = concat_df.drop(columns=["id"])
+                concat_df.to_csv(output_maf, index=False, sep="\t")
             except:
                 concat_df.to_csv(output_maf, index=False, sep="\t")
     else:
