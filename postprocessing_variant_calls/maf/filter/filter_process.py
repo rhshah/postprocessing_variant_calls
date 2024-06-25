@@ -241,6 +241,43 @@ def cmo_ch(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
+@app.command("access_filters", help="Filter a MAF file based on all the parameters listed in ACCESS filters python script")
+def access_filters(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to subset",
+    ),
+    output_maf: Path = typer.Option(
+        "output.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback=check_separator,
+    ),
+    blacklist: str = typer.Option(
+        "tsv",
+        "--blacklist",
+        "-bl",
+        help="Optional input blacklist file for access filtering criteria.",
+    )
+):
+    # prep maf
+    mafa = MAFFile(maf, separator)
+    mafa = mafa.filter("access_filters")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    return 0
+
 
 if __name__ == "__main__":
     app()
