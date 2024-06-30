@@ -165,6 +165,49 @@ def maf_tsv(
     annotated_maf.to_csv(output_maf, index=False, sep="\t")
     return 0
 
+@app.command("extract_blocklist", help="Extract values from an optional blocklist file if provided. Used in SNVs/indels workflow.")
+def extract_blocklist(
+    tsv: Path = typer.Option(
+        ...,
+        "--blocklist_file",
+        "-b",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Blocklist text file to extract values from. Needs to be in TSV format",
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    )
+):
+    # prep maf
+    header=['Chromosome','Start_Position','End_Position','Reference_Allele','Tumor_Seq_Allele','Annotation']
+    tsva = read_tsv(tsv, separator)
+    
+    
+    if tsva.empty:
+        blacklist = []
+        print("Extracted blocklist values for input blocklist file. Can be used for filtering later on.")
+        return blacklist
+    elif tsva.empty == False:
+        if list(tsva.columns.values)!=header:
+            raise Exception('Blacklist provided is in the wrong format, file should have the following in the header (in order):'+', '.join(header))
+        else:
+            tsva.drop(['Annotation'], axis=1, inplace=True)
+            tsva.drop_duplicates(inplace=True)
+            blacklist=[str(b[0])+"_"+str(b[1])+"_"+str(b[2])+"_"+str(b[3])+"_"+str(b[4]) for b in tsva.values.tolist()]
+            print("Extracted blocklist values for input blocklist file. Can be used for filtering later on.")
+            return blacklist
+    else:
+        raise IOError('Blacklist file provided does not exist. Please check inputs again.')
+
 
 if __name__ == "__main__":
     app()

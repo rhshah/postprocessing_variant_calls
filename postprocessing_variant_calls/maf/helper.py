@@ -145,6 +145,14 @@ class MAFFile:
                 "Reference_Allele",
                 "Tumor_Seq_Allele2",
             ],
+            "blocklist": [
+                "Chromosome",
+                "Start_Position",
+                "End_Position",
+                "Reference_Allele",
+                "Tumor_Seq_Allele",
+                "Annotation"
+            ],
             "germline_status": ["t_alt_count", "t_depth"],
             "common_variant": ["gnomAD_AF"],
             "prevalence_in_cosmicDB": ["CNT"],
