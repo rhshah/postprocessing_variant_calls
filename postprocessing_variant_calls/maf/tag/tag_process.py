@@ -75,7 +75,8 @@ def germline_status(
     )
     mafa = mafa.tag("germline_status")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa_id_dropped = mafa.drop('id', axis=1)
+    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
