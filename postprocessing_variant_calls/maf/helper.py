@@ -201,6 +201,32 @@ class MAFFile:
         self.data_frame = self.__read_tsv()
         self.__gen_id()
         self.tsg_genes = tsg_genes
+        
+    def _convert_annomaf_to_df(self):
+        if self.data_frame.empty == False:
+            self.data_frame['Chromosome'] = self.data_frame['Chromosome'].astype(str)
+            self.data_frame.set_index(self.cols['general'], drop=False, inplace=True)
+            self.data_frame.rename(columns ={'Matched_Norm_Sample_Barcode':'caller_Norm_Sample_Barcode','t_depth':'caller_t_depth','t_ref_count':'caller_t_ref_count', 't_alt_count':'caller_t_alt_count', 'n_depth':'caller_n_depth','n_ref_count':'caller_n_ref_count', 'n_alt_count':'caller_n_alt_count','set':'CallMethod'}, inplace=True)
+        # quick cleanup of mutect columns (can be made into mini function in the MAF class)
+    
+        # marking the mutect and vardict combo columns if the condition in the line below is met.
+            self.data_frame.loc[(self.data_frame['MUTECT'] == 1) & (self.data_frame['CallMethod'] != 'MuTect'),'CallMethod'] = 'VarDict,MuTect'
+            self.data_frame.drop(['TYPE','FAILURE_REASON','MUTECT'], inplace=True, axis=1)
+            return self.data_frame
+        else:
+            typer.secho(f"failed to open path to the annotation MAF file {self.file_path}.", fg=typer.colors.RED)
+            raise typer.Abort()
+    
+    def _convert_fillout_to_df(self):
+        if self.data_frame.empty == False:
+            self.data_frame['Chromosome'] = self.data_frame['Chromosome'].astype(str)
+            self.data_frame.set_index(self.cols['general'], drop=False, inplace=True)
+            return self.data_frame
+        else:
+            typer.secho(f"failed to open path to the fillout MAF file {self.file_path}.", fg=typer.colors.RED)
+            raise typer.Abort()
+            
+        
 
     def __read_tsv(self):
         """Read the tsv file and store it in the instance variable 'data_frame'.

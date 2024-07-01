@@ -243,17 +243,29 @@ def cmo_ch(
 
 @app.command("access_filters", help="Filter a MAF file based on all the parameters listed in ACCESS filters python script")
 def access_filters(
-    maf: Path = typer.Option(
+    fillout_maf: Path = typer.Option(
         ...,
-        "--maf",
-        "-m",
+        "--fillout_maf",
+        "-f",
         exists=True,
         file_okay=True,
         dir_okay=False,
         writable=False,
         readable=True,
         resolve_path=True,
-        help="MAF file to subset",
+        help="Fillout MAF file to subset (direct output from traceback subworkflow)",
+    ),
+    anno_maf: Path = typer.Option(
+        ...,
+        "--anno_maf",
+        "-a",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Annotated MAF file to subset (direct input file from beginning of traceback subworkflow)",
     ),
     output_maf: Path = typer.Option(
         "output.maf", "--output", "-o", help="Maf output file name."
@@ -272,10 +284,31 @@ def access_filters(
         help="Optional input blacklist file for access filtering criteria.",
     )
 ):
-    # prep maf
-    mafa = MAFFile(maf, separator)
-    mafa = mafa.filter("access_filters")
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    # prep annotated and fillout mafs
+    
+    fillout_mafa = MAFFile(fillout_maf, separator)
+    anno_mafa = MAFFile(anno_maf, separator)
+    
+    anno_df = anno_mafa.data_frame
+    fillout_df = fillout_mafa.data_frame
+    
+    # call the extract blacklist function (might move this to other location)
+    
+    # convert the anno and fillout mafs to dataframe (functions located in MAF class)
+    df_annotation = anno_mafa._convert_annomaf_to_df()
+    df_full_fillout = fillout_mafa._convert_fillout_to_df()
+    
+    # run extract fillout type function on the fillout df (will result in many mini dfs)
+    
+    # create a column called fillout type which contains the fillout tags depending on suffixed value in tumor sample barcode
+    # NOTE: temporarily hard coding in the type values 
+    
+    print("DONE")
+    
+    
+    
+    #mafa = mafa.filter("access_filters")
+    #mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
