@@ -75,8 +75,7 @@ def germline_status(
     )
     mafa = mafa.tag("germline_status")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa_id_dropped = mafa.drop('id', axis=1)
-    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -115,8 +114,7 @@ def common_variant(
     )
     mafa = mafa.tag("common_variant")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa_id_dropped = mafa.drop('id', axis=1)
-    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -155,8 +153,7 @@ def prevalence_in_cosmicDB(
     )
     mafa = mafa.tag("prevalence_in_cosmicDB")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa_id_dropped = mafa.drop('id', axis=1)
-    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -195,8 +192,7 @@ def truncating_mut_in_TSG(
     )
     mafa = mafa.tag("truncating_mut_in_TSG")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa_id_dropped = mafa.drop('id', axis=1)
-    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -232,8 +228,7 @@ def cmo_ch(
     typer.secho(f"Tagging Maf with cmo_ch_tag columns", fg=typer.colors.BRIGHT_GREEN)
     mafa = mafa.tag_all("cmo_ch_tag")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa_id_dropped = mafa.drop('id', axis=1)
-    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -257,6 +252,9 @@ def traceback(
     output_maf: Path = typer.Option(
         "output.maf", "--output", "-o", help="Maf output file name."
     ),
+    sample_type: str = typer.Option(
+        "--sample_type", "-t", help="String value of type of sample. Taken from meta map in traceback subworkflow."
+    ),
     separator: str = typer.Option(
         "tsv",
         "--separator",
@@ -264,6 +262,8 @@ def traceback(
         help="Specify a seperator for delimited data.",
         callback=check_separator,
     ),
+    
+    
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
@@ -271,6 +271,8 @@ def traceback(
     mafa = mafa.tag("traceback")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa_id_dropped = mafa.drop('id', axis=1)
+    # adding in sample type as a separate column to differentiate between groups of samples
+    mafa_id_dropped['type']= str(sample_type)
     mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
@@ -325,8 +327,7 @@ def by_maf(
     tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
 
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa_id_dropped = tagged_by_variant_annot_maf.drop('id', axis=1)
-    mafa_id_dropped.to_csv(
+    tagged_by_variant_annot_maf.to_csv(
         f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t"
     )
     return 0
