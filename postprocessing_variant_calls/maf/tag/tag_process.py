@@ -115,7 +115,8 @@ def common_variant(
     )
     mafa = mafa.tag("common_variant")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa_id_dropped = mafa.drop('id', axis=1)
+    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -154,7 +155,8 @@ def prevalence_in_cosmicDB(
     )
     mafa = mafa.tag("prevalence_in_cosmicDB")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa_id_dropped = mafa.drop('id', axis=1)
+    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -193,7 +195,8 @@ def truncating_mut_in_TSG(
     )
     mafa = mafa.tag("truncating_mut_in_TSG")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa_id_dropped = mafa.drop('id', axis=1)
+    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -229,7 +232,8 @@ def cmo_ch(
     typer.secho(f"Tagging Maf with cmo_ch_tag columns", fg=typer.colors.BRIGHT_GREEN)
     mafa = mafa.tag_all("cmo_ch_tag")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa_id_dropped = mafa.drop('id', axis=1)
+    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -266,7 +270,8 @@ def traceback(
     typer.secho(f"Tagging Maf with traceback columns", fg=typer.colors.BRIGHT_GREEN)
     mafa = mafa.tag("traceback")
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    mafa_id_dropped = mafa.drop('id', axis=1)
+    mafa_id_dropped.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
 
@@ -320,7 +325,8 @@ def by_maf(
     tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
 
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    tagged_by_variant_annot_maf.to_csv(
+    mafa_id_dropped = tagged_by_variant_annot_maf.drop('id', axis=1)
+    mafa_id_dropped.to_csv(
         f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t"
     )
     return 0
