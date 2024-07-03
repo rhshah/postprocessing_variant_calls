@@ -132,7 +132,66 @@ def gen_id_tsv(df):
         raise typer.Abort()
     return df
 
+def extract_fillout_type(df_full_fillout):
+    #tag fillout type in full fillout
+    df_full_fillout['Fillout_Type'] = df_full_fillout['Tumor_Sample_Barcode'].apply(lambda x: "CURATED-SIMPLEX" if "-CURATED-SIMPLEX" in x else ("SIMPLEX" if "-SIMPLEX" in x else ("CURATED-DUPLEX" if "CURATED-DUPLEX" in x else "POOL")))
+    #extract curated duplex and and VAf and summary column
+    df_curated = (df_full_fillout.loc[df_full_fillout['Fillout_Type'] == 'CURATED-DUPLEX'])
+    df_curated = __find_VAFandsummary(df_curated)
+    breakpoint()
+    #extract simplex and transform to simplex +duplex
+    df_curatedsimplex = (df_full_fillout.loc[df_full_fillout['Fillout_Type'] == 'CURATED-SIMPLEX'])
+    df_ds_curated = __create_duplexsimplex(df_curatedsimplex, df_curated)
+    #extract duplex and and VAf and summary column
+    df_pool = (df_full_fillout.loc[df_full_fillout['Fillout_Type'] == 'POOL'])
+    df_pool = __find_VAFandsummary(df_pool)
+    #extract simplex and transform to simplex +duplex
+    df_simplex = (df_full_fillout.loc[df_full_fillout['Fillout_Type'] == 'SIMPLEX'])
+    df_ds_tumor = __create_duplexsimplex(df_simplex, df_pool)
+    #separate tumor samples from Normal samples from POOL Fillout_Type
+    #This is done by assuming all tumor samples have a simplex-duplex tumor sample genotyped, while normals do not. Samples not in DS_tumor are assumed to be normals
+    df_tumor, df_normal= __separate_normal_and_tumor(df_pool, df_ds_tumor)
+    return df_tumor, df_normal, df_ds_tumor, df_curated, df_ds_curated
 
+def __find_VAFandsummary(df_fillout): 
+    df_fillout = df_fillout.copy()
+    #find the VAF from the fillout
+    df_fillout['t_vaf_fragment'] = (df_fillout['t_alt_count'] / (df_fillout['t_alt_count'].astype(int) + df_fillout['t_ref_count'].astype(int))).round(4)
+    df_fillout['summary_fragment'] = 'DP='+(df_fillout['t_alt_count'].astype(int) + df_fillout['t_ref_count'].astype(int)).astype(str)+';RD='+  df_fillout['t_ref_count'].astype(str)+';AD='+ df_fillout['t_alt_count'].astype(str)+';VF='+df_fillout['t_vaf_fragment'].fillna(0).astype(str)
+    return df_fillout
+    
+def __create_duplexsimplex(df_s, df_d):
+    df_s = df_s.copy()
+    df_d = df_d.copy()
+    #Prep Simplex
+    df_s.rename(columns = {'t_alt_count_fragment': 't_alt_count_fragment_simplex','t_ref_count_fragment':'t_ref_count_fragment_simplex'}, inplace=True)   
+    df_s['Tumor_Sample_Barcode'] = df_s['Tumor_Sample_Barcode'].str.replace('-SIMPLEX','')
+    df_s.set_index('Tumor_Sample_Barcode', append=True, drop=False, inplace=True)
+    #Prep Duplex
+    df_d.rename(columns = {'t_alt_count_fragment': 't_alt_count_fragment_duplex','t_ref_count_fragment':'t_ref_count_fragment_duplex'}, inplace=True)
+    df_d['Tumor_Sample_Barcode'] = df_d['Tumor_Sample_Barcode'].str.replace('-DUPLEX', '')
+    df_d.set_index('Tumor_Sample_Barcode', append=True, drop=False, inplace=True)
+    #Merge
+    df_ds = df_s.merge(df_d[['t_ref_count_fragment_duplex','t_alt_count_fragment_duplex']], left_index=True, right_index=True)
+    ##Add
+    df_ds['t_ref_count_fragment'] = df_ds['t_ref_count_fragment_simplex'] + df_ds['t_ref_count_fragment_duplex']
+    df_ds['t_alt_count_fragment'] = df_ds['t_alt_count_fragment_simplex'] + df_ds['t_alt_count_fragment_duplex']
+    df_ds['t_total_count_fragment'] = df_ds['t_alt_count_fragment'] + df_ds['t_ref_count_fragment']
+    ##clean up
+    fillout_type = df_ds['Fillout_Type']+'-DUPLEX'
+    df_ds.drop(['Fillout_Type', 't_ref_count_fragment_simplex', 't_ref_count_fragment_duplex', 't_alt_count_fragment_simplex','t_alt_count_fragment_duplex'], axis=1, inplace=True)
+    df_ds['Fillout_Type'] = fillout_type
+    df_ds['Tumor_Sample_Barcode'] = df_ds['Tumor_Sample_Barcode']+'-SIMPLEX-DUPLEX'
+    df_ds.set_index(mutation_key, drop=False, inplace=True)
+    df_ds = find_VAFandsummary(df_ds)
+    return df_ds
+    
+def __separate_normal_and_tumor (df_pool, df_ds_tumor):
+    tumor_samples=[f.replace('-SIMPLEX-DUPLEX', '') for f in df_ds_tumor.Tumor_Sample_Barcode.unique().tolist()]
+    df_tumor=(df_pool.loc[df_pool['Tumor_Sample_Barcode'].isin(tumor_samples)])
+    df_normal=(df_pool.loc[~df_pool['Tumor_Sample_Barcode'].isin(tumor_samples)])
+    df_normal.Fillout_Type='NORMAL'
+    return df_tumor, df_normal
 class MAFFile:
     def __init__(self, file_path, separator, header=None):
         self.file_path = file_path
@@ -227,6 +286,21 @@ class MAFFile:
             raise typer.Abort()
             
         
+    def __check_delimiter(self):
+        filename = self.file_path
+        try:
+            with open(filename, "r", newline="") as file_in:
+                reader = csv.reader(file_in, delimiter=self.separator)
+                headers = next(reader)
+
+                column_count = len(headers)
+                if column_count == 1:
+                    raise ValueError("Column Count is 1")
+
+        except Exception as e:
+            typer.secho(f'file \"{filename}\" is probably not separated by \"{self.separator}"', fg=typer.colors.RED)
+            typer.secho(f'trying \t', fg=typer.colors.RED)
+            
 
     def __read_tsv(self):
         """Read the tsv file and store it in the instance variable 'data_frame'.
@@ -238,14 +312,13 @@ class MAFFile:
             pd.DataFrame: Output a data frame containing the MAF/tsv
         """
         if Path(self.file_path).is_file():
+
             typer.secho(
                 f"Reading Delimited file: {self.file_path}",
                 fg=typer.colors.BRIGHT_GREEN,
             )
             skip = self.get_row()
-            df = pd.read_csv(
-                self.file_path, sep=self.separator, skiprows=skip, low_memory=True
-            )
+            df = pd.read_csv(self.file_path, sep=None, skiprows=skip, low_memory=True)
             if self.header:
                 df = df[df.columns.intersection(self.header)]
             return df
@@ -282,7 +355,7 @@ class MAFFile:
                 fg=typer.colors.RED,
             )
             raise typer.Abort()
-
+    
     def annotate_maf_maf(self, maf_df_a, cname, values):
         self.data_frame[cname] = np.where(
             self.data_frame["id"].isin(maf_df_a["id"]), values[0], values[1]

@@ -21,6 +21,7 @@ from postprocessing_variant_calls.maf.helper import (
     read_tsv,
     MAFFile,
     gen_id_tsv,
+    extract_fillout_type
 )
 from utils.pybed_intersect import annotater
 import pandas as pd
@@ -270,13 +271,6 @@ def access_filters(
     output_maf: Path = typer.Option(
         "output.maf", "--output", "-o", help="Maf output file name."
     ),
-    separator: str = typer.Option(
-        "tsv",
-        "--separator",
-        "-sep",
-        help="Specify a seperator for delimited data.",
-        callback=check_separator,
-    ),
     blacklist: str = typer.Option(
         "tsv",
         "--blacklist",
@@ -286,18 +280,15 @@ def access_filters(
 ):
     # prep annotated and fillout mafs
     
-    fillout_mafa = MAFFile(fillout_maf, separator)
-    anno_mafa = MAFFile(anno_maf, separator)
-    
-    anno_df = anno_mafa.data_frame
-    fillout_df = fillout_mafa.data_frame
-    
+    fillout_mafa = MAFFile(fillout_maf, None)
+    anno_mafa = MAFFile(anno_maf, None)
     # call the extract blacklist function (might move this to other location)
     
     # convert the anno and fillout mafs to dataframe (functions located in MAF class)
     df_annotation = anno_mafa._convert_annomaf_to_df()
     df_full_fillout = fillout_mafa._convert_fillout_to_df()
-    
+    # breakpoint()
+    extract_fillout_type(df_full_fillout)
     # run extract fillout type function on the fillout df (will result in many mini dfs)
     
     # create a column called fillout type which contains the fillout tags depending on suffixed value in tumor sample barcode
