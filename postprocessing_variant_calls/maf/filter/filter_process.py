@@ -284,6 +284,22 @@ def access_filters(
         help="Optional input blacklist file for access filtering criteria.",
     )
 ):
+    # all mini functions used in this command
+    
+    # FindVAFandSummary
+    def find_VAFandsummary(df,sample_group): 
+        df = df.copy()
+        #find the VAF from the fillout (the comma separated string values that the summary will later be calculated from)
+        # NOTE: col [t_vaf_fragment] already calculated by traceback, no need to create column again
+        df[f"summary_fragment_{str(sample_group)}"] = 'DP='+(df[f"t_alt_count_fragment_{str(sample_group)}"].astype(int) + df[f"t_ref_count_fragment_{str(sample_group)}"].astype(int)).astype(str)+';RD='+  df[f"t_ref_count_fragment_{str(sample_group)}"].astype(str)+';AD='+ df[f"t_alt_count_fragment_{str(sample_group)}"].astype(str)+';VF='+df[f"t_vaf_fragment_{str(sample_group)}"].fillna(0).astype(str)
+        
+        suffixes = set(col.split('_')[-1] for col in df.columns)
+        sorted_columns = [col for suffix in sorted(suffixes) for col in df.columns if col.endswith(f'_{suffix}')]
+        df_sorted = df[sorted_columns]
+        return df_sorted
+    
+
+    
     # prep annotated and fillout mafs
     
     fillout_mafa = MAFFile(fillout_maf, separator)
@@ -293,7 +309,7 @@ def access_filters(
     fillout_df = fillout_mafa.data_frame
     
     # call the extract blacklist function (might move this to other location)
-    
+    #extract_blacklist()
     # convert the anno and fillout mafs to dataframe (functions located in MAF class)
     df_annotation = anno_mafa._convert_annomaf_to_df()
     df_full_fillout = fillout_mafa._convert_fillout_to_df()
@@ -301,7 +317,21 @@ def access_filters(
     # run extract fillout type function on the fillout df (will result in many mini dfs)
     
     # create a column called fillout type which contains the fillout tags depending on suffixed value in tumor sample barcode
-    # NOTE: temporarily hard coding in the type values 
+    # NOTE: temporarily hard coding in the type values (CURATED,PLASMA,TUMOR,UNMATCHED_NORMAL,MATCHED_NORMAL)
+    # NOTE: add in POOL category (only if needed)
+    
+    # extract the VAF and summary values for the curated samples
+    df_curated = df_full_fillout[df_full_fillout['Fillout_Type'].isin(['CURATED','PLASMA','TUMOR'])]
+    # make a call to the findVAFandSummary function for each of the subgroups within curated (simplex,duplex)
+    df_curated_simplex_summary_added = find_VAFandsummary(df_curated,'simplex')
+    df_curated_simplex_duplex_summary_added = find_VAFandsummary(df_curated_simplex_summary_added,'duplex')
+    df_all_curated_summary_added = find_VAFandsummary(df_curated_simplex_duplex_summary_added,'simplex_duplex')
+    
+    # take the dataframe which has all the summaries for CURATED groups and run the create_simplexduplex function on it
+    
+    
+    
+    
     
     print("DONE")
     
