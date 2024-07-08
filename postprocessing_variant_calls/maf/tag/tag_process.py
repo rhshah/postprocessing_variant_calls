@@ -258,11 +258,18 @@ def traceback(
         help="Specify a seperator for delimited data.",
         callback=check_separator,
     ),
+    sample_group_cols: Path = typer.Option(
+        ..., "--sample_group_cols", help="List of sample ID and corresponding sample category meta maps"
+    ),
+    
 ):
     # prep maf
+    print(sample_group_cols)
     mafa = MAFFile(maf, separator)
     typer.secho(f"Tagging Maf with traceback columns", fg=typer.colors.BRIGHT_GREEN)
     mafa = mafa.tag("traceback")
+    # add in sample category columns
+    
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
