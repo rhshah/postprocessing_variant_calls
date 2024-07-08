@@ -289,7 +289,8 @@ class MAFFile:
         )
         return self.data_frame
 
-    def tag(self, tagging):
+    def tag(self, tagging,sample_group_cols):
+        print(sample_group_cols)
         cols = self.cols[tagging]
         if isinstance(cols, dict):
             dictionary = True

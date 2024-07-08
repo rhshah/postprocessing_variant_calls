@@ -199,7 +199,7 @@ def non_common_variant(
         "tsv",
         "--separator",
         "-sep",
-        help="Specify a seperator for delimited data.",
+        help="Specify a separator for delimited data.",
         callback=check_separator,
     ),
 ):
@@ -282,12 +282,18 @@ def access_filters(
         "--blacklist",
         "-bl",
         help="Optional input blacklist file for access filtering criteria.",
+    ),
+    tumor_detect_alt_thres: str = typer.Option(
+        2,
+        "--tumor_detect_alt_thres",
+        help="The Minimum Alt depth required to be considered detected in fillout",
     )
 ):
     # all mini functions used in this command
     
     # FindVAFandSummary
-    def find_VAFandsummary(df,sample_group): 
+    def _find_VAFandsummary(df,sample_group): # add category as third argumnet
+        # add a line of code here to rename the simplex, duplex and simplex_duplex columns with a prefix of the category they belong to.
         df = df.copy()
         #find the VAF from the fillout (the comma separated string values that the summary will later be calculated from)
         # NOTE: col [t_vaf_fragment] already calculated by traceback, no need to create column again
@@ -298,6 +304,58 @@ def access_filters(
         df_sorted = df[sorted_columns]
         return df_sorted
     
+    def _extract_fillout_type(df_full_fillout): # run extract fillout type function on the fillout df (will result in many mini dfs)
+        # extract the VAF and summary values for the curated samples
+        df_curated = df_full_fillout[df_full_fillout['Fillout_Type'].isin(['CURATED'])]
+        df_plasma = df_full_fillout[df_full_fillout['Fillout_Type'].isin(['PLASMA'])]
+        df_tumor = df_full_fillout[df_full_fillout['Fillout_Type'].isin(['TUMOR'])]
+        
+        # make a call to the findVAFandSummary function for each of the subgroups within curated (simplex,duplex) 
+        df_curated_simplex_summary_added = _find_VAFandsummary(df_curated,'simplex')
+        df_curated_simplex_duplex_summary_added = _find_VAFandsummary(df_curated_simplex_summary_added,'duplex')
+        df_all_curated = _find_VAFandsummary(df_curated_simplex_duplex_summary_added,'simplex_duplex')
+    
+        df_plasma_simplex_summary_added = _find_VAFandsummary(df_plasma,'simplex')
+        df_plasma_simplex_duplex_summary_added = _find_VAFandsummary(df_plasma_simplex_summary_added,'duplex')
+        df_all_plasma = _find_VAFandsummary(df_plasma_simplex_duplex_summary_added,'simplex_duplex')
+    
+        df_tumor_simplex_summary_added = _find_VAFandsummary(df_tumor,'simplex')
+        df_tumor_simplex_duplex_summary_added = _find_VAFandsummary(df_tumor_simplex_summary_added,'duplex')
+        df_all_tumor = _find_VAFandsummary(df_tumor_simplex_duplex_summary_added,'simplex_duplex')
+        
+        # NOTE: instead of creating separate_normal_tumor() function, just subsetting dataframe to include only normal counts and calculations for them
+        df_all_normals = df_full_fillout[df_full_fillout['Fillout_Type'].isin(['MATCHED_NORMAL','UNMATCHED_NORMAL'])]
+        # NOTE: will calculate df normals summary stats by adding if/else to findVAFandsummary since col names are different
+        
+        return df_all_curated,df_all_plasma,df_all_tumor,df_all_normals
+    
+    def _create_fillout_summary(df_fillout, tumor_detect_alt_thres,mutation_key):
+        # make sure there is a valid fillout type value and that is suffixed with "_"
+        try:
+            fillout_type = df_fillout['Fillout_Type'].iloc[0]
+            if fillout_type != '':
+                fillout_type = fillout_type+'_'
+        except:
+            print("The fillout provided to summarize was not run through extract_fillout_type")
+            fillout_type = ''
+            raise
+        
+        ## NOTE: need to merge the simplex, duplex, and simplex-duplex t_vaf_fragment and t_alt_count_fragment cols together
+        # Make the dataframe with the fragment count summary of all the samples per mutation
+        summary_table = df_fillout.pivot_table(index=mutation_key, columns='Tumor_Sample_Barcode', values='summary_fragment', aggfunc=lambda x: ' '.join(x))
+        
+        
+        # Find the median VAF for the set
+    
+        summary_table[fillout_type + 'median_VAF'] = df_fillout.groupby(mutation_key)['t_vaf_fragment'].median()
+
+        # Find the number of samples with alt count above the threshold (alt_thres)
+        summary_table[fillout_type + 'n_fillout_sample_alt_detect'] = df_fillout.groupby(mutation_key)['t_alt_count_fragment'].aggregate(lambda x :(x>=alt_thres).sum())
+
+        # Find the number of sample with the Total Depth is >0
+        # 't_vaf_fragment' column is NA for samples where mutation had no coverage, so count() will exclude it
+        summary_table[fillout_type + 'n_fillout_sample'] = df_fillout.groupby(mutation_key)['t_vaf_fragment'].count()
+        return summary_table
 
     
     # prep annotated and fillout mafs
@@ -307,6 +365,7 @@ def access_filters(
     
     anno_df = anno_mafa.data_frame
     fillout_df = fillout_mafa.data_frame
+    mutation_key = fillout_mafa.cols['general']
     
     # call the extract blacklist function (might move this to other location)
     #extract_blacklist()
@@ -314,20 +373,12 @@ def access_filters(
     df_annotation = anno_mafa._convert_annomaf_to_df()
     df_full_fillout = fillout_mafa._convert_fillout_to_df()
     
-    # run extract fillout type function on the fillout df (will result in many mini dfs)
+    # call the extract fillouttype function to return all subcategory dfs with summary cols calculated
+    df_all_curated,df_all_plasma,df_all_tumor,df_all_normals = _extract_fillout_type(df_full_fillout)
     
-    # create a column called fillout type which contains the fillout tags depending on suffixed value in tumor sample barcode
-    # NOTE: temporarily hard coding in the type values (CURATED,PLASMA,TUMOR,UNMATCHED_NORMAL,MATCHED_NORMAL)
-    # NOTE: add in POOL category (only if needed)
+    # call create_fillout_summary function using df_all_tumor and tumor_detect_alt_thres
+    _create_fillout_summary(df_all_tumor,tumor_detect_alt_thres,mutation_key)
     
-    # extract the VAF and summary values for the curated samples
-    df_curated = df_full_fillout[df_full_fillout['Fillout_Type'].isin(['CURATED','PLASMA','TUMOR'])]
-    # make a call to the findVAFandSummary function for each of the subgroups within curated (simplex,duplex)
-    df_curated_simplex_summary_added = find_VAFandsummary(df_curated,'simplex')
-    df_curated_simplex_duplex_summary_added = find_VAFandsummary(df_curated_simplex_summary_added,'duplex')
-    df_all_curated_summary_added = find_VAFandsummary(df_curated_simplex_duplex_summary_added,'simplex_duplex')
-    
-    # take the dataframe which has all the summaries for CURATED groups and run the create_simplexduplex function on it
     
     
     
