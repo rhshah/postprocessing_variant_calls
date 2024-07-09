@@ -269,7 +269,8 @@ def traceback(
     typer.secho(f"Tagging Maf with traceback columns", fg=typer.colors.BRIGHT_GREEN)
     mafa = mafa.tag("traceback")
     # add in sample category columns
-    
+    #sample_categories_df = pd.DataFrame(sample_group_cols,sep='\t',columns = ['Tumor_Sample_Barcode', 'Fillout_Type'])
+    #final_mafa = mafa.merge(sample_categories_df,on='Tumor_Sample_Barcode',how='left')
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0

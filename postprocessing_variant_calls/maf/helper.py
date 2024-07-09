@@ -220,7 +220,7 @@ class MAFFile:
     def _convert_fillout_to_df(self):
         if self.data_frame.empty == False:
             self.data_frame['Chromosome'] = self.data_frame['Chromosome'].astype(str)
-            self.data_frame.set_index(self.cols['general'], drop=False, inplace=True)
+            #self.data_frame.set_index(self.cols['general'], drop=False, inplace=True)
             return self.data_frame
         else:
             typer.secho(f"failed to open path to the fillout MAF file {self.file_path}.", fg=typer.colors.RED)
