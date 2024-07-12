@@ -26,11 +26,11 @@ from postprocessing_variant_calls.maf.helper import (
     make_pre_filtered_maf,
     apply_filter_maf,
     make_condensed_post_filter,
-    
 )
 
 from utils.pybed_intersect import annotater
 import pandas as pd
+
 pd.options.mode.chained_assignment = None
 import numpy as np
 from typing import Tuple
@@ -249,7 +249,11 @@ def cmo_ch(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
-@app.command("access_filters", help="Filter a MAF file based on all the parameters listed in ACCESS filters python script")
+
+@app.command(
+    "access_filters",
+    help="Filter a MAF file based on all the parameters listed in ACCESS filters python script",
+)
 def access_filters(
     fillout_maf: Path = typer.Option(
         ...,
@@ -334,12 +338,12 @@ def access_filters(
         help="The Minimum Total Depth required in Matched Normal to consider a variant Germline",
     ),
     tumor_vaf_germline_thres: str = typer.Option(
-        .4,
+        0.4,
         "--tumor_vaf_germline_thres",
         help="The threshold for variant allele fraction required in Tumor to be consider a variant Likely Germline",
     ),
     normal_vaf_germline_thres: str = typer.Option(
-        .4,
+        0.4,
         "--tumor_vaf_germline_thres",
         help="The threshold for variant allele fraction required in Matched Normal to be consider a variant Germline",
     ),
@@ -365,42 +369,75 @@ def access_filters(
     ),
 ):
     # all mini functions used in this command
-    
-    
+
     # prep annotated and fillout mafs
-    
+
     fillout_mafa = MAFFile(fillout_maf, separator)
     anno_mafa = MAFFile(anno_maf, separator)
-    mutation_key = fillout_mafa.cols['general']
-    
+    mutation_key = fillout_mafa.cols["general"]
+
     # convert the anno and fillout mafs to dataframe (functions located in MAF class)
     df_annotation = anno_mafa._convert_annomaf_to_df()
     df_full_fillout = fillout_mafa._convert_fillout_to_df()
-    
+
     # call the extract blocklist function
-    blacklist_lst = extract_blacklist(blacklist,separator)
-    
+    blacklist_lst = extract_blacklist(blacklist, separator)
+
     # call the extract fillouttype function to return all subcategory dfs with summary cols calculated
-    df_all_curated,df_all_plasma,df_all_tumor,df_all_normals,df_all_control,df_all_genotypes = _extract_fillout_type(df_full_fillout)
-    
-    pre_filter_maf = make_pre_filtered_maf(df_annotation,df_all_curated,df_all_plasma,df_all_tumor,df_all_normals,df_all_genotypes,mutation_key,tumor_detect_alt_thres,curated_detect_alt_thres,plasma_detect_alt_thres,control_detect_alt_thres,tumor_samplename,normal_samplename)
-    
-    
+    (
+        df_all_curated,
+        df_all_plasma,
+        df_all_tumor,
+        df_all_normals,
+        df_all_control,
+        df_all_genotypes,
+    ) = _extract_fillout_type(df_full_fillout)
+
+    pre_filter_maf = make_pre_filtered_maf(
+        df_annotation,
+        df_all_curated,
+        df_all_plasma,
+        df_all_tumor,
+        df_all_normals,
+        df_all_genotypes,
+        mutation_key,
+        tumor_detect_alt_thres,
+        curated_detect_alt_thres,
+        plasma_detect_alt_thres,
+        control_detect_alt_thres,
+        tumor_samplename,
+        normal_samplename,
+    )
+
     # # calls to apply_filter_maf (tagging functions)
-    args = {'tumor_TD_min':tumor_TD_min,'normal_TD_min':normal_TD_min,'tumor_vaf_germline_thres':tumor_vaf_germline_thres,'normal_vaf_germline_thres':normal_vaf_germline_thres,'tier_one_alt_min':tier_one_alt_min,'tier_two_alt_min':tier_two_alt_min,'min_n_curated_samples_alt_detected':min_n_curated_samples_alt_detected,'tn_ratio_thres':tn_ratio_thres,'blacklist_lst':blacklist_lst}
-    df_post_filter = apply_filter_maf(pre_filter_maf,**args)
-    
-    # calls to condensed post filter maf 
+    args = {
+        "tumor_TD_min": tumor_TD_min,
+        "normal_TD_min": normal_TD_min,
+        "tumor_vaf_germline_thres": tumor_vaf_germline_thres,
+        "normal_vaf_germline_thres": normal_vaf_germline_thres,
+        "tier_one_alt_min": tier_one_alt_min,
+        "tier_two_alt_min": tier_two_alt_min,
+        "min_n_curated_samples_alt_detected": min_n_curated_samples_alt_detected,
+        "tn_ratio_thres": tn_ratio_thres,
+        "blacklist_lst": blacklist_lst,
+    }
+    df_post_filter = apply_filter_maf(pre_filter_maf, **args)
+
+    # calls to condensed post filter maf
     df_condensed = make_condensed_post_filter(df_post_filter)
-    
+
     # write out the final maf files (filtered and condensed)
-    
+
     # remove these two lines when postprocessing package is updated
-    df_post_filter_final = df_post_filter.drop(['id','Unnamed: 0'], axis=1)
-    df_condensed_final = df_condensed.drop(['id','Unnamed: 0'], axis=1)
-    
-    df_post_filter_final.to_csv(f"{output_maf}_filtered.maf", header=True, index=None, sep='\t')
-    df_condensed_final.to_csv(f"{output_maf}_filtered_condensed.maf", header=True, index=None, sep='\t')
+    df_post_filter_final = df_post_filter.drop(["id", "Unnamed: 0"], axis=1)
+    df_condensed_final = df_condensed.drop(["id", "Unnamed: 0"], axis=1)
+
+    df_post_filter_final.to_csv(
+        f"{output_maf}_filtered.maf", header=True, index=None, sep="\t"
+    )
+    df_condensed_final.to_csv(
+        f"{output_maf}_filtered_condensed.maf", header=True, index=None, sep="\t"
+    )
 
     return 0
 
