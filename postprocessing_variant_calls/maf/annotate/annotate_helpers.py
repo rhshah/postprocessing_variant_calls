@@ -69,13 +69,15 @@ def read_bed(bed):
         bed, sep="\t", skiprows=skip, low_memory=False, header=None, names=bed_names
     )
     # remove the string "chr"
-    bed_df["Chromosome"] = bed_df["Chromosome"].str.replace("chr", "")
+    bed_df["Chromosome"] = bed_df["Chromosome"].astype(str).str.replace("chr", "")
     return bed_df
 
 
 def read_maf(maf):
     # call the function to remove lines starting with #
     # read MSF file using Pandas
+    # TODO IMPROVE THE READING OF MAF FILE
     skip = get_row(maf)
     maf_df = pd.read_csv(maf, sep="\t", skiprows=skip, low_memory=False)
+    maf_df["Chromosome"] = maf_df["Chromosome"].astype(str).str.replace("chr", "")
     return maf_df
