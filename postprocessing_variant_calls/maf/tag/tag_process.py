@@ -303,5 +303,47 @@ def traceback(
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
 
+
+# @app.command(
+#     "access_filters_tag",
+#     help="Tag a variant in a MAF file based on the following criteria in the access_filters python script",
+# )
+# def access_filters_tag(
+#     df_pre_filter: Path = typer.Option(
+#     ..., "--df_pre_filter",help="Pre Filtered MAF dataframe."
+#     )
+# ):
+    
+#     typer.secho(
+#         f"Tagging Maf with germline columns", fg=typer.colors.BRIGHT_GREEN
+#     )
+    # code for tagging for germline (if there is a matched normal and it has sufficient coverage)
+    # return df_pre_filter
+    # typer.secho(
+    #     f"Tagging Maf with below alt threshold values", fg=typer.colors.BRIGHT_GREEN
+    # )
+    # code for tagging for below alt threshold
+    #mafa = mafa.tag("below_alt_thres")
+    # typer.secho(
+    #     f"Tagging Maf for occurrence in curated samples", fg=typer.colors.BRIGHT_GREEN
+    # )
+    # code for tagging occurrence in curated
+    #mafa = mafa.tag("curated_occurrence")
+    # typer.secho(
+    #     f"Tagging Maf for occurrence in normal samples", fg=typer.colors.BRIGHT_GREEN
+    # )
+    # code for tagging occurrence in normal
+    #mafa = mafa.tag("normal_occurrence")
+    # typer.secho(
+    #     f"Tagging Maf for occurrence in blacklist", fg=typer.colors.BRIGHT_GREEN
+    # )
+    # code for tagging occurrence in blacklist
+    #mafa = mafa.tag("in_blacklist")
+    
+    
+    #typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    #mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    # return 0
+
 if __name__ == "__main__":
     app()
