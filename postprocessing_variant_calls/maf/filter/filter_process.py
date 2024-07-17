@@ -21,7 +21,7 @@ from postprocessing_variant_calls.maf.helper import (
     read_tsv,
     MAFFile,
     gen_id_tsv,
-    extract_blacklist,
+    extract_blocklist,
     _extract_fillout_type,
     make_pre_filtered_maf,
     apply_filter_maf,
@@ -289,11 +289,11 @@ def access_filters(
         help="Specify a seperator for delimited data.",
         callback=check_separator,
     ),
-    blacklist: str = typer.Option(
+    blocklist: str = typer.Option(
         "tsv",
-        "--blacklist",
+        "--blocklist",
         "-bl",
-        help="Optional input blacklist file for access filtering criteria.",
+        help="Optional input blocklist file for access filtering criteria.",
     ),
     tumor_samplename: str = typer.Option(
         ...,
@@ -368,48 +368,6 @@ def access_filters(
         help="Tumor-Normal variant fraction ratio threshold",
     ),
 ):
-    # all mini functions used in this command
-
-    # prep annotated and fillout mafs
-
-    fillout_mafa = MAFFile(fillout_maf, separator)
-    anno_mafa = MAFFile(anno_maf, separator)
-    mutation_key = fillout_mafa.cols["general"]
-
-    # convert the anno and fillout mafs to dataframe (functions located in MAF class)
-    df_annotation = anno_mafa._convert_annomaf_to_df()
-    df_full_fillout = fillout_mafa._convert_fillout_to_df()
-
-    # call the extract blocklist function
-    blacklist_lst = extract_blacklist(blacklist, separator)
-
-    # call the extract fillouttype function to return all subcategory dfs with summary cols calculated
-    (
-        df_all_curated,
-        df_all_plasma,
-        df_all_tumor,
-        df_all_normals,
-        df_all_control,
-        df_all_genotypes,
-    ) = _extract_fillout_type(df_full_fillout)
-
-    pre_filter_maf = make_pre_filtered_maf(
-        df_annotation,
-        df_all_curated,
-        df_all_plasma,
-        df_all_tumor,
-        df_all_normals,
-        df_all_genotypes,
-        mutation_key,
-        tumor_detect_alt_thres,
-        curated_detect_alt_thres,
-        plasma_detect_alt_thres,
-        control_detect_alt_thres,
-        tumor_samplename,
-        normal_samplename,
-    )
-
-    # # calls to apply_filter_maf (tagging functions)
     args = {
         "tumor_TD_min": tumor_TD_min,
         "normal_TD_min": normal_TD_min,
@@ -419,16 +377,52 @@ def access_filters(
         "tier_two_alt_min": tier_two_alt_min,
         "min_n_curated_samples_alt_detected": min_n_curated_samples_alt_detected,
         "tn_ratio_thres": tn_ratio_thres,
-        "blacklist_lst": blacklist_lst,
+        "blocklist_lst": blocklist_lst,
     }
-    df_post_filter = apply_filter_maf(pre_filter_maf, **args)
 
-    # calls to condensed post filter maf
+    # prep annotated and fillout mafs
+    fillout_mafa = MAFFile(fillout_maf, separator)
+    anno_mafa = MAFFile(anno_maf, separator)
+    mutation_key = fillout_mafa.cols["general"]
+
+    # convert the anno and fillout mafs to dataframe (functions located in MAF class)
+    df_annotation = anno_mafa._convert_annomaf_to_df()
+    df_full_fillout = fillout_mafa._convert_fillout_to_df()
+    # call the extract blocklist function
+    blocklist_lst = extract_blocklist(blocklist, separator)
+
+    # call the extract fillouttype function to return all subcategory dfs with summary cols calculated
+    (
+        df_all_curated_SD,
+        df_all_plasma_SD,
+        df_all_tumor_SD,
+        df_matched_normal,
+        df_all_normals,
+        df_all_control_SD,
+    ) = _extract_fillout_type(df_full_fillout)
+
+    pre_filter_maf = make_pre_filtered_maf(
+        df_annotation,
+        df_all_curated_SD,
+        df_all_plasma_SD,
+        df_all_tumor_SD,
+        df_matched_normal,
+        df_all_normals,
+        mutation_key,
+        tumor_detect_alt_thres,
+        curated_detect_alt_thres,
+        plasma_detect_alt_thres,
+        control_detect_alt_thres,
+        tumor_samplename,
+        normal_samplename,
+    )
+    # # calls to apply_filter_maf (tagging functions)
+    df_post_filter = apply_filter_maf(pre_filter_maf, **args)
+    # # calls to condensed post filter maf
     df_condensed = make_condensed_post_filter(df_post_filter)
 
-    # write out the final maf files (filtered and condensed)
-
-    # remove these two lines when postprocessing package is updated
+    # # write out the final maf files (filtered and condensed)
+    # # remove these two lines when postprocessing package is updated
     df_post_filter_final = df_post_filter.drop(["id", "Unnamed: 0"], axis=1)
     df_condensed_final = df_condensed.drop(["id", "Unnamed: 0"], axis=1)
 
