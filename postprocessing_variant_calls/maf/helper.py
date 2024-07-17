@@ -1026,14 +1026,6 @@ class MAFFile:
             self.tag("truncating_mut_in_TSG")
         return self.data_frame
 
-    def tag_access_filters(self, tagging):
-        if tagging == "access_filters":
-            self.tag("germline")
-            self.tag("common_variant")
-            self.tag("prevalence_in_cosmicDB")
-            self.tag("truncating_mut_in_TSG")
-        return self.data_frame
-
     def tag_traceback(self, cols, tagging):
         if set(cols["standard"] + cols["access"]).issubset(
             set(self.data_frame.columns.tolist())

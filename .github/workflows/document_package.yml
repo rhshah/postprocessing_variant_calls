@@ -11,28 +11,38 @@ jobs:
                 python-version: ["3.9"]
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
               with:
-                token: ${{ secrets.PAT }}
-            - name: Set up Python 
-              uses: actions/setup-python@v3
+                fetch-depth: 0
+            - name: Extract branch name
+              shell: bash
+              run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+              id: extract_branch
+            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            - name: setup python
+              uses: actions/setup-python@v4
               with:
-                  python-version: ${{ matrix.python-version }}
-
+                python-version: "3.10" # install the python version needed
             - name: Document CLI and write to folder
               run: |
+                    git checkout ${{ steps.extract_branch.outputs.branch }}
                     make deps-install
-                    poetry run typer postprocessing_variant_calls.main utils docs > docs/CLI.md
-                    rm docs/README.md
-                    cp README.md docs/README.md
-            - name: Check for changes
-              id: git_changes
-              run: echo "HAS_CHANGES=$(if git diff --quiet; then echo 'false'; else echo 'true'; fi)" >> $GITHUB_ENV
-            - name: Push Changes
-              if: env.HAS_CHANGES == 'true'
+                    mkdir -p docs
+                    poetry run typer postprocessing_variant_calls.main utils docs > docs/cli.md
+            - uses: EndBug/add-and-commit@v9
+              with:
+                default_author: github_actions
+                message: "add doc for cli"
+                add: '["docs/*.md --force"]'
+            - name: Write Docs
+              id: write_docs
               run: |
-                    git config --global user.name 'buehlere'
-                    git config --global user.email 'buehlere77@gmail.com'
-                    git add ./docs
-                    git commit -m "Updating the repository GitHub MD documentation in the docs folder"
-                    git push -f origin           
+                    git checkout docs --
+                    git checkout ${{ steps.extract_branch.outputs.branch }} -- README.md
+                    git checkout ${{ steps.extract_branch.outputs.branch }} -- docs/cli.md
+            - uses: EndBug/add-and-commit@v9
+              with:
+                default_author: github_actions
+                message: "add doc for cli"
+                add: '["*.md --force"]'
+                push: 'origin docs --set-upstream --force'
