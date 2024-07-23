@@ -368,17 +368,7 @@ def access_filters(
         help="Tumor-Normal variant fraction ratio threshold",
     ),
 ):
-    args = {
-        "tumor_TD_min": tumor_TD_min,
-        "normal_TD_min": normal_TD_min,
-        "tumor_vaf_germline_thres": tumor_vaf_germline_thres,
-        "normal_vaf_germline_thres": normal_vaf_germline_thres,
-        "tier_one_alt_min": tier_one_alt_min,
-        "tier_two_alt_min": tier_two_alt_min,
-        "min_n_curated_samples_alt_detected": min_n_curated_samples_alt_detected,
-        "tn_ratio_thres": tn_ratio_thres,
-        "blocklist_lst": blocklist_lst,
-    }
+    
 
     # prep annotated and fillout mafs
     fillout_mafa = MAFFile(fillout_maf, separator)
@@ -390,6 +380,18 @@ def access_filters(
     df_full_fillout = fillout_mafa._convert_fillout_to_df()
     # call the extract blocklist function
     blocklist_lst = extract_blocklist(blocklist, separator)
+    
+    args = {
+        "tumor_TD_min": tumor_TD_min,
+        "normal_TD_min": normal_TD_min,
+        "tumor_vaf_germline_thres": tumor_vaf_germline_thres,
+        "normal_vaf_germline_thres": normal_vaf_germline_thres,
+        "tier_one_alt_min": tier_one_alt_min,
+        "tier_two_alt_min": tier_two_alt_min,
+        "min_n_curated_samples_alt_detected": min_n_curated_samples_alt_detected,
+        "tn_ratio_thres": tn_ratio_thres,
+        "blocklist_lst": blocklist_lst,
+    }
 
     # call the extract fillouttype function to return all subcategory dfs with summary cols calculated
     (
@@ -416,13 +418,15 @@ def access_filters(
         tumor_samplename,
         normal_samplename,
     )
-    # # calls to apply_filter_maf (tagging functions)
+    # # # calls to apply_filter_maf (tagging functions)
     df_post_filter = apply_filter_maf(pre_filter_maf, **args)
     # # calls to condensed post filter maf
     df_condensed = make_condensed_post_filter(df_post_filter)
 
-    # # write out the final maf files (filtered and condensed)
-    # # remove these two lines when postprocessing package is updated
+    # # # write out the final maf files (filtered and condensed)
+    # # # remove these two lines when postprocessing package is updated
+    
+    # # NOTE: merge changes from pv mag tag PR into this 
     df_post_filter_final = df_post_filter.drop(["id", "Unnamed: 0"], axis=1)
     df_condensed_final = df_condensed.drop(["id", "Unnamed: 0"], axis=1)
 

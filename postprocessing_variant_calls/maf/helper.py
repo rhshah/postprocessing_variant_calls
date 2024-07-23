@@ -216,20 +216,6 @@ def apply_filter_maf(pre_filter_maf, **kwargs):
 
 def make_condensed_post_filter(df_post_filter):
 
-    # Make Total depth Columns - commented out for now because example data on JUNO doesn't have these columns
-    # df_selected = df_post_filter.loc[df_post_filter["Status"] == ""]
-    # df_selected["SD_t_depth_count_fragment"] = (
-    #     df_selected["SD_t_alt_count_fragment"] + df_selected["SD_t_ref_count_fragment"]
-    # )
-
-    # if len(df_selected) and df_selected.n_alt_count_fragment[0] == "NA":
-    #     # Unmatched mode, no normal, can't calculate n_depth
-    #     df_selected["n_depth_count_fragment"] = "NA"
-    # else:
-    #     df_selected["n_depth_count_fragment"] = (
-    #         df_selected["n_alt_count_fragment"] + df_selected["n_ref_count_fragment"]
-    #     )
-
     # creating the "condensed" MAF -- can be customized in the future
     df_condensed = df_post_filter.loc[:, :"n_vaf_fragment"]
     return df_condensed
@@ -539,7 +525,7 @@ def _extract_tn_genotypes(
         },
         inplace=True,
     )
-
+    
     if str(normal_samplename) != "":
 
         df_n_genotype = df_matched_normal[
@@ -551,7 +537,6 @@ def _extract_tn_genotypes(
                 "t_variant_frequency_standard",
             ]
         ]
-
         df_n_genotype.insert(0, "Matched_Norm_Sample_Barcode", str(normal_samplename))
         df_n_genotype.rename(
             columns={
@@ -561,7 +546,6 @@ def _extract_tn_genotypes(
             },
             inplace=True,
         )
-
     df_tn_genotype_final = pd.concat(
         [
             df_tn_genotype.reset_index(drop=True),
@@ -612,7 +596,7 @@ def make_pre_filtered_maf(
     )
 
     df_tn_genotype_final = _extract_tn_genotypes(
-        df_all_tumor, df_matched_normal, tumor_samplename, normal_samplename
+        df_all_tumor, df_all_normals, tumor_samplename, normal_samplename
     )
 
     df_anno_with_genotypes = pd.concat(
