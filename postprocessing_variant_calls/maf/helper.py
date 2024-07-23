@@ -417,7 +417,7 @@ class MAFFile:
                 )
                 self.data_frame = self.data_frame[
                     (
-                        (self.data_frame["common_variant"] == "yes")
+                        (self.data_frame["common_variant"] == "no")
                         & (self.data_frame["mappability"] == "no")
                         & (self.data_frame["complexity"] == "no")
                         & (self.data_frame["retain"] == "yes")
