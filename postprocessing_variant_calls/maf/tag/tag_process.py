@@ -253,7 +253,9 @@ def traceback(
         "output.maf", "--output", "-o", help="Maf output file name."
     ),
     sample_type: str = typer.Option(
-        "--sample_type", "-t", help="String value of type of sample. Taken from meta map in traceback subworkflow."
+        "--sample_type",
+        "-t",
+        help="String value of type of sample. Taken from meta map in traceback subworkflow.",
     ),
     separator: str = typer.Option(
         "tsv",
@@ -310,14 +312,16 @@ def traceback(
 
     # write out to csv file
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    mafa_id_dropped = mafa.drop('id', axis=1)
+    mafa_id_dropped = mafa.drop("id", axis=1)
     # adding in sample type as a separate column to differentiate between groups of samples
-    #test_lst = [['DONOR36-TP', 'CURATED'], ['DONOR19-T', 'CURATED'], ['DONOR3-T', 'CURATED'], ['C-1V5P0L-N001-d01', 'UNMATCHED_NORMAL'], ['C-30N2P4-L004-d03', 'PLASMA'], ['C-H77MCH-L008-d08', 'PLASMA'], ['DONOR10-T', 'CURATED'], ['DONOR17-T', 'CURATED'], ['DONOR23-T', 'CURATED'], ['C-30N2P4-L003-d02', 'PLASMA'], ['C-PR83CF-L004-d04_cl_aln_srt_MD_IR_FX_BR__aln_srt_IR_FX-duplex', null], ['C-217F4D-N005-d05', 'UNMATCHED_NORMAL'], ['DONOR6-T', 'CURATED'], ['DONOR16-T', 'CURATED'], ['DONOR39-TP', 'CURATED'], ['C-13TFTU-N003-d02', 'UNMATCHED_NORMAL'], ['DONOR46-T', 'CURATED'], ['DONOR13-T', 'CURATED'], ['DONOR5-T', 'CURATED'], ['DONOR28-TP', 'CURATED'], ['C-001421-N001-d01', 'UNMATCHED_NORMAL'], ['C-2UW6JP-N001-d01', 'UNMATCHED_NORMAL'], ['DONOR30-TP', 'CURATED'], ['C-1DFUNN-N018-d03', 'UNMATCHED_NORMAL'], ['DONOR32-TP', 'CURATED'], ['C-2UW6JP-L008-d07', 'PLASMA'], ['DONOR38-TP', 'CURATED'], ['C-30N2P4-N001-d01', 'MATCHED_NORMAL'], ['C-09XLT2-N001-d01', 'UNMATCHED_NORMAL'], ['C-0D9K3A-N001-d01', 'UNMATCHED_NORMAL'], ['C-13TFTU-L010-d10', 'PLASMA']]
-    
-    temp_df = pd.DataFrame(sample_type, columns=['Tumor_Sample_Barcode', 'Type']) 
-    
-    mafa_final = mafa_id_dropped.merge(temp_df,on="Tumor_Sample_Barcode",how='left')
-    mafa_final.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
+    # test_lst = [['DONOR36-TP', 'CURATED'], ['DONOR19-T', 'CURATED'], ['DONOR3-T', 'CURATED'], ['C-1V5P0L-N001-d01', 'UNMATCHED_NORMAL'], ['C-30N2P4-L004-d03', 'PLASMA'], ['C-H77MCH-L008-d08', 'PLASMA'], ['DONOR10-T', 'CURATED'], ['DONOR17-T', 'CURATED'], ['DONOR23-T', 'CURATED'], ['C-30N2P4-L003-d02', 'PLASMA'], ['C-PR83CF-L004-d04_cl_aln_srt_MD_IR_FX_BR__aln_srt_IR_FX-duplex', null], ['C-217F4D-N005-d05', 'UNMATCHED_NORMAL'], ['DONOR6-T', 'CURATED'], ['DONOR16-T', 'CURATED'], ['DONOR39-TP', 'CURATED'], ['C-13TFTU-N003-d02', 'UNMATCHED_NORMAL'], ['DONOR46-T', 'CURATED'], ['DONOR13-T', 'CURATED'], ['DONOR5-T', 'CURATED'], ['DONOR28-TP', 'CURATED'], ['C-001421-N001-d01', 'UNMATCHED_NORMAL'], ['C-2UW6JP-N001-d01', 'UNMATCHED_NORMAL'], ['DONOR30-TP', 'CURATED'], ['C-1DFUNN-N018-d03', 'UNMATCHED_NORMAL'], ['DONOR32-TP', 'CURATED'], ['C-2UW6JP-L008-d07', 'PLASMA'], ['DONOR38-TP', 'CURATED'], ['C-30N2P4-N001-d01', 'MATCHED_NORMAL'], ['C-09XLT2-N001-d01', 'UNMATCHED_NORMAL'], ['C-0D9K3A-N001-d01', 'UNMATCHED_NORMAL'], ['C-13TFTU-L010-d10', 'PLASMA']]
+
+    temp_df = pd.DataFrame(sample_type, columns=["Tumor_Sample_Barcode", "Type"])
+
+    mafa_final = mafa_id_dropped.merge(temp_df, on="Tumor_Sample_Barcode", how="left")
+    mafa_final.to_csv(
+        f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t"
+    )
     return 0
 
 
@@ -417,6 +421,7 @@ def by_maf(
 # typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
 # mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
 # return 0
+
 
 @app.command(
     "access",

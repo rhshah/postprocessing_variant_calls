@@ -23,8 +23,10 @@ from postprocessing_variant_calls.maf.helper import (
     read_tsv,
     MAFFile,
     gen_id_tsv,
+)
+
+from postprocessing_variant_calls.maf.filter.filter_helpers import (
     extract_blocklist,
-    _extract_fillout_type,
     make_pre_filtered_maf,
     apply_filter_maf,
     make_condensed_post_filter,
@@ -428,19 +430,19 @@ def access_filters(
         help="Tumor-Normal variant fraction ratio threshold",
     ),
 ):
-    
 
     # prep annotated and fillout mafs
     fillout_mafa = MAFFile(fillout_maf, separator)
     anno_mafa = MAFFile(anno_maf, separator)
     mutation_key = fillout_mafa.cols["general"]
 
-    # convert the anno and fillout mafs to dataframe (functions located in MAF class)
-    df_annotation = anno_mafa._convert_annomaf_to_df()
-    df_full_fillout = fillout_mafa._convert_fillout_to_df()
+    # convert the anno maf to dataframe (functions located in MAF class)
+    df_annotation = anno_mafa.convert_annomaf_to_df()
+
     # call the extract blocklist function
     blocklist_lst = extract_blocklist(blocklist, separator)
-    
+
+    # standard compiled arguments for rest of access_filters functions
     args = {
         "tumor_TD_min": tumor_TD_min,
         "normal_TD_min": normal_TD_min,
@@ -453,7 +455,7 @@ def access_filters(
         "blocklist_lst": blocklist_lst,
     }
 
-    # call the extract fillouttype function to return all subcategory dfs with summary cols calculated
+    # call the extract fillout type function to return all subcategory dfs with summary columns calculated (function located in MAF class)
     (
         df_all_curated_SD,
         df_all_plasma_SD,
@@ -461,7 +463,7 @@ def access_filters(
         df_matched_normal,
         df_all_normals,
         df_all_control_SD,
-    ) = _extract_fillout_type(df_full_fillout)
+    ) = fillout_mafa.extract_fillout_type()
 
     pre_filter_maf = make_pre_filtered_maf(
         df_annotation,
@@ -478,15 +480,16 @@ def access_filters(
         tumor_samplename,
         normal_samplename,
     )
-    # # # calls to apply_filter_maf (tagging functions)
+
+    # calls to apply_filter_maf (tagging functions)
     df_post_filter = apply_filter_maf(pre_filter_maf, **args)
-    # # calls to condensed post filter maf
+
+    # calls to condensed post filter maf
     df_condensed = make_condensed_post_filter(df_post_filter)
 
-    # # # write out the final maf files (filtered and condensed)
-    # # # remove these two lines when postprocessing package is updated
-    
-    # # NOTE: merge changes from pv mag tag PR into this 
+    # write out the final maf files (filtered and condensed)
+
+    # remove when running full test in traceback
     df_post_filter_final = df_post_filter.drop(["id", "Unnamed: 0"], axis=1)
     df_condensed_final = df_condensed.drop(["id", "Unnamed: 0"], axis=1)
 
