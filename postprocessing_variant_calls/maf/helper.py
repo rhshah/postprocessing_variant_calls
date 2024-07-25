@@ -449,3 +449,8 @@ class MAFFile:
                 fg=typer.colors.RED,
             )
             raise typer.Abort()
+        
+    def split_by_annotations_subset(self):
+        # Replace "-" in column headers to "_" so that they can be
+        #  used as attributes to a variant object
+        

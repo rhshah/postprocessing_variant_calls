@@ -154,28 +154,18 @@ def maf_tsv(
         "-v",
         help="name for annotation column. Defaults to (Yes, No)",
     ),
-    split_by_annotations: str = typer.Option(
-        "False",
-        "--split_by_annotations",
-        help="Flag for invoking splitting the input MAF file by annotations (run at end of nucleovar). Defaults to false",
-    ),
 ):
     # prep maf
-    if split_by_annotations == False:
-        mafa = MAFFile(maf, separator)
+    mafa = MAFFile(maf, separator)
 
-        # prep tsv
-        tsva = read_tsv(tsv, separator)
-        tsva = gen_id_tsv(tsva)
+    # prep tsv
+    tsva = read_tsv(tsv, separator)
+    tsva = gen_id_tsv(tsva)
 
-        # annotate maf with processed bed file
-        annotated_maf = mafa.annotate_maf_maf(tsva, oc, values)
-        # write out paths
-        annotated_maf.to_csv(output_maf, index=False, sep="\t")
-    else:
-        split_by_annotations(maf,output_maf)
-        # make a call to the split by annotations function
-        
+    # annotate maf with processed bed file
+    annotated_maf = mafa.annotate_maf_maf(tsva, oc, values)
+    # write out paths
+    annotated_maf.to_csv(output_maf, index=False, sep="\t")
     return 0
 
 
