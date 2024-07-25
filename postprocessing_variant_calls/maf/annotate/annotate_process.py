@@ -151,6 +151,11 @@ def maf_tsv(
         "-v",
         help="name for annotation column. Defaults to (Yes, No)",
     ),
+    split_by_annotations: str = typer.Option(
+        "false",
+        "--split_by_annotations",
+        help="Flag for invoking splitting the input MAF file by annotations (run at end of nucleovar). Defaults to false",
+    ),
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
