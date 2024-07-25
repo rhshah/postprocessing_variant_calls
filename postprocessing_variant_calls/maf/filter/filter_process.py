@@ -439,6 +439,7 @@ def access_filters(
     # convert the anno maf to dataframe (functions located in MAF class)
     df_annotation = anno_mafa.convert_annomaf_to_df()
 
+    
     # call the extract blocklist function
     blocklist_lst = extract_blocklist(blocklist, separator)
 
@@ -480,10 +481,8 @@ def access_filters(
         tumor_samplename,
         normal_samplename,
     )
-
-    # calls to apply_filter_maf (tagging functions)
+    #calls to apply_filter_maf (tagging functions)
     df_post_filter = apply_filter_maf(pre_filter_maf, **args)
-
     # calls to condensed post filter maf
     df_condensed = make_condensed_post_filter(df_post_filter)
 
