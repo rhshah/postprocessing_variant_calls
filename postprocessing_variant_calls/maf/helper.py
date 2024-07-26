@@ -91,7 +91,7 @@ def _find_VAFandsummary(df, sample_group):  # add category as third argumnet
     df = df.copy()
     # find the VAF from the fillout (the comma separated string values that the summary will later be calculated from)
     # NOTE: col [t_vaf_fragment] already calculated by traceback, no need to create column again
-    
+
     if (~df["fillout_type"].isin(["MATCHED_NORMAL", "UNMATCHED_NORMAL"])).any():
         df[f"summary_fragment_{str(sample_group)}"] = (
             "DP="
@@ -107,7 +107,13 @@ def _find_VAFandsummary(df, sample_group):  # add category as third argumnet
             + df[f"t_vaf_fragment_{str(sample_group)}"].fillna(0).astype(str)
         )
     else:
-        df['t_vaf_fragment_standard'] = (df['t_alt_count_fragment_standard'] / (df['t_alt_count_fragment_standard'].astype(int) + df['t_ref_count_fragment_standard'].astype(int))).round(4)
+        df["t_vaf_fragment_standard"] = (
+            df["t_alt_count_fragment_standard"]
+            / (
+                df["t_alt_count_fragment_standard"].astype(int)
+                + df["t_ref_count_fragment_standard"].astype(int)
+            )
+        ).round(4)
         df[f"summary_fragment_standard"] = (
             "DP="
             + (
@@ -121,22 +127,9 @@ def _find_VAFandsummary(df, sample_group):  # add category as third argumnet
             + ";VF="
             + df[f"t_vaf_fragment_standard"].fillna(0).astype(str)
         )
-        
-        
-    return df 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+    return df
+
     # if (~df["fillout_type"].isin(["MATCHED_NORMAL", "UNMATCHED_NORMAL"])).any():
     #     df[f"summary_fragment_{str(sample_group)}"] = (
     #         "DP="
@@ -167,7 +160,7 @@ def _find_VAFandsummary(df, sample_group):  # add category as third argumnet
     #         + ";VF="
     #         + df[f"t_vaf_fragment"].fillna(0).astype(str)
     #     )
-    #return df
+    # return df
 
 
 def maf_duplicates(data_frame):
@@ -447,8 +440,15 @@ class MAFFile:
 
         # make a call to the _convert_fillout_to_df() function since it is also within the MAF class
         df_full_fillout = self._convert_fillout_to_df()
-        
-        df_full_fillout = df_full_fillout.rename(columns={"t_total_count_fragment": "t_total_count_fragment_standard", "t_variant_frequency": "t_vaf_fragment_standard","t_alt_count_fragment":"t_alt_count_fragment_standard","t_ref_count_fragment":"t_ref_count_fragment_standard"})
+
+        df_full_fillout = df_full_fillout.rename(
+            columns={
+                "t_total_count_fragment": "t_total_count_fragment_standard",
+                "t_variant_frequency": "t_vaf_fragment_standard",
+                "t_alt_count_fragment": "t_alt_count_fragment_standard",
+                "t_ref_count_fragment": "t_ref_count_fragment_standard",
+            }
+        )
 
         # run extract fillout type function on the fillout df (will result in many mini dfs)
         # extract the VAF and summary values for the curated samples
@@ -470,8 +470,7 @@ class MAFFile:
         df_all_curated_SD = _find_VAFandsummary(
             df_curated_simplex_duplex_summary_added, "simplex_duplex"
         )
-        
-        
+
         df_plasma_simplex_summary_added = _find_VAFandsummary(df_plasma, "simplex")
         df_plasma_simplex_duplex_summary_added = _find_VAFandsummary(
             df_plasma_simplex_summary_added, "duplex"
@@ -479,7 +478,7 @@ class MAFFile:
         df_all_plasma_SD = _find_VAFandsummary(
             df_plasma_simplex_duplex_summary_added, "simplex_duplex"
         )
-        
+
         df_tumor_simplex_summary_added = _find_VAFandsummary(df_tumor, "simplex")
         df_tumor_simplex_duplex_summary_added = _find_VAFandsummary(
             df_tumor_simplex_summary_added, "duplex"
@@ -487,7 +486,7 @@ class MAFFile:
         df_all_tumor_SD = _find_VAFandsummary(
             df_tumor_simplex_duplex_summary_added, "simplex_duplex"
         )
-        
+
         df_control_simplex_summary_added = _find_VAFandsummary(df_control, "simplex")
         df_control_simplex_duplex_summary_added = _find_VAFandsummary(
             df_control_simplex_summary_added, "duplex"
@@ -495,15 +494,15 @@ class MAFFile:
         df_all_control_SD = _find_VAFandsummary(
             df_control_simplex_duplex_summary_added, "simplex_duplex"
         )
-        
+
         df_matched_normal = _find_VAFandsummary(df_matched_normal, "standard")
-        
+
         df_normals = df_full_fillout[
             df_full_fillout["fillout_type"].isin(["MATCHED_NORMAL", "UNMATCHED_NORMAL"])
         ]
 
         df_all_normals = _find_VAFandsummary(df_normals, "standard")
-        
+
         return (
             df_all_curated_SD,
             df_all_plasma_SD,

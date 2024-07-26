@@ -120,12 +120,12 @@ def __generate_table_and_find_summary_stats(
         summary_table[new_fillout_type + "median_VAF"] = df_fillout.groupby(
             mutation_key
         )["t_vaf_fragment_standard"].median()
-        
+
         # Find the number of samples with alt count above the threshold (alt_thres)
-        summary_table[new_fillout_type + "n_fillout_sample_alt_detect"] = (
-            df_fillout.groupby(mutation_key)["t_alt_count_fragment_standard"].aggregate(
-                lambda x: (x >= float(alt_thres)).sum()
-            )
+        summary_table[
+            new_fillout_type + "n_fillout_sample_alt_detect"
+        ] = df_fillout.groupby(mutation_key)["t_alt_count_fragment_standard"].aggregate(
+            lambda x: (x >= float(alt_thres)).sum()
         )
         # Find the number of sample with the Total Depth is >0
         # 't_vaf_fragment' column is NA for samples where mutation had no coverage, so count() will exclude it
@@ -150,9 +150,9 @@ def __generate_table_and_find_summary_stats(
         summary_table[new_fillout_type + "median_VAF"] = df_fillout.groupby(
             mutation_key
         )["t_vaf_fragment"].median()
-        
+
         # Find the number of samples with alt count above the threshold (alt_thres)
-        
+
         summary_table[new_fillout_type + "n_fillout_sample_alt_detect"] = (
             df_fillout.groupby(mutation_key)["t_alt_count_fragment"].aggregate(
                 lambda x: (x >= float(alt_thres)).sum()
@@ -207,7 +207,7 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
         )
         fillout_type = ""
         raise
-    
+
     # for each of the groups (exception of normals), we are going to subset to their duplex and simplex-duplex stats as well as rename the fillout type those categories
     if fillout_type not in ("NORMAL_"):
         # take the duplex stats and convert their column
@@ -219,9 +219,9 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
         duplex_columns = [
             col
             for col in df_fillout.columns
-            if not col.endswith(("_simplex_duplex","_simplex"))
+            if not col.endswith(("_simplex_duplex", "_simplex"))
         ]
-        
+
         duplex_df = df_fillout[duplex_columns]
         duplex_df["fillout_type"] = f"{fillout_type}DUPLEX_"
         new_fillout_type_D = f"{fillout_type}DUPLEX_"
@@ -233,8 +233,8 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
         simplex_duplex_df["fillout_type"] = f"{fillout_type}SIMPLEX_DUPLEX_"
         new_fillout_type_SD = f"{fillout_type}SIMPLEX_DUPLEX_"
 
-        # remove the nan t alt count, t ref count and t total count and t vaf fragment columns 
-        
+        # remove the nan t alt count, t ref count and t total count and t vaf fragment columns
+
         duplex_df = duplex_df.rename(
             columns={
                 "summary_fragment_duplex": "summary_fragment",
@@ -244,8 +244,7 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
                 "t_total_count_fragment_duplex": "t_total_count_fragment",
             }
         )
-        
-        
+
         simplex_duplex_df = simplex_duplex_df.rename(
             columns={
                 "summary_fragment_simplex_duplex": "summary_fragment",
@@ -255,16 +254,15 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
                 "t_total_count_fragment_simplex_duplex": "t_total_count_fragment",
             }
         )
-        
+
         for col in ["t_vaf_fragment", "t_alt_count_fragment", "t_ref_count_fragment"]:
             duplex_df[col] = duplex_df[col].astype(float)
             simplex_duplex_df[col] = simplex_duplex_df[col].astype(float)
 
-        
         duplex_summary_table = __generate_table_and_find_summary_stats(
             duplex_df, mutation_key, fillout_type, alt_thres, new_fillout_type_D
         )
-        
+
         simplex_duplex_summary_table = __generate_table_and_find_summary_stats(
             simplex_duplex_df,
             mutation_key,
@@ -275,7 +273,7 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
 
         return [duplex_summary_table, simplex_duplex_summary_table]
     else:
-        
+
         for col in [
             "t_vaf_fragment_standard",
             "t_alt_count_fragment_standard",
@@ -283,11 +281,11 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
         ]:
             df_fillout[col] = df_fillout[col].astype(float)
             df_normal_combined = df_fillout
-        
+
         summary_table = __generate_table_and_find_summary_stats(
             df_normal_combined, mutation_key, fillout_type, alt_thres, str(fillout_type)
         )
-        
+
         return summary_table
 
 
@@ -316,7 +314,7 @@ def _extract_tn_genotypes(
     :return: The function `_extract_tn_genotypes` returns a DataFrame `df_tn_genotype_final` containing
     the genotypes of the tumor sample and, if provided, the matched normal sample.
     """
-    
+
     df_tn_genotype = df_tumor[
         df_tumor["Tumor_Sample_Barcode"] == str(tumor_samplename)
     ][
@@ -450,11 +448,11 @@ def make_pre_filtered_maf(
     result of merging various summary tables and genotypes extracted from input DataFrames based on
     specified conditions and thresholds.
     """
-    
+
     [tumor_duplex_summary_table, tumor_simplex_duplex_summary_table] = (
         _create_fillout_summary(df_all_tumor, tumor_detect_alt_thres, mutation_key)
     )
-    
+
     if df_all_normals.empty:
         df_normal_summary = pd.DataFrame(index=tumor_summary_table.index.copy())
         df_normal_summary["NORMAL_median_VAF"] = "no_normals_in_pool"
@@ -467,18 +465,18 @@ def make_pre_filtered_maf(
         normal_summary_table = _create_fillout_summary(
             df_all_normals, tumor_detect_alt_thres, mutation_key
         )
-    
+
     [curated_duplex_summary_table, curated_simplex_duplex_summary_table] = (
         _create_fillout_summary(df_all_curated, curated_detect_alt_thres, mutation_key)
     )
     [plasma_duplex_summary_table, plasma_simplex_duplex_summary_table] = (
         _create_fillout_summary(df_all_plasma, curated_detect_alt_thres, mutation_key)
     )
-    
+
     df_tn_genotype_final = _extract_tn_genotypes(
         df_all_tumor, df_all_normals, tumor_samplename, normal_samplename
     )
-    
+
     df_anno_with_genotypes = pd.concat(
         [
             df_annotation.reset_index(drop=True),
@@ -486,7 +484,7 @@ def make_pre_filtered_maf(
         ],
         axis=1,
     )
-    
+
     df_anno_with_genotypes.index = df_annotation.index
 
     df_pre_filter = (
@@ -500,8 +498,6 @@ def make_pre_filtered_maf(
         .merge(plasma_duplex_summary_table, left_index=True, right_index=True)
         .merge(plasma_simplex_duplex_summary_table, left_index=True, right_index=True)
     )
-    
-
 
     return df_pre_filter
 
