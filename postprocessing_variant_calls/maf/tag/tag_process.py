@@ -268,10 +268,10 @@ def traceback(
     return 0
 
 
-@app.command(
-    "split_by_annotations",
-    help="Tag filtered MAF file with various annotations and subset into individual text files.",
-)
+# @app.command(
+#     "split_by_annotations",
+#     help="Tag filtered MAF file with various annotations and subset into individual text files.",
+# )
 # def split_by_annotations(
 #     maf: Path = typer.Option(
 #         ...,
