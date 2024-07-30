@@ -190,38 +190,6 @@ def _find_VAFandsummary(df, sample_group):  # add category as third argumnet
 
     return df
 
-    # if (~df["fillout_type"].isin(["MATCHED_NORMAL", "UNMATCHED_NORMAL"])).any():
-    #     df[f"summary_fragment_{str(sample_group)}"] = (
-    #         "DP="
-    #         + (
-    #             df[f"t_alt_count_fragment_{str(sample_group)}"].astype(int)
-    #             + df[f"t_ref_count_fragment_{str(sample_group)}"].astype(int)
-    #         ).astype(str)
-    #         + ";RD="
-    #         + df[f"t_ref_count_fragment_{str(sample_group)}"].astype(str)
-    #         + ";AD="
-    #         + df[f"t_alt_count_fragment_{str(sample_group)}"].astype(str)
-    #         + ";VF="
-    #         + df[f"t_vaf_fragment_{str(sample_group)}"].fillna(0).astype(str)
-    #     )
-    # else:
-    #     print("not_normal")
-    #     df = df.rename(columns={"t_variant_frequency": "t_vaf_fragment"})
-    #     df[f"summary_fragment"] = (
-    #         "DP="
-    #         + (
-    #             df[f"t_alt_count_fragment"].astype(int)
-    #             + df[f"t_ref_count_fragment"].astype(int)
-    #         ).astype(str)
-    #         + ";RD="
-    #         + df[f"t_ref_count_fragment"].astype(str)
-    #         + ";AD="
-    #         + df[f"t_alt_count_fragment"].astype(str)
-    #         + ";VF="
-    #         + df[f"t_vaf_fragment"].fillna(0).astype(str)
-    #     )
-    # return df
-
 
 def maf_duplicates(data_frame):
     de_duplication_columns = [
@@ -501,14 +469,6 @@ class MAFFile:
         # make a call to the _convert_fillout_to_df() function since it is also within the MAF class
         df_full_fillout = self._convert_fillout_to_df()
 
-        df_full_fillout = df_full_fillout.rename(
-            columns={
-                "t_total_count_fragment": "t_total_count_fragment_standard",
-                "t_variant_frequency": "t_vaf_fragment_standard",
-                "t_alt_count_fragment": "t_alt_count_fragment_standard",
-                "t_ref_count_fragment": "t_ref_count_fragment_standard",
-            }
-        )
 
         # run extract fillout type function on the fillout df (will result in many mini dfs)
         # extract the VAF and summary values for the curated samples
