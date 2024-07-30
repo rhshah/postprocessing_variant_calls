@@ -269,10 +269,10 @@ def traceback(
 
 
 @app.command(
-    "split_by_annotations",
-    help="Tag filtered MAF file with various annotations and subset into individual text files.",
+    "tag_by_variant_classification",
+    help="Tag filtered MAF file by variant classifications and subset into individual text files.",
 )
-def split_by_annotations(
+def tag_by_variant_classification(
     maf: Path = typer.Option(
         ...,
         "--maf",
@@ -299,7 +299,7 @@ def split_by_annotations(
     # prep maf
     typer.secho(f"Reading in input filtered MAF file.", fg=typer.colors.BRIGHT_GREEN)
     mafa = MAFFile(maf, separator)
-    mafa.split_by_annotations_subset()
+    #mafa.split_by_annotations_subset()
     # print(test)
     
     
