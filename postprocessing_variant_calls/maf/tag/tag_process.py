@@ -268,6 +268,7 @@ def traceback(
     return 0
 
 
+<<<<<<< HEAD
 # @app.command(
 #     "split_by_annotations",
 #     help="Tag filtered MAF file with various annotations and subset into individual text files.",
@@ -305,6 +306,46 @@ def traceback(
 #     # include the various tagging functions here (all will be in the MAF class)
 #     # mafa = mafa.tag("")
 #     return 0
+=======
+@app.command(
+    "split_by_annotations",
+    help="Tag filtered MAF file with various annotations and subset into individual text files.",
+)
+def split_by_annotations(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="filtered MAF file to split by annotations with",
+    ),
+    output: Path = typer.Option(
+        "output", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a seperator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # prep maf
+    typer.secho(f"Reading in input filtered MAF file.", fg=typer.colors.BRIGHT_GREEN)
+    mafa = MAFFile(maf, separator)
+    mafa.split_by_annotations_subset()
+    # print(test)
+    
+    
+    # include the various tagging functions here (all will be in the MAF class)
+    #mafa = mafa.tag("")
+    return 0
+>>>>>>> feature/split_by_annotations
 
 
 if __name__ == "__main__":
