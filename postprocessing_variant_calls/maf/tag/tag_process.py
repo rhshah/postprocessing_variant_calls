@@ -299,7 +299,7 @@ def split_by_annotations(
     # prep maf
     typer.secho(f"Reading in input filtered MAF file.", fg=typer.colors.BRIGHT_GREEN)
     mafa = MAFFile(maf, separator)
-    test = mafa.split_by_annotations_subset()
+    mafa.split_by_annotations_subset()
     # print(test)
     
     

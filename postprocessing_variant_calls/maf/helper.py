@@ -11,6 +11,11 @@ import pandas as pd
 import numpy as np
 from .resources import tsg_genes
 
+from postprocessing_variant_calls.maf.tag.tag_constants import (
+    MAF_DUMMY_COLUMNS2,
+    MAF_COLUMNS_SELECT,
+)
+
 
 def process_paths(paths):
     file = open(paths, "r")
@@ -36,6 +41,61 @@ def check_maf(files: List[Path]):
             )
             raise typer.Abort()
     return files
+
+
+#NOTE: move these helper functions over to tag_helpers and import from there 
+def add_dummy_columns(maf, columns):
+    """
+    Temporary function to add dummy columns
+    to meet DMP requirements
+    """
+    for col in columns:
+        if not col in maf.columns:
+            maf[col] = ""
+    return maf
+    
+
+def customize_cosmic(cosmic_id, cosmic_occurrence):
+        """
+        helper function to customize cosmic annotation.
+        If cosmic_id is defined, but not occurrence, then
+        a generic value of "1(unknown)" will be used.
+        """
+        if cosmic_id is not np.nan and cosmic_id != "":
+            # OCCURENCE spelled incorrectly by design
+            return (
+                "ID="
+                + cosmic_id
+                + ";OCCURENCE="
+                + (
+                    cosmic_occurrence
+                    if cosmic_occurrence is not np.nan
+                    else "1(unknown)"
+                )
+            )
+        else:
+            return "" 
+        
+
+def get_exon(maf_exon, maf_intron):
+        """"
+        helper function to determine the exonic or
+        intronic location of a variant.
+        """
+        try:
+            exon, total_exon = str(maf_exon).split("/")
+            return "exon" + str(exon)
+        except ValueError:  # Not exonic
+            try:
+                intron, total_intron = str(maf_intron).split("/")
+                return "intron" + str(intron)
+            except ValueError:  # Not intronic
+                return ""
+    
+    
+def filter_by_annotations(maf,ref_tx_file,project_name):
+    
+    return 0
 
 
 def maf_duplicates(data_frame):
@@ -451,6 +511,118 @@ class MAFFile:
             raise typer.Abort()
         
     def split_by_annotations_subset(self):
+        
+        
         # Replace "-" in column headers to "_" so that they can be
         #  used as attributes to a variant object
+        incompatible_required_column_headers = filter(
+        lambda x: "-" in x and any([x.startswith("CURATED-"), x.startswith("NORMAL-")]),
+        self.data_frame.columns)
+        
+        maf = self.data_frame.rename(
+        columns=dict(
+            zip(
+                incompatible_required_column_headers,
+                map(
+                    lambda x: x.replace("-", "_"), incompatible_required_column_headers
+                ),
+            )
+        )
+        )
+    # assign potential missing expected columns in MAF
+        maf_w_dummy_cols = add_dummy_columns(maf, MAF_DUMMY_COLUMNS2)
+    
+    # if a mutation does not have a flag for "Mutation_Status", classify it as Novel
+        maf_w_dummy_cols["Mutation_Class"] = np.vectorize(lambda x: "Novel" if x is np.nan else "")(
+            maf_w_dummy_cols["Status"]
+        )
+    # add modified cosmic column
+        maf_w_dummy_cols["Cosmic_ID"] = np.vectorize(customize_cosmic, otypes=[str])(
+            maf_w_dummy_cols["cosmic_ID"], maf_w_dummy_cols["cosmic_OCCURENCE"]
+        )
+        
+        
+        try:
+            maf_w_dummy_cols = maf_w_dummy_cols[MAF_COLUMNS_SELECT]
+        except KeyError:
+            missing_columns = set(MAF_COLUMNS_SELECT) - set(maf_w_dummy_cols.columns.values.tolist())
+            missing_columns_str = ",".join(missing_columns)
+            #message = f"The following required columns are missing in the {maf_w_dummy_cols}: {missing_columns_str}"
+            #print(message)
+            raise typer.Abort()
+        
+        # compute columns
+        maf_w_dummy_cols["EXON"] = np.vectorize(get_exon, otypes=[str])(maf_w_dummy_cols["EXON"], maf_w_dummy_cols["INTRON"])
+        maf_w_dummy_cols = maf_w_dummy_cols.drop(["INTRON"], axis=1)
+        
+        # computing all the gnomad associated cols
+        # "TypeError: '>=' not supported between instances of 'float' and 'str'"
+        maf_w_dummy_cols[GNOMAD_COLUMNS] = maf_w_dummy_cols[GNOMAD_COLUMNS].replace('', np.nan)
+        
+        # get max of gnomad
+        #maf_w_dummy_cols["gnomAD_Max_AF"] = np.nanmax(maf[GNOMAD_COLUMNS].values, axis=1)
+        # version 1.8 of numpy has this 
+        # compute various mutation depth and vaf metrics
+        maf_w_dummy_cols["D_t_count_fragment"] = (
+            maf_w_dummy_cols["D_t_ref_count_fragment"] + maf_w_dummy_cols["D_t_alt_count_fragment"]
+        )
+        
+        maf_w_dummy_cols["SD_t_count_fragment"] = (
+            maf_w_dummy_cols["SD_t_ref_count_fragment"] + maf_w_dummy_cols["SD_t_alt_count_fragment"]
+        )
+        
+        maf_w_dummy_cols["S_t_ref_count_fragment"] = (
+            maf_w_dummy_cols["SD_t_ref_count_fragment"] - maf_w_dummy_cols["D_t_ref_count_fragment"]
+        )
+        
+        maf_w_dummy_cols["S_t_alt_count_fragment"] = (
+            maf_w_dummy_cols["SD_t_alt_count_fragment"] - maf_w_dummy_cols["D_t_alt_count_fragment"]
+        )
+        
+        maf_w_dummy_cols["S_t_count_fragment"] = (
+            maf_w_dummy_cols["S_t_ref_count_fragment"] + maf_w_dummy_cols["S_t_alt_count_fragment"]
+        )
+        
+        maf_w_dummy_cols["n_count_fragment"] = maf_w_dummy_cols["n_ref_count_fragment"] + maf_w_dummy_cols["n_alt_count_fragment"]
+        
+        
+        maf_w_dummy_cols["S_t_vaf_fragment"] = (
+            maf_w_dummy_cols["S_t_alt_count_fragment"] / maf_w_dummy_cols["S_t_count_fragment"]
+        ).fillna(0)
+        
+        maf_w_dummy_cols["SD_t_vaf_fragment_over_n_vaf_fragment"] = (
+            maf_w_dummy_cols["SD_t_vaf_fragment"] / maf_w_dummy_cols["n_vaf_fragment"]
+        ).fillna(0)
+        
+        # convert NaN and inf computed values to 0
+        computed_maf = maf_w_dummy_cols.replace([np.inf, np.nan], 0)
+        
+        # format SNP column
+        computed_maf["dbSNP_RS"] = computed_maf["dbSNP_RS"].apply(
+            lambda x: x if isinstance(x, str) and x.startswith("rs") else ""
+        )
+        
+        # generate occurrence stats columns
+        computed_maf["CURATED_DUPLEX_n_fillout_sample"] = (
+            computed_maf["CURATED_DUPLEX_n_fillout_sample_alt_detect"].map(str)
+            + ";"
+            + computed_maf["CURATED_DUPLEX_median_VAF"].map(str)
+        )
+        computed_maf["CURATED_SIMPLEX_DUPLEX_n_fillout_sample"] = (
+            computed_maf["CURATED_SIMPLEX_DUPLEX_n_fillout_sample_alt_detect"].map(str)
+            + ";"
+            + computed_maf["CURATED_SIMPLEX_DUPLEX_median_VAF"].map(str)
+        )
+        computed_maf["NORMAL_n_fillout_sample"] = (
+            computed_maf["NORMAL_n_fillout_sample_alt_detect"].map(str)
+            + ";"
+            + computed_maf["NORMAL_median_VAF"].map(str)
+        )
+        
+        return maf
+        
+        
+        
+        
+        
         
