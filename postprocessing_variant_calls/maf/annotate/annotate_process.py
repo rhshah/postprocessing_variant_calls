@@ -23,9 +23,7 @@ from postprocessing_variant_calls.maf.helper import (
     MAFFile,
     gen_id_tsv,
 )
-from postprocessing_variant_calls.maf.tag.tag_process import (
-    split_by_annotations,
-)
+
 from utils.pybed_intersect import annotater
 import pandas as pd
 import numpy as np

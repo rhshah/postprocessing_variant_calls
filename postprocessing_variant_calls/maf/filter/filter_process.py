@@ -30,6 +30,7 @@ from postprocessing_variant_calls.maf.filter.filter_helpers import (
     make_pre_filtered_maf,
     apply_filter_maf,
     make_condensed_post_filter,
+    format_maf_for_mpath,
 )
 
 from utils.pybed_intersect import annotater
@@ -367,7 +368,7 @@ def access_filters(
         ...,
         "--normal_samplename",
         "-ns",
-        help="Name of normal sample",
+        help="Name of MATCHED normal sample",
     ),
     tumor_detect_alt_thres: str = typer.Option(
         2,
@@ -439,10 +440,10 @@ def access_filters(
     # convert the anno maf to dataframe (functions located in MAF class)
     df_annotation = anno_mafa.convert_annomaf_to_df()
 
-    # call the extract blocklist function
+    # # call the extract blocklist function
     blocklist_lst = extract_blocklist(blocklist, separator)
 
-    # standard compiled arguments for rest of access_filters functions
+    # # standard compiled arguments for rest of access_filters functions
     args = {
         "tumor_TD_min": tumor_TD_min,
         "normal_TD_min": normal_TD_min,
@@ -455,7 +456,7 @@ def access_filters(
         "blocklist_lst": blocklist_lst,
     }
 
-    # call the extract fillout type function to return all subcategory dfs with summary columns calculated (function located in MAF class)
+    # # call the extract fillout type function to return all subcategory dfs with summary columns calculated (function located in MAF class)
     (
         df_all_curated_SD,
         df_all_plasma_SD,
@@ -485,11 +486,17 @@ def access_filters(
     # calls to condensed post filter maf
     df_condensed = make_condensed_post_filter(df_post_filter)
 
-    # write out the final maf files (filtered and condensed)
+    # # write out the final maf files (filtered and condensed)
+    
+    # # remove when running full test in traceback
+    df_post_filter = df_post_filter.drop(["id"], axis=1)
+    df_condensed_final = df_condensed.drop(["id"], axis=1)
 
-    # remove when running full test in traceback
-    df_post_filter_final = df_post_filter.drop(["id", "Unnamed: 0"], axis=1)
-    df_condensed_final = df_condensed.drop(["id", "Unnamed: 0"], axis=1)
+    
+    df_post_filter_final = format_maf_for_mpath(df_post_filter)
+    
+    
+
 
     df_post_filter_final.to_csv(
         f"{output_maf}_filtered.maf", header=True, index=None, sep="\t"

@@ -640,12 +640,6 @@ MAF_DUMMY_COLUMNS2 = [
     "gnomAD_AF_NFE",
     "gnomAD_AF_OTH",
     "gnomAD_AF_SAS",
-    "CURATED_DUPLEX_median_VAF",
-    "CURATED_DUPLEX_n_fillout_sample",
-    "CURATED_DUPLEX_n_fillout_sample_alt_detect",
-    "CURATED_SIMPLEX_DUPLEX_median_VAF",
-    "CURATED_SIMPLEX_DUPLEX_n_fillout_sample",
-    "CURATED_SIMPLEX_DUPLEX_n_fillout_sample_alt_detect",
 ]
 
 # Filename variables
