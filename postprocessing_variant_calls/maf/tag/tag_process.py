@@ -284,10 +284,10 @@ def traceback(
 
 
 @app.command(
-    "tag_by_variant_classification",
+    "by_variant_classification",
     help="Tag filtered MAF file by variant classifications and subset into individual text files.",
 )
-def tag_by_variant_classification(
+def by_variant_classification(
     maf: Path = typer.Option(
         ...,
         "--maf",
