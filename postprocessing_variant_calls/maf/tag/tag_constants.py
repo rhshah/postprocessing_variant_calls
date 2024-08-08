@@ -652,7 +652,7 @@ NONPANEL_EXONIC_DROPPED = "_NonPanelExonicDropped.txt"
 NONPANEL_SILENT_FILTERED = "_NonPanelSilentFiltered.txt"
 NONPANEL_SILENT_DROPPED = "_NonPanelSilentDropped.txt"
 
-EXONIC_FILTERED = "annotated_exonic_variants.txt"
+EXONIC_FILTERED = "annotated_exonic_variants.maf"
 SILENT_FILTERED = "annotated_silent_variants.txt"
 NONPANEL_EXONIC_FILTERED = "annotated_nonpanel_exonic_variants.txt"
 NONPANEL_SILENT_FILTERED = "annotated_nonpanel_silent_variants.txt"

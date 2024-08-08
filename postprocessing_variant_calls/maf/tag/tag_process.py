@@ -406,8 +406,15 @@ def tag_by_variant_classification(
 
                 variant = variant._replace(
                     Hugo_Symbol=variant_tuple[0],  # Gene
+                    Entrez_Gene_Id=variant.Entrez_Gene_Id,
+                    Center=variant.Center,
+                    NCBI_Build=variant.NCBI_Build,
+                    Chromosome=variant.Chromosome,
                     Variant_Classification=variant_tuple[1],  # VariantClass
+                    Variant_Type=variant.Variant_Type,
                     vcf_pos=variant_tuple[2],  # Start coordinate
+                    Tumor_Sample_Barcode=variant.Tumor_Sample_Barcode,
+                    caller_Norm_Sample_Barcode=variant.caller_Norm_Sample_Barcode,
                     Transcript_ID=transcript_id,  # TranscriptID
                 )
                 formatted_exonic_variant_row = format_var(variant)
