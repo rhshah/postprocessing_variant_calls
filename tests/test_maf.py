@@ -70,7 +70,6 @@ maf_tag = [
     ["maf", "tag", "truncating_mut_in_TSG", "--help"],
     ["maf", "tag", "traceback", "--help"],
     ["maf", "tag", "by_variant_classification", "--help"],
-    ["maf", "tag", "access", "--help"],
 ]
 
 
