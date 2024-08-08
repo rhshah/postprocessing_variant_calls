@@ -487,16 +487,12 @@ def access_filters(
     df_condensed = make_condensed_post_filter(df_post_filter)
 
     # # write out the final maf files (filtered and condensed)
-    
+
     # # remove when running full test in traceback
     df_post_filter = df_post_filter.drop(["id"], axis=1)
     df_condensed_final = df_condensed.drop(["id"], axis=1)
 
-    
     df_post_filter_final = format_maf_for_mpath(df_post_filter)
-    
-    
-
 
     df_post_filter_final.to_csv(
         f"{output_maf}_filtered.maf", header=True, index=None, sep="\t"

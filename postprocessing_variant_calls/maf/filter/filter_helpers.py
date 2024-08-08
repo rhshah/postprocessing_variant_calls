@@ -779,47 +779,56 @@ def make_condensed_post_filter(df_post_filter):
 
 
 def calculate_stats_for_mpath(df_post_filter_format):
-    
-    # compute various mutation depth and vaf metrics from fragment columns calculated in access_filters 
+
+    # compute various mutation depth and vaf metrics from fragment columns calculated in access_filters
     df_post_filter_format["D_t_count_fragment"] = (
-            df_post_filter_format["D_t_ref_count_fragment"] + df_post_filter_format["D_t_alt_count_fragment"]
-        )
-        
+        df_post_filter_format["D_t_ref_count_fragment"]
+        + df_post_filter_format["D_t_alt_count_fragment"]
+    )
+
     df_post_filter_format["SD_t_count_fragment"] = (
-            df_post_filter_format["SD_t_ref_count_fragment"] + df_post_filter_format["SD_t_alt_count_fragment"]
-        )
-        
+        df_post_filter_format["SD_t_ref_count_fragment"]
+        + df_post_filter_format["SD_t_alt_count_fragment"]
+    )
+
     df_post_filter_format["S_t_ref_count_fragment"] = (
-            df_post_filter_format["SD_t_ref_count_fragment"] - df_post_filter_format["D_t_ref_count_fragment"]
-        )
-        
+        df_post_filter_format["SD_t_ref_count_fragment"]
+        - df_post_filter_format["D_t_ref_count_fragment"]
+    )
+
     df_post_filter_format["S_t_alt_count_fragment"] = (
-            df_post_filter_format["SD_t_alt_count_fragment"] - df_post_filter_format["D_t_alt_count_fragment"]
-        )
-        
+        df_post_filter_format["SD_t_alt_count_fragment"]
+        - df_post_filter_format["D_t_alt_count_fragment"]
+    )
+
     df_post_filter_format["S_t_count_fragment"] = (
-            df_post_filter_format["S_t_ref_count_fragment"] + df_post_filter_format["S_t_alt_count_fragment"]
-        )
-        
-    df_post_filter_format["n_count_fragment"] = df_post_filter_format["n_ref_count_fragment"] + df_post_filter_format["n_alt_count_fragment"]
-        
-        
+        df_post_filter_format["S_t_ref_count_fragment"]
+        + df_post_filter_format["S_t_alt_count_fragment"]
+    )
+
+    df_post_filter_format["n_count_fragment"] = (
+        df_post_filter_format["n_ref_count_fragment"]
+        + df_post_filter_format["n_alt_count_fragment"]
+    )
+
     df_post_filter_format["S_t_vaf_fragment"] = (
-            df_post_filter_format["S_t_alt_count_fragment"] / df_post_filter_format["S_t_count_fragment"]
-        ).fillna(0)
-        
+        df_post_filter_format["S_t_alt_count_fragment"]
+        / df_post_filter_format["S_t_count_fragment"]
+    ).fillna(0)
+
     df_post_filter_format["SD_t_vaf_fragment_over_n_vaf_fragment"] = (
-            df_post_filter_format["SD_t_vaf_fragment"] / df_post_filter_format["n_vaf_fragment"]
-        ).fillna(0)
-        
+        df_post_filter_format["SD_t_vaf_fragment"]
+        / df_post_filter_format["n_vaf_fragment"]
+    ).fillna(0)
+
     # convert NaN and inf computed values to 0
     computed_maf = df_post_filter_format.replace([np.inf, np.nan], 0)
-        
+
     # format SNP column
     computed_maf["dbSNP_RS"] = computed_maf["dbSNP_RS"].apply(
-            lambda x: x if isinstance(x, str) and x.startswith("rs") else ""
-        )
-        
+        lambda x: x if isinstance(x, str) and x.startswith("rs") else ""
+    )
+
     # generate occurrence stats columns
     # computed_maf["CURATED_DUPLEX_n_fillout_sample"] = (
     #         computed_maf["CURATED_DUPLEX_n_fillout_sample_alt_detect"].map(str)
@@ -836,9 +845,8 @@ def calculate_stats_for_mpath(df_post_filter_format):
     #         + ";"
     #         + computed_maf["NORMAL_median_VAF"].map(str)
     #     )
-    
-    return computed_maf
 
+    return computed_maf
 
 
 def add_dummy_columns(maf, columns):
@@ -850,8 +858,7 @@ def add_dummy_columns(maf, columns):
         if not col in maf.columns:
             maf[col] = ""
     return maf
-    
-    
+
 
 def customize_cosmic(cosmic_id, cosmic_occurrence):
     """
@@ -862,21 +869,17 @@ def customize_cosmic(cosmic_id, cosmic_occurrence):
     if cosmic_id is not np.nan and cosmic_id != "":
         # OCCURENCE spelled incorrectly by design
         return (
-        "ID="
-        + cosmic_id
-        + ";OCCURENCE="
-        + (
-        cosmic_occurrence
-        if cosmic_occurrence is not np.nan
-        else "1(unknown)"
-        )
+            "ID="
+            + cosmic_id
+            + ";OCCURENCE="
+            + (cosmic_occurrence if cosmic_occurrence is not np.nan else "1(unknown)")
         )
     else:
         return ""
-        
-        
+
+
 def get_exon(maf_exon, maf_intron):
-    """"
+    """ "
     helper function to determine the exonic or
     intronic location of a variant.
     """
@@ -889,15 +892,14 @@ def get_exon(maf_exon, maf_intron):
             return "intron" + str(intron)
         except ValueError:  # Not intronic
             return ""
-    
-    
 
 
 def format_maf_for_mpath(df_post_filter):
     incompatible_required_column_headers = filter(
         lambda x: "-" in x and any([x.startswith("CURATED-"), x.startswith("NORMAL-")]),
-        df_post_filter.columns)
-    
+        df_post_filter.columns,
+    )
+
     renamed_maf = df_post_filter.rename(
         columns=dict(
             zip(
@@ -907,24 +909,25 @@ def format_maf_for_mpath(df_post_filter):
                 ),
             )
         )
-        )
-    
-    
+    )
+
     # assign potential missing expected columns in MAF
     renamed_maf_w_dummy_cols = add_dummy_columns(renamed_maf, MAF_DUMMY_COLUMNS2)
-    
+
     # if a mutation does not have a flag for "Mutation_Status", classify it as Novel
-    renamed_maf_w_dummy_cols["Mutation_Class"] = np.vectorize(lambda x: "Novel" if x is np.nan else "")(
-        renamed_maf_w_dummy_cols["Status"]
-    )
-    
-    
+    renamed_maf_w_dummy_cols["Mutation_Class"] = np.vectorize(
+        lambda x: "Novel" if x is np.nan else ""
+    )(renamed_maf_w_dummy_cols["Status"])
+
     # add modified cosmic column
-    renamed_maf_w_dummy_cols["Cosmic_ID"] = np.vectorize(customize_cosmic, otypes=[str])(
-        renamed_maf_w_dummy_cols["cosmic_ID"], renamed_maf_w_dummy_cols["cosmic_OCCURENCE"]
+    renamed_maf_w_dummy_cols["Cosmic_ID"] = np.vectorize(
+        customize_cosmic, otypes=[str]
+    )(
+        renamed_maf_w_dummy_cols["cosmic_ID"],
+        renamed_maf_w_dummy_cols["cosmic_OCCURENCE"],
     )
-    
-    # commenting this out for now since it is removing individual sample summary statistics 
+
+    # commenting this out for now since it is removing individual sample summary statistics
     # try:
     #     renamed_maf_w_dummy_cols = renamed_maf_w_dummy_cols[MAF_COLUMNS_SELECT]
     # except KeyError:
@@ -932,25 +935,27 @@ def format_maf_for_mpath(df_post_filter):
     #     missing_columns_str = ",".join(missing_columns)
     #     # TODO: add proper error handling message here for missing required columns
     #     sys.exit(f"The following required columns are missing: {missing_columns_str}")
-    
-    
+
     # compute exon and intron columns
-    renamed_maf_w_dummy_cols["EXON"] = np.vectorize(get_exon, otypes=[str])(renamed_maf_w_dummy_cols["EXON"], renamed_maf_w_dummy_cols["INTRON"])
+    renamed_maf_w_dummy_cols["EXON"] = np.vectorize(get_exon, otypes=[str])(
+        renamed_maf_w_dummy_cols["EXON"], renamed_maf_w_dummy_cols["INTRON"]
+    )
     renamed_maf_w_dummy_cols = renamed_maf_w_dummy_cols.drop(["INTRON"], axis=1)
-    
-    
-    
+
     # computing all the gnomad associated cols
     # "TypeError: '>=' not supported between instances of 'float' and 'str'"
-    renamed_maf_w_dummy_cols[GNOMAD_COLUMNS] = renamed_maf_w_dummy_cols[GNOMAD_COLUMNS].replace('', np.nan)
-    
+    renamed_maf_w_dummy_cols[GNOMAD_COLUMNS] = renamed_maf_w_dummy_cols[
+        GNOMAD_COLUMNS
+    ].replace("", np.nan)
+
     # get max of gnomad
-    renamed_maf_w_dummy_cols["gnomAD_Max_AF"] = np.max(renamed_maf_w_dummy_cols[GNOMAD_COLUMNS].values, axis=1)
-    
+    renamed_maf_w_dummy_cols["gnomAD_Max_AF"] = np.max(
+        renamed_maf_w_dummy_cols[GNOMAD_COLUMNS].values, axis=1
+    )
+
     # generate occurrence stats columns
     calculated_and_formatted_maf = calculate_stats_for_mpath(renamed_maf_w_dummy_cols)
-    
-    
+
     return calculated_and_formatted_maf
 
 

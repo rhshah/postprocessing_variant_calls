@@ -675,7 +675,7 @@ ALLOWED_EXONIC_VARIANT_CLASS = [
 def IS_EXONIC_CLASS(Gene, VariantClass, Coordinate):
     """
     Determine whether a variant can be considered as exonic
-    based on user-defined conditions. Multiple user-defined 
+    based on user-defined conditions. Multiple user-defined
     conditions can be added to the conditional block.
     """
     if any(

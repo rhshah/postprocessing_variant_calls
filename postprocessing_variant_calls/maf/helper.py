@@ -6,6 +6,7 @@ import csv
 import re
 
 from pathlib import Path
+from contextlib import ExitStack
 from typing import List, Optional
 import typer
 import pandas as pd
@@ -15,6 +16,14 @@ from .resources import tsg_genes
 from postprocessing_variant_calls.maf.tag.tag_constants import (
     MAF_DUMMY_COLUMNS2,
     MAF_COLUMNS_SELECT,
+    MAF_DUMMY_COLUMNS,
+    MAF_TSV_COL_MAP,
+    EXONIC_FILTERED,
+    SILENT_FILTERED,
+    NONPANEL_EXONIC_FILTERED,
+    NONPANEL_SILENT_FILTERED,
+    DROPPED,
+    ALLOWED_EXONIC_VARIANT_CLASS,
 )
 
 
@@ -25,6 +34,32 @@ def process_paths(paths):
         files.append(line.rstrip("\n"))
     file.close
     return files
+
+
+def IS_EXONIC_CLASS(Gene, Variant_Classification, Coordinate):
+    """
+    Determine whether a variant can be considered as exonic
+    based on user-defined conditions. Multiple user-defined
+    conditions can be added to the conditional block.
+    """
+    if any(
+        [
+            Variant_Classification in ALLOWED_EXONIC_VARIANT_CLASS,
+            Gene == "TERT" and Variant_Classification == "5'Flank",
+        ]
+    ):
+        return (Gene, Variant_Classification, Coordinate)
+    elif any(
+        [
+            Gene == "MET"
+            and Variant_Classification == "Intron"
+            and Coordinate >= 116411708
+            and Coordinate <= 116414935
+        ]
+    ):
+        return (Gene, "Splice_Site", Coordinate)
+    else:
+        return None
 
 
 def check_maf(files: List[Path]):
@@ -44,7 +79,7 @@ def check_maf(files: List[Path]):
     return files
 
 
-#NOTE: move these helper functions over to tag_helpers and import from there 
+# NOTE: move these helper functions over to tag_helpers and import from there
 def add_dummy_columns(maf, columns):
     """
     Temporary function to add dummy columns
@@ -54,48 +89,44 @@ def add_dummy_columns(maf, columns):
         if not col in maf.columns:
             maf[col] = ""
     return maf
-    
+
 
 def customize_cosmic(cosmic_id, cosmic_occurrence):
-        """
-        helper function to customize cosmic annotation.
-        If cosmic_id is defined, but not occurrence, then
-        a generic value of "1(unknown)" will be used.
-        """
-        if cosmic_id is not np.nan and cosmic_id != "":
-            # OCCURENCE spelled incorrectly by design
-            return (
-                "ID="
-                + cosmic_id
-                + ";OCCURENCE="
-                + (
-                    cosmic_occurrence
-                    if cosmic_occurrence is not np.nan
-                    else "1(unknown)"
-                )
-            )
-        else:
-            return "" 
-        
+    """
+    helper function to customize cosmic annotation.
+    If cosmic_id is defined, but not occurrence, then
+    a generic value of "1(unknown)" will be used.
+    """
+    if cosmic_id is not np.nan and cosmic_id != "":
+        # OCCURENCE spelled incorrectly by design
+        return (
+            "ID="
+            + cosmic_id
+            + ";OCCURENCE="
+            + (cosmic_occurrence if cosmic_occurrence is not np.nan else "1(unknown)")
+        )
+    else:
+        return ""
+
 
 def get_exon(maf_exon, maf_intron):
-        """"
-        helper function to determine the exonic or
-        intronic location of a variant.
-        """
+    """ "
+    helper function to determine the exonic or
+    intronic location of a variant.
+    """
+    try:
+        exon, total_exon = str(maf_exon).split("/")
+        return "exon" + str(exon)
+    except ValueError:  # Not exonic
         try:
-            exon, total_exon = str(maf_exon).split("/")
-            return "exon" + str(exon)
-        except ValueError:  # Not exonic
-            try:
-                intron, total_intron = str(maf_intron).split("/")
-                return "intron" + str(intron)
-            except ValueError:  # Not intronic
-                return ""
-    
-    
-def filter_by_annotations(maf,ref_tx_file,project_name):
-    
+            intron, total_intron = str(maf_intron).split("/")
+            return "intron" + str(intron)
+        except ValueError:  # Not intronic
+            return ""
+
+
+def filter_by_annotations(maf, ref_tx_file, project_name):
+
     return 0
 
 
@@ -236,18 +267,42 @@ def check_separator(separator: str):
     return sep
 
 
-def read_tsv(tsv, separator):
+def read_tsv(tsv, separator, canonical_tx_ref_flag=False):
     """Read a tsv file
 
     Args:
         maf (File): Input MAF/tsv like format file
+        canonical tx ref flag: flag that if set to True, processes a TSV meant to be the
+        Reference canonical transcript file, meant to be used in the SNVs/indels nextflow pipeline.
 
     Returns:
         data_frame: Output a data frame containing the MAF/tsv
+        OR
+        tx_isoform_lst: If a Reference canonical transcript file is given, a list of extracted transcript isoforms are returned.
     """
     typer.echo("Read Delimited file...")
-    skip = get_row(tsv)
-    return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=False)
+    if canonical_tx_ref_flag != False:
+        skip = get_row(tsv)
+        try:
+            tx_tsv = pd.read_csv(
+                tsv,
+                sep=separator,
+                skiprows=skip,
+                low_memory=False,
+                usecols=["isoform", "gene_name", "refseq_id"],
+            )
+            tx_isoform_list = tx_tsv.isoform.values.tolist()
+            return tx_tsv, tx_isoform_list
+        except [IOError, KeyError] as e:
+            print(
+                "Transcript file requires the following columns {}.".format(
+                    ",".join(["isoform", "gene_name", "refseq_id"])
+                )
+            )
+            raise
+    else:
+        skip = get_row(tsv)
+        return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=False)
 
 
 def get_row(tsv_file):
@@ -469,7 +524,6 @@ class MAFFile:
         # make a call to the _convert_fillout_to_df() function since it is also within the MAF class
         df_full_fillout = self._convert_fillout_to_df()
 
-
         # run extract fillout type function on the fillout df (will result in many mini dfs)
         # extract the VAF and summary values for the curated samples
         df_curated = df_full_fillout[df_full_fillout["fillout_type"].isin(["CURATED"])]
@@ -584,6 +638,9 @@ class MAFFile:
             if tagging == "traceback":
                 self.tag_traceback(cols, tagging)
 
+            if tagging == "by_variant_classification":
+                self.tag_by_variant_classification(cols, tagging)
+
         else:
             typer.secho(
                 f"missing columns expected for {tagging} tagging expects: {set(cols).difference(set(self.data_frame.columns.tolist()))}, which was missing from the input",
@@ -634,6 +691,88 @@ class MAFFile:
                 fg=typer.colors.RED,
             )
             raise typer.Abort()
+
+    def tag_by_variant_classification(self, output_dir, ref_lst):
+        maf = add_dummy_columns(self.data_frame, MAF_DUMMY_COLUMNS)
+
+        # start tagging the input MAF with the 5 categories
+
+        def is_exonic_or_silent(row, ref_lst):
+            exonic_result = IS_EXONIC_CLASS(
+                row.Hugo_Symbol, row.Variant_Classification, row.vcf_pos
+            )
+            if exonic_result:
+                if row.Transcript_ID in ref_lst:
+                    return "exonic"
+                else:
+                    return "nonpanel_exonic"
+            else:
+                if row.Transcript_ID in ref_lst:
+                    return "silent"
+                else:
+                    return "nonpanel_silent"
+
+        def dropped(row):
+            return pd.notna(row.Status) and row.Status != ""
+
+        def tag_row(row, canonical):
+            tags = []
+
+            # Evaluate "dropped"
+            if dropped(row):
+                tags.append("dropped")
+
+            # Evaluate "exonic" or "silent" independently of "dropped"
+            is_exonic_or_silent_tag = is_exonic_or_silent(row, canonical)
+            if is_exonic_or_silent_tag:
+                tags.append(is_exonic_or_silent_tag)
+
+            return ", ".join(tags)
+
+        tags_list = []
+        for row in maf.itertuples(index=False):
+            tags_list.append(tag_row(row, ref_lst))
+
+        maf["classification"] = tags_list
+
+        return maf
+
+        # file_names = [
+        #     EXONIC_FILTERED,
+        #     SILENT_FILTERED,
+        #     NONPANEL_EXONIC_FILTERED,
+        #     NONPANEL_SILENT_FILTERED,
+        #     DROPPED
+        #     ]
+
+        # Create exonic, silent, and nonpanel files.
+        # file_paths = [f"{output_dir}/{name}" for name in file_names]
+
+        # headers = "\t".join(MAF_TSV_COL_MAP.values()) + "\n"
+
+        # with ExitStack() as stack:
+        #     files = [stack.enter_context(open(path, "w")) for path in file_paths]
+
+        #     for file in files:
+        #         file.write(headers)
+
+        # with open(output_dir + "/" + EXONIC_FILTERED, "w") as exonic, open(
+        #     output_dir + "/" + SILENT_FILTERED, "w") as silent, open(
+        #     output_dir + "/" + NONPANEL_EXONIC_FILTERED, "w") as nonpanel_exonic, open(
+        #     output_dir + "/" + NONPANEL_SILENT_FILTERED, "w") as nonpanel_silent, open(
+        #     output_dir + "/" + DROPPED, "w") as dropped:
+
+        #     headers = "\t".join(MAF_TSV_COL_MAP.values()) + "\n"
+        #     for f in [exonic, silent, nonpanel_exonic, nonpanel_silent, dropped]:
+        #         f.write(headers)
+
+        return headers
+
+        # typer.secho(
+        #     f"missing columns expected for {tagging} tagging",
+        #     fg=typer.colors.RED,
+        # )
+        # raise typer.Abort()
 
     def tag_by_variant_annotations(self, rules_df):
         if rules_df is not None:
@@ -809,4 +948,3 @@ class RulesFile:
                 fg=typer.colors.RED,
             )
             raise typer.Abort()
-
