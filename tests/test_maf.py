@@ -58,6 +58,8 @@ maf_filter = [
     ["maf", "filter", "non_common_variant", "--help"],
     ["maf", "filter", "non_hotspot", "--help"],
     ["maf", "filter", "not_complex", "--help"],
+    ["maf", "filter", "access_remove_variants", "--help"],
+    ["maf", "filter", "access_filters", "--help"],
 ]
 
 
@@ -69,6 +71,7 @@ maf_tag = [
     ["maf", "tag", "prevalence_in_cosmicDB", "--help"],
     ["maf", "tag", "truncating_mut_in_TSG", "--help"],
     ["maf", "tag", "traceback", "--help"],
+    ["maf", "tag", "by_variant_classification", "--help"],
 ]
 
 
