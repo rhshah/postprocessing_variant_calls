@@ -58,8 +58,26 @@ $ main maf annotate [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
+* `extract_blocklist`: Extract values from an optional blocklist...
 * `mafbybed`: annotate a maf column by a bed file.
 * `mafbytsv`: annotate a maf column by a bed file.
+
+#### `main maf annotate extract_blocklist`
+
+Extract values from an optional blocklist file if provided. Used in SNVs/indels workflow.
+
+**Usage**:
+
+```console
+$ main maf annotate extract_blocklist [OPTIONS]
+```
+
+**Options**:
+
+* `-b, --blocklist_file FILE`: Blocklist text file to extract values from. Needs to be in TSV format  [required]
+* `-m, --maf FILE`: MAF file to subset  [required]
+* `-sep, --separator TEXT`: Specify a separator for delimited data.  [default: tsv]
+* `--help`: Show this message and exit.
 
 #### `main maf annotate mafbybed`
 
@@ -135,12 +153,65 @@ $ main maf filter [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
+* `access_filters`: Filter a MAF file based on all the...
+* `access_remove_variants`: Filter a MAF file based on all the...
 * `cmo_ch`: Filter a MAF file based on all the parameters
 * `hotspot`: filter a MAF file based on the presence of...
 * `mappable`: Filter a MAF file to retain only mappable...
 * `non_common_variant`: Filter a MAF file for common variants and...
 * `non_hotspot`: filter a MAF file based on the presence of...
 * `not_complex`: Filter a MAF filter for complex variants...
+
+#### `main maf filter access_filters`
+
+Filter a MAF file based on all the parameters listed in ACCESS filters python script
+
+**Usage**:
+
+```console
+$ main maf filter access_filters [OPTIONS]
+```
+
+**Options**:
+
+* `-f, --fillout_maf FILE`: Fillout MAF file to subset (direct output from traceback subworkflow)  [required]
+* `-a, --anno_maf FILE`: Annotated MAF file to subset (direct input file from beginning of traceback subworkflow)  [required]
+* `-o, --output PATH`: Maf output file name.  [default: output]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-bl, --blocklist TEXT`: Optional input blocklist file for access filtering criteria.  [default: tsv]
+* `-ts, --tumor_samplename TEXT`: Name of Tumor Sample  [required]
+* `-ns, --normal_samplename TEXT`: Name of MATCHED normal sample  [required]
+* `--tumor_detect_alt_thres TEXT`: The Minimum Alt depth required to be considered detected in fillout  [default: 2]
+* `--tumor_detect_alt_thres TEXT`: The Minimum Alt depth required to be considered detected in fillout  [default: 2]
+* `--curated_detect_alt_thres TEXT`: The Minimum Alt depth required to be considered detected in fillout  [default: 2]
+* `--plasma_detect_alt_thres TEXT`: The Minimum Alt depth required to be considered detected in fillout  [default: 2]
+* `--tumor_TD_min TEXT`: The Minimum Total Depth required in tumor to consider a variant Likely Germline  [default: 20]
+* `--normal_TD_min TEXT`: The Minimum Total Depth required in Matched Normal to consider a variant Germline  [default: 20]
+* `--tumor_vaf_germline_thres TEXT`: The threshold for variant allele fraction required in Tumor to be consider a variant Likely Germline  [default: 0.4]
+* `--tumor_vaf_germline_thres TEXT`: The threshold for variant allele fraction required in Matched Normal to be consider a variant Germline  [default: 0.4]
+* `--tier_one_alt_min TEXT`: The Minimum Alt Depth required in hotspots  [default: 3]
+* `--tier_two_alt_min TEXT`: The Minimum Alt Depth required in non-hotspots  [default: 5]
+* `--min_n_curated_samples_alt_detected TEXT`: The Minimum number of curated samples variant is detected to be flagged  [default: 2]
+* `--tn_ratio_thres TEXT`: Tumor-Normal variant fraction ratio threshold  [default: 5]
+* `--help`: Show this message and exit.
+
+#### `main maf filter access_remove_variants`
+
+Filter a MAF file based on all the parameters satisfied by the remove variants by annotations CWL script in the ACCESS pipeline
+
+**Usage**:
+
+```console
+$ main maf filter access_remove_variants [OPTIONS]
+```
+
+**Options**:
+
+* `-m, --maf FILE`: MAF file to subset  [required]
+* `-i, --intervals FILE`: Intervals file containing rows of criterion to tag input MAF by  [required]
+* `-o, --output PATH`: Maf output file name.  [default: output.maf]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `--help`: Show this message and exit.
 
 #### `main maf filter cmo_ch`
 
@@ -207,7 +278,7 @@ $ main maf filter non_common_variant [OPTIONS]
 
 * `-m, --maf FILE`: MAF file to subset  [required]
 * `-o, --output PATH`: Maf output file name.  [default: output.maf]
-* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-sep, --separator TEXT`: Specify a separator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
 #### `main maf filter non_hotspot`
@@ -300,12 +371,31 @@ $ main maf tag [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
+* `by_variant_classification`: Tag filtered MAF file by variant...
 * `cmo_ch`: Tag a variant in MAF file based on all the...
 * `common_variant`: Tag a variant in a MAF file as common...
 * `germline_status`: Tag a variant in a MAF file as germline...
 * `prevalence_in_cosmicDB`: Tag a variant in a MAF file with...
 * `traceback`: Generate combined count columns between...
 * `truncating_mut_in_TSG`: Tag a truncating mutating variant in a MAF...
+
+#### `main maf tag by_variant_classification`
+
+Tag filtered MAF file by variant classifications and subset into individual text files.
+
+**Usage**:
+
+```console
+$ main maf tag by_variant_classification [OPTIONS]
+```
+
+**Options**:
+
+* `-m, --maf FILE`: filtered MAF file to split by annotations with  [required]
+* `-tx_ref, --canonical_tx_ref FILE`: Reference canonical transcript file  [required]
+* `-o, --output_dir PATH`: Output Directory to export individual text files to.  [default: output_dir]
+* `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `--help`: Show this message and exit.
 
 #### `main maf tag cmo_ch`
 
