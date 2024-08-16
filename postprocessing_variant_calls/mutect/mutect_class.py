@@ -336,16 +336,23 @@ def _write_to_vcf(outDir, vcf_out, vcf_reader, allsamples, tsampleName, keepDict
             record.add_info("set", "MuTect")
 
             # If the caller reported the normal genotype column before the tumor, swap those around
-
-            if allsamples[1] == tsampleName:
-                vcf_writer.samples[0] = allsamples[1]
-                vcf_writer.samples[1] = allsamples[0]
+        
 
             if record.FILTER == "PASS":
+                tum = record.samples[0]
+                nrm = record.samples[1]
+                
+                record.samples[0] = tum
+                record.samples[1] = nrm
                 vcf_writer.write_record(record)
             # Change the failure reason to PASS, for mutations for which we want to override MuTect's assessment
             else:
                 record.FILTER = "PASS"
+                tum = record.samples[0]
+                nrm = record.samples[1]
+                
+                record.samples[0] = tum
+                record.samples[1] = nrm
                 vcf_writer.write_record(record)
         else:
             continue
