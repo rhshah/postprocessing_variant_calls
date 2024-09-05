@@ -27,6 +27,7 @@ app.add_typer(
     help="Post-processing commands for filtering of MuTect version 2 VCF input file.",
 )
 
+
 @single_app.command("filter")
 def filter(
     inputVcf: Path = typer.Option(
@@ -111,11 +112,20 @@ def filter(
     )
     # single sample case
     # create mutect object
-    
-    
-    to_filter = mutect_sample(inputVcf,inputTxt,refFasta,outputDir,tsampleName,totalDepth,alleleDepth,variantFraction,tnRatio,)
 
-    #check for normal
+    to_filter = mutect_sample(
+        inputVcf,
+        inputTxt,
+        refFasta,
+        outputDir,
+        tsampleName,
+        totalDepth,
+        alleleDepth,
+        variantFraction,
+        tnRatio,
+    )
+
+    # check for normal
     if to_filter.has_tumor_and_normal_cols():
         vcf_out = to_filter.filter_mutect2_paired_sample()
         typer.secho(

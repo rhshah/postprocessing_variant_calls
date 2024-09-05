@@ -265,11 +265,13 @@ class mutect_sample:
         -output:
             - self.vcf_out
         """
-        
+
         vcf_writer = vcf.Writer(open(self.vcf_out, "w"), self.vcf_reader)
 
-        def should_remove(tumor_total_depth, tad, tvf, totalDepth, alleleDepth, variantFraction, nvfRF):
-        # Check the additional criteria (mark for removal if it fails)
+        def should_remove(
+            tumor_total_depth, tad, tvf, totalDepth, alleleDepth, variantFraction, nvfRF
+        ):
+            # Check the additional criteria (mark for removal if it fails)
 
             if tvf > nvfRF:
                 if (
@@ -282,7 +284,6 @@ class mutect_sample:
                     return True
             else:
                 return True
-
 
         # If the caller reported the normal genotype column before the tumor, swap those around
         if self.allsamples[1] == self.tsampleName:
@@ -320,13 +321,23 @@ class mutect_sample:
                     tumor_total_depth = sum(map(int, t_ad_vals))
                     normal_total_depth = sum(map(int, n_ad_vals))
 
+                    tdp, tvf = _tumor_variant_calculation(
+                        int(tumor_call.data.AD[0]), int(tumor_call.data.AD[1])
+                    )
+                    ndp, nvf = _normal_variant_calculation(
+                        int(norm_call.data.AD[0]), int(norm_call.data.AD[1])
+                    )
+                    nvfRF = _tvf_threshold_calculation(nvf, self.tnRatio)
 
-                    tdp, tvf = _tumor_variant_calculation(int(tumor_call.data.AD[0]),int(tumor_call.data.AD[1]))
-                    ndp, nvf = _normal_variant_calculation(int(norm_call.data.AD[0]),int(norm_call.data.AD[1]))
-                    nvfRF = _tvf_threshold_calculation(nvf,self.tnRatio)
-
-                    
-                    if not should_remove(tumor_total_depth,tad,tvf,self.totalDepth,self.alleleDepth,self.variantFraction,nvfRF):
+                    if not should_remove(
+                        tumor_total_depth,
+                        tad,
+                        tvf,
+                        self.totalDepth,
+                        self.alleleDepth,
+                        self.variantFraction,
+                        nvfRF,
+                    ):
                         vcf_writer.write_record(record)
                     else:
                         continue
@@ -345,13 +356,23 @@ class mutect_sample:
                 tumor_total_depth = sum(map(int, t_ad_vals))
                 normal_total_depth = sum(map(int, n_ad_vals))
 
+                tdp, tvf = _tumor_variant_calculation(
+                    int(tumor_call.data.AD[0]), int(tumor_call.data.AD[1])
+                )
+                ndp, nvf = _normal_variant_calculation(
+                    int(norm_call.data.AD[0]), int(norm_call.data.AD[1])
+                )
+                nvfRF = _tvf_threshold_calculation(nvf, self.tnRatio)
 
-                tdp, tvf = _tumor_variant_calculation(int(tumor_call.data.AD[0]),int(tumor_call.data.AD[1]))
-                ndp, nvf = _normal_variant_calculation(int(norm_call.data.AD[0]),int(norm_call.data.AD[1]))
-                nvfRF = _tvf_threshold_calculation(nvf,self.tnRatio)
-
-
-                if not should_remove(tumor_total_depth,tad,tvf,self.totalDepth,self.alleleDepth,self.variantFraction,nvfRF):
+                if not should_remove(
+                    tumor_total_depth,
+                    tad,
+                    tvf,
+                    self.totalDepth,
+                    self.alleleDepth,
+                    self.variantFraction,
+                    nvfRF,
+                ):
                     vcf_writer.write_record(record)
                 else:
                     continue
@@ -381,7 +402,6 @@ def _tumor_variant_calculation(trd, tad):
         tvf = 0
 
     return tdp, tvf
-
 
 
 def _normal_variant_calculation(nrd, nad):
@@ -432,8 +452,8 @@ def _write_to_vcf(outDir, vcf_out, vcf_reader, allsamples, tsampleName, keepDict
         if key_for_tracking in keepDict:
             failure_reason = keepDict.get(key_for_tracking)
             print(failure_reason)
-            #There was no failure reason for calls that had "KEEP" in their judgement column,
-            #but this code uses "KEEP" as the key when they are encountered
+            # There was no failure reason for calls that had "KEEP" in their judgement column,
+            # but this code uses "KEEP" as the key when they are encountered
             if failure_reason == "KEEP":
                 failure_reason = "None"
 
