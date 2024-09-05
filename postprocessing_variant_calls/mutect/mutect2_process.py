@@ -22,6 +22,7 @@ app = typer.Typer(help="post-processing commands for MuTect version 2 VCFs.")
 
 single_app = typer.Typer()
 
+
 @single_app.command("filter")
 def filter(
     inputVcf: Path = typer.Option(
