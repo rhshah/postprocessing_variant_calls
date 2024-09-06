@@ -256,6 +256,130 @@ class mutect_sample:
 
         return self.vcf_out, self.txt_out
 
+    def filter_mutect2_paired_sample(self):
+        # TODO: contiue work on method, check with Karthi / Ronak about single filter
+        """
+        @Description : The purpose of this function is to filter VCFs output from MuTect2 that tumor and normal sample info
+        @author : Rashmi Naidu
+        -input: self
+        -output:
+            - self.vcf_out
+        """
+
+        vcf_writer = vcf.Writer(open(self.vcf_out, "w"), self.vcf_reader)
+
+        def should_remove(
+            tumor_total_depth, tad, tvf, totalDepth, alleleDepth, variantFraction, nvfRF
+        ):
+            # Check the additional criteria (mark for removal if it fails)
+
+            if tvf > nvfRF:
+                if (
+                    (tumor_total_depth >= int(self.totalDepth))
+                    & (int(tad) >= int(self.alleleDepth))
+                    & (tvf >= float(self.variantFraction))
+                ):
+                    return False
+                else:
+                    return True
+            else:
+                return True
+
+        # If the caller reported the normal genotype column before the tumor, swap those around
+        if self.allsamples[1] == self.tsampleName:
+            self.vcf_reader.samples[0] = self.allsamples[1]
+            self.vcf_reader.samples[1] = self.allsamples[0]
+
+        for record in self.vcf_reader:
+            if len(record.ALT) > 1:
+                # Split the multiallele record into separate records
+                for alt_allele in record.ALT:
+                    new_record = vcf.model._Record(
+                        record.CHROM,
+                        record.POS,
+                        record.ID,
+                        record.REF,
+                        record.ALT,
+                        record.QUAL,
+                        record.FILTER,
+                        record.INFO,
+                        record.FORMAT,
+                        record.genotype,
+                        record.samples,
+                    )
+
+                    contig = new_record.CHROM
+                    position = new_record.POS
+                    ref_allele = new_record.REF
+                    alt_allele = new_record.ALT
+                    tumor_call = record.genotype(self.vcf_reader.samples[0])
+                    norm_call = record.genotype(self.vcf_reader.samples[1])
+                    t_ad_vals = tumor_call.data.AD
+                    tad = tumor_call.data.AD[1]
+                    n_ad_vals = norm_call.data.AD
+                    nad = norm_call.data.AD[1]
+                    tumor_total_depth = sum(map(int, t_ad_vals))
+                    normal_total_depth = sum(map(int, n_ad_vals))
+
+                    tdp, tvf = _tumor_variant_calculation(
+                        int(tumor_call.data.AD[0]), int(tumor_call.data.AD[1])
+                    )
+                    ndp, nvf = _normal_variant_calculation(
+                        int(norm_call.data.AD[0]), int(norm_call.data.AD[1])
+                    )
+                    nvfRF = _tvf_threshold_calculation(nvf, self.tnRatio)
+
+                    if not should_remove(
+                        tumor_total_depth,
+                        tad,
+                        tvf,
+                        self.totalDepth,
+                        self.alleleDepth,
+                        self.variantFraction,
+                        nvfRF,
+                    ):
+                        vcf_writer.write_record(record)
+                    else:
+                        continue
+
+            else:
+                contig = record.CHROM
+                position = record.POS
+                ref_allele = record.REF
+                alt_allele = record.ALT
+                tumor_call = record.genotype(self.vcf_reader.samples[0])
+                norm_call = record.genotype(self.vcf_reader.samples[1])
+                t_ad_vals = tumor_call.data.AD
+                tad = tumor_call.data.AD[1]
+                n_ad_vals = norm_call.data.AD
+                nad = norm_call.data.AD[1]
+                tumor_total_depth = sum(map(int, t_ad_vals))
+                normal_total_depth = sum(map(int, n_ad_vals))
+
+                tdp, tvf = _tumor_variant_calculation(
+                    int(tumor_call.data.AD[0]), int(tumor_call.data.AD[1])
+                )
+                ndp, nvf = _normal_variant_calculation(
+                    int(norm_call.data.AD[0]), int(norm_call.data.AD[1])
+                )
+                nvfRF = _tvf_threshold_calculation(nvf, self.tnRatio)
+
+                if not should_remove(
+                    tumor_total_depth,
+                    tad,
+                    tvf,
+                    self.totalDepth,
+                    self.alleleDepth,
+                    self.variantFraction,
+                    nvfRF,
+                ):
+                    vcf_writer.write_record(record)
+                else:
+                    continue
+        vcf_writer.close()
+
+        return self.vcf_out
+
 
 def _tumor_variant_calculation(trd, tad):
     ##############################
@@ -327,6 +451,7 @@ def _write_to_vcf(outDir, vcf_out, vcf_reader, allsamples, tsampleName, keepDict
         )
         if key_for_tracking in keepDict:
             failure_reason = keepDict.get(key_for_tracking)
+            print(failure_reason)
             # There was no failure reason for calls that had "KEEP" in their judgement column,
             # but this code uses "KEEP" as the key when they are encountered
             if failure_reason == "KEEP":
@@ -337,15 +462,21 @@ def _write_to_vcf(outDir, vcf_out, vcf_reader, allsamples, tsampleName, keepDict
 
             # If the caller reported the normal genotype column before the tumor, swap those around
 
-            if allsamples[1] == tsampleName:
-                vcf_writer.samples[0] = allsamples[1]
-                vcf_writer.samples[1] = allsamples[0]
-
             if record.FILTER == "PASS":
+                tum = record.samples[0]
+                nrm = record.samples[1]
+
+                record.samples[0] = tum
+                record.samples[1] = nrm
                 vcf_writer.write_record(record)
             # Change the failure reason to PASS, for mutations for which we want to override MuTect's assessment
             else:
                 record.FILTER = "PASS"
+                tum = record.samples[0]
+                nrm = record.samples[1]
+
+                record.samples[0] = tum
+                record.samples[1] = nrm
                 vcf_writer.write_record(record)
         else:
             continue
