@@ -304,7 +304,8 @@ def read_tsv(tsv, separator, canonical_tx_ref_flag=False):
         skip = get_row(tsv)
         return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=False)
 
-def tag_by_hotspots(input_maf,hotspots_maf):
+
+def tag_by_hotspots(input_maf, hotspots_maf):
     """Read an input MAF file and tag any hotspots present in it from corresponding hotspots MAF file.
 
     Args:
@@ -314,31 +315,26 @@ def tag_by_hotspots(input_maf,hotspots_maf):
     Returns:
         data_frame: Output a data frame containing the MAF/tsv tagged with hotspots
     """
-    cols = [
-        'Chromosome',
-        'Start_Position',
-        'Reference_Allele',
-        'Tumor_Seq_Allele2'
-    ]
+    cols = ["Chromosome", "Start_Position", "Reference_Allele", "Tumor_Seq_Allele2"]
     hotspots = set()
-    with open(hotspots_maf, 'r') as infile:
-        reader = csv.DictReader(infile, delimiter='\t')
+    with open(hotspots_maf, "r") as infile:
+        reader = csv.DictReader(infile, delimiter="\t")
         for row in reader:
-            key = ':'.join([row[k] for k in cols])
+            key = ":".join([row[k] for k in cols])
             hotspots.add(tuple(key))
-            
 
     # Add hotspots column, set initial value to No
-    input_maf['hotspot_whitelist'] = 'No'
+    input_maf["hotspot_whitelist"] = "No"
     # Create the column containing the cols values by joining values
-    input_maf['key'] = input_maf[cols].astype(str).agg(':'.join,axis=1)
+    input_maf["key"] = input_maf[cols].astype(str).agg(":".join, axis=1)
     # update the hotspot whitelist column with Yes values if hotspots are detected
-    input_maf.loc[input_maf['key'].apply(tuple).isin(hotspots),'hotspot_whitelist'] = 'Yes'
+    input_maf.loc[input_maf["key"].apply(tuple).isin(hotspots), "hotspot_whitelist"] = (
+        "Yes"
+    )
     # drop the key column since its not needed in final maf
-    input_maf_final = input_maf.drop(columns=['key'])
-    
+    input_maf_final = input_maf.drop(columns=["key"])
+
     return input_maf_final
-    
 
 
 def get_row(tsv_file):

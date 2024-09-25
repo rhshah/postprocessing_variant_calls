@@ -474,7 +474,6 @@ def by_variant_classification(
     return 0
 
 
-<<<<<<< HEAD
 @app.command(
     "maf_processing",
     help="Tag a variant in a MAF file based on criterion stated by the SNV/indels ACCESS pipeline workflow",
@@ -535,13 +534,13 @@ def maf_processing(
     )
     rules_file = RulesFile(rules)
     tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
-    tagged_by_variant_annot_and_hotspots_maf = tag_by_hotspots(tagged_by_variant_annot_maf,hotspots)
-    
+    tagged_by_variant_annot_and_hotspots_maf = tag_by_hotspots(
+        tagged_by_variant_annot_maf, hotspots
+    )
+
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
-    tagged_by_variant_annot_and_hotspots_maf.to_csv(output_maf,sep='\t',index=False)
+    tagged_by_variant_annot_and_hotspots_maf.to_csv(output_maf, sep="\t", index=False)
 
 
-=======
->>>>>>> 4d5f9f12644a837951712cf1f63fbf1c91a4f021
 if __name__ == "__main__":
     app()
