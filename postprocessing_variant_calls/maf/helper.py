@@ -769,43 +769,6 @@ class MAFFile:
 
         return maf
 
-        # file_names = [
-        #     EXONIC_FILTERED,
-        #     SILENT_FILTERED,
-        #     NONPANEL_EXONIC_FILTERED,
-        #     NONPANEL_SILENT_FILTERED,
-        #     DROPPED
-        #     ]
-
-        # Create exonic, silent, and nonpanel files.
-        # file_paths = [f"{output_dir}/{name}" for name in file_names]
-
-        # headers = "\t".join(MAF_TSV_COL_MAP.values()) + "\n"
-
-        # with ExitStack() as stack:
-        #     files = [stack.enter_context(open(path, "w")) for path in file_paths]
-
-        #     for file in files:
-        #         file.write(headers)
-
-        # with open(output_dir + "/" + EXONIC_FILTERED, "w") as exonic, open(
-        #     output_dir + "/" + SILENT_FILTERED, "w") as silent, open(
-        #     output_dir + "/" + NONPANEL_EXONIC_FILTERED, "w") as nonpanel_exonic, open(
-        #     output_dir + "/" + NONPANEL_SILENT_FILTERED, "w") as nonpanel_silent, open(
-        #     output_dir + "/" + DROPPED, "w") as dropped:
-
-        #     headers = "\t".join(MAF_TSV_COL_MAP.values()) + "\n"
-        #     for f in [exonic, silent, nonpanel_exonic, nonpanel_silent, dropped]:
-        #         f.write(headers)
-
-        return headers
-
-        # typer.secho(
-        #     f"missing columns expected for {tagging} tagging",
-        #     fg=typer.colors.RED,
-        # )
-        # raise typer.Abort()
-
     def tag_by_variant_annotations(self, rules_df):
         if rules_df is not None:
             for index, row in rules_df.iterrows():
