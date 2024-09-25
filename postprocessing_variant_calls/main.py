@@ -2,6 +2,7 @@
 import typer
 from .vardict import vardict_process
 from .mutect import mutect_process
+from .mutect import mutect2_process
 
 # from .maf import main
 from .maf import main
@@ -24,6 +25,13 @@ app.add_typer(
     mutect_process.app,
     name="mutect1",
     help="post-processing commands for MuTect version 1.1.5 VCFs.",
+)
+
+# muTect filter App
+app.add_typer(
+    mutect2_process.app,
+    name="mutect2",
+    help="post-processing commands for MuTect version 2 VCFs.",
 )
 
 # Add Annote Maf
