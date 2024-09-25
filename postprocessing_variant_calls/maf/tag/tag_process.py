@@ -22,6 +22,7 @@ from postprocessing_variant_calls.maf.helper import (
     MAFFile,
     RulesFile,
     gen_id_tsv,
+    tag_by_hotspots,
 )
 from utils.pybed_intersect import annotater
 import pandas as pd
@@ -338,10 +339,10 @@ def by_maf(
 
 
 @app.command(
-    "access",
+    "maf_processing",
     help="Tag a variant in a MAF file based on criterion stated by the SNV/indels ACCESS pipeline workflow",
 )
-def access(
+def maf_processing(
     maf: Path = typer.Option(
         ...,
         "--maf",
@@ -366,8 +367,20 @@ def access(
         resolve_path=True,
         help="Intervals JSON file containing criterion to tag input MAF by",
     ),
+    hotspots: Path = typer.Option(
+        ...,
+        "--hotspots",
+        "-h",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Text file containing hotspots to tag input MAF by",
+    ),
     output_maf: Path = typer.Option(
-        "output.maf", "--output", "-o", help="Maf output file name."
+        "output_tagged.maf", "--output", "-o", help="Maf output file name."
     ),
     separator: str = typer.Option(
         "tsv",
@@ -385,17 +398,10 @@ def access(
     )
     rules_file = RulesFile(rules)
     tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
-
-    # run tag by refseq IDs
-    # run tag_by_hotspots
-    # pv mag annotate mafbytsv
-    # run tag by artifacts
-    # xpv mag annotate mafbytsv
-
-    # run tag by germ baseline (if applicable)
-
-    # split into df_keep and df_drop
-    # typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    tagged_by_variant_annot_and_hotspots_maf = tag_by_hotspots(tagged_by_variant_annot_maf,hotspots)
+    
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    tagged_by_variant_annot_and_hotspots_maf.to_csv(output_maf,sep='\t',index=False)
 
 
 if __name__ == "__main__":

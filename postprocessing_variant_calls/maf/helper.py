@@ -96,6 +96,42 @@ def read_tsv(tsv, separator):
     skip = get_row(tsv)
     return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=True)
 
+def tag_by_hotspots(input_maf,hotspots_maf):
+    """Read an input MAF file and tag any hotspots present in it from corresponding hotspots MAF file.
+
+    Args:
+        maf (File): Input MAF/tsv like format file
+        hotspots_maf (File): Input MAF/tsv like format file containing hotspots
+
+    Returns:
+        data_frame: Output a data frame containing the MAF/tsv tagged with hotspots
+    """
+    cols = [
+        'Chromosome',
+        'Start_Position',
+        'Reference_Allele',
+        'Tumor_Seq_Allele2'
+    ]
+    hotspots = set()
+    with open(hotspots_maf, 'r') as infile:
+        reader = csv.DictReader(infile, delimiter='\t')
+        for row in reader:
+            key = ':'.join([row[k] for k in cols])
+            hotspots.add(tuple(key))
+            
+
+    # Add hotspots column, set initial value to No
+    input_maf['hotspot_whitelist'] = 'No'
+    # Create the column containing the cols values by joining values
+    input_maf['key'] = input_maf[cols].astype(str).agg(':'.join,axis=1)
+    # update the hotspot whitelist column with Yes values if hotspots are detected
+    input_maf.loc[input_maf['key'].apply(tuple).isin(hotspots),'hotspot_whitelist'] = 'Yes'
+    # drop the key column since its not needed in final maf
+    input_maf_final = input_maf.drop(columns=['key'])
+    
+    return input_maf_final
+    
+
 
 def get_row(tsv_file):
     """Function to skip rows
@@ -392,13 +428,13 @@ class MAFFile:
                 if End_Position != "none":
                     condition &= self.data_frame["End_Position"] <= float(End_Position)
 
-                colname = " ".join(Tag_Column_Name)
+                colname = "".join(Tag_Column_Name)
                 tag_column_name = f"is_{colname}_variant"
                 self.data_frame[tag_column_name] = "No"
                 self.data_frame.loc[condition, tag_column_name] = "Yes"
         else:
             typer.secho(
-                f"MAF File is empty. Please check your inputs again.",
+                f"MAF Rules JSON File is empty. Please check your inputs again.",
                 fg=typer.colors.RED,
             )
             raise typer.Abort()
