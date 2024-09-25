@@ -273,11 +273,53 @@ def traceback(
         help="Specify a seperator for delimited data.",
         callback=check_separator,
     ),
+    samplesheet: List[Path] = typer.Option(
+        None,
+        "--samplesheet",
+        "-sheet",
+        help="Samplesheets in nucleovar formatting. See README for more info: `https://github.com/mskcc-omics-workflows/nucleovar/blob/main/README.md`. Used to add fillout type information to maf. The `sample_id` and `type` columns must be present.",
+    ),
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
+
+    # Tag columns for traceback
     typer.secho(f"Tagging Maf with traceback columns", fg=typer.colors.BRIGHT_GREEN)
     mafa = mafa.tag("traceback")
+
+    pd_samplesheet = []
+    if samplesheet:
+        for sheet in samplesheet:
+            s = pd.read_csv(sheet, sep=separator)
+            required_columns = ["sample_id", "type"]
+            missing_columns = [col for col in required_columns if col not in s.columns]
+            if len(missing_columns) == 0:
+                pd_samplesheet.append(s)
+            else:
+                typer.secho(
+                    f"Samplesheet is missing required column(s): {missing_columns}",
+                    fg=typer.colors.RED,
+                )
+                raise typer.Abort()
+
+        # Concatenate samplesheets
+        combine_samplesheet = pd.concat(pd_samplesheet, ignore_index=True, sort=False)
+        combine_samplesheet.fillna("", inplace=True)
+        combine_samplesheet = combine_samplesheet[["sample_id", "type"]]
+
+        # add in sample category columns via left merge
+        typer.secho(f"Adding fillout type column", fg=typer.colors.BRIGHT_GREEN)
+        mafa = pd.merge(
+            mafa,
+            combine_samplesheet,
+            how="left",
+            left_on="Tumor_Sample_Barcode",
+            right_on="sample_id",
+        )
+        mafa.drop(columns=["sample_id"], inplace=True)
+        mafa.rename(columns={"type": "fillout_type"}, inplace=True)
+
+    # write out to csv file
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
