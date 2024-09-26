@@ -180,6 +180,7 @@ def make_condensed_post_filter(df_post_filter):
 def _find_VAFandsummary(df, sample_group):  # add category as third argumnet
     # add a line of code here to rename the simplex, duplex and simplex_duplex columns with a prefix of the category they belong to.
     df = df.copy()
+    
     # find the VAF from the fillout (the comma separated string values that the summary will later be calculated from)
     # NOTE: col [t_vaf_fragment] already calculated by traceback, no need to create column again
 
