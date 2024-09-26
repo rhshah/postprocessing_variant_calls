@@ -384,7 +384,6 @@ def by_variant_classification(
             columns = map(lambda x: getattr(variant, x), MAF_TSV_COL_MAP.keys())
             return "\t".join(map(str, columns)) + "\n"
         except AttributeError:
-            return
             missing_columns = set(MAF_TSV_COL_MAP.keys()) - set(
                 filter(lambda x: not x.startswith("_"), dir(variant))
             )
@@ -413,7 +412,7 @@ def by_variant_classification(
 
     # start tagging by variant classification process
     final_maf = mafa.tag_by_variant_classification(output_dir, tx_isoform_lst)
-
+    
     # Create exonic, silent, and nonpanel files.
     file_names = [
         EXONIC_FILTERED,
@@ -438,13 +437,13 @@ def by_variant_classification(
 
             # Reformat the row
             formatted_variant = format_var(variant)
-
+            
             # Determine which file(s) to write to based on the tag
             if "exonic" in tag:
                 variant_tuple = (
                     variant.Hugo_Symbol,
                     variant.Variant_Classification,
-                    variant.vcf_pos,
+                    variant.Start_Position,
                 )
                 transcript_id = reformat_tx(variant.Transcript_ID, tx_df)
 
@@ -456,13 +455,14 @@ def by_variant_classification(
                     Chromosome=variant.Chromosome,
                     Variant_Classification=variant_tuple[1],  # VariantClass
                     Variant_Type=variant.Variant_Type,
-                    vcf_pos=variant_tuple[2],  # Start coordinate
+                    Start_Position=variant_tuple[2],  # Start coordinate
                     Tumor_Sample_Barcode=variant.Tumor_Sample_Barcode,
                     caller_Norm_Sample_Barcode=variant.caller_Norm_Sample_Barcode,
                     Transcript_ID=transcript_id,  # TranscriptID
                 )
                 formatted_exonic_variant_row = format_var(variant)
                 files[0].write(formatted_exonic_variant_row)
+            
             if "silent" in tag:
                 files[1].write(formatted_variant)
             if "nonpanel_exonic" in tag:

@@ -727,12 +727,12 @@ class MAFFile:
 
     def tag_by_variant_classification(self, output_dir, ref_lst):
         maf = add_dummy_columns(self.data_frame, MAF_DUMMY_COLUMNS)
-
+        
         # start tagging the input MAF with the 5 categories
 
         def is_exonic_or_silent(row, ref_lst):
             exonic_result = IS_EXONIC_CLASS(
-                row.Hugo_Symbol, row.Variant_Classification, row.vcf_pos
+                row.Hugo_Symbol, row.Variant_Classification, row.Start_Position
             )
             if exonic_result:
                 if row.Transcript_ID in ref_lst:
