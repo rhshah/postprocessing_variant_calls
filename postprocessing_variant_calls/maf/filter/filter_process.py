@@ -481,7 +481,7 @@ def access_filters(
         tumor_samplename,
         normal_samplename,
     )
-    
+
     # calls to apply_filter_maf (tagging functions)
     df_post_filter = apply_filter_maf(pre_filter_maf, **args)
     # calls to condensed post filter maf

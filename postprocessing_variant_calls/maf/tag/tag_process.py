@@ -23,7 +23,7 @@ from postprocessing_variant_calls.maf.helper import (
     MAFFile,
     gen_id_tsv,
     tag_by_hotspots,
-    RulesFile
+    RulesFile,
 )
 
 from postprocessing_variant_calls.maf.tag.tag_constants import (
@@ -526,8 +526,8 @@ def by_rules(
 
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     tagged_by_variant_annot_maf.to_csv(output_maf, sep="\t", index=False)
-    
-    
+
+
 @app.command(
     "hotspots",
     help="Tag a variant in a MAF file based on hotspots file",
@@ -574,9 +574,7 @@ def hotspots(
         f"Tagging Maf with criteria from input rules JSON file",
         fg=typer.colors.BRIGHT_GREEN,
     )
-    tagged_by_hotspot_maf = tag_by_hotspots(
-        tagged_by_variant_annot_maf, hotspots
-    )
+    tagged_by_hotspot_maf = tag_by_hotspots(tagged_by_variant_annot_maf, hotspots)
 
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     tagged_by_hotspot_maf.to_csv(output_maf, sep="\t", index=False)
