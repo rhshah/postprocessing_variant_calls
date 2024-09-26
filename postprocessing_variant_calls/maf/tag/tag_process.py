@@ -23,6 +23,7 @@ from postprocessing_variant_calls.maf.helper import (
     MAFFile,
     gen_id_tsv,
     tag_by_hotspots,
+    RulesFile
 )
 
 from postprocessing_variant_calls.maf.tag.tag_constants import (
