@@ -224,6 +224,7 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
             for col in df_fillout.columns
             if not col.endswith(("_simplex_duplex", "_duplex", "_simplex"))
         ]
+
         duplex_columns = [
             col
             for col in df_fillout.columns
@@ -237,6 +238,7 @@ def _create_fillout_summary(df_fillout, alt_thres, mutation_key):
         simplex_duplex_columns = base_columns + [
             col for col in df_fillout.columns if col.endswith(("_simplex_duplex"))
         ]
+
         simplex_duplex_df = df_fillout[simplex_duplex_columns]
         simplex_duplex_df["fillout_type"] = f"{fillout_type}SIMPLEX_DUPLEX_"
         new_fillout_type_SD = f"{fillout_type}SIMPLEX_DUPLEX_"
@@ -336,6 +338,10 @@ def _extract_tn_genotypes(
             "t_alt_count_fragment_simplex",
             "t_ref_count_fragment_simplex",
             "t_vaf_fragment_simplex",
+            "is_exonic_variant",
+            "is_MET_variant",
+            "is_TERT_variant",
+            "hotspot_whitelist",
         ]
     ]
 
@@ -367,6 +373,10 @@ def _extract_tn_genotypes(
                 "t_alt_count_fragment_standard",
                 "t_ref_count_fragment_standard",
                 "t_vaf_fragment_standard",
+                "is_exonic_variant",
+                "is_MET_variant",
+                "is_TERT_variant",
+                "hotspot_whitelist",
             ]
         ]
         df_n_genotype.insert(0, "Matched_Norm_Sample_Barcode", str(normal_samplename))
@@ -493,6 +503,10 @@ def make_pre_filtered_maf(
         axis=1,
     )
 
+    # Remove duplicate columns
+    df_anno_with_genotypes = df_anno_with_genotypes.loc[
+        :, ~df_anno_with_genotypes.columns.duplicated()
+    ]
     df_anno_with_genotypes.index = df_annotation.index
 
     df_pre_filter = (
@@ -746,7 +760,6 @@ def apply_filter_maf(pre_filter_maf, **kwargs):
         return df_post_filter
 
     df_post_filter = pre_filter_maf.copy()
-
     df_post_filter["Status"] = ""
 
     for i, mut in df_post_filter.iterrows():
@@ -937,10 +950,10 @@ def format_maf_for_mpath(df_post_filter):
     #     sys.exit(f"The following required columns are missing: {missing_columns_str}")
 
     # compute exon and intron columns
-    renamed_maf_w_dummy_cols["EXON"] = np.vectorize(get_exon, otypes=[str])(
-        renamed_maf_w_dummy_cols["EXON"], renamed_maf_w_dummy_cols["INTRON"]
-    )
-    renamed_maf_w_dummy_cols = renamed_maf_w_dummy_cols.drop(["INTRON"], axis=1)
+    # renamed_maf_w_dummy_cols["EXON"] = np.vectorize(get_exon, otypes=[str])(
+    #     renamed_maf_w_dummy_cols["EXON"], renamed_maf_w_dummy_cols["INTRON"]
+    # )
+    # renamed_maf_w_dummy_cols = renamed_maf_w_dummy_cols.drop(["INTRON"], axis=1)
 
     # computing all the gnomad associated cols
     # "TypeError: '>=' not supported between instances of 'float' and 'str'"
