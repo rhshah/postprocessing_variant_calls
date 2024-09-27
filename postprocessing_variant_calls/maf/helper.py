@@ -180,6 +180,7 @@ def make_condensed_post_filter(df_post_filter):
 def _find_VAFandsummary(df, sample_group):  # add category as third argumnet
     # add a line of code here to rename the simplex, duplex and simplex_duplex columns with a prefix of the category they belong to.
     df = df.copy()
+
     # find the VAF from the fillout (the comma separated string values that the summary will later be calculated from)
     # NOTE: col [t_vaf_fragment] already calculated by traceback, no need to create column again
 
@@ -303,6 +304,38 @@ def read_tsv(tsv, separator, canonical_tx_ref_flag=False):
     else:
         skip = get_row(tsv)
         return pd.read_csv(tsv, sep=separator, skiprows=skip, low_memory=False)
+
+
+def tag_by_hotspots(input_maf, hotspots_maf):
+    """Read an input MAF file and tag any hotspots present in it from corresponding hotspots MAF file.
+
+    Args:
+        maf (File): Input MAF/tsv like format file
+        hotspots_maf (File): Input MAF/tsv like format file containing hotspots
+
+    Returns:
+        data_frame: Output a data frame containing the MAF/tsv tagged with hotspots
+    """
+    cols = ["Chromosome", "Start_Position", "Reference_Allele", "Tumor_Seq_Allele2"]
+    hotspots = set()
+    with open(hotspots_maf, "r") as infile:
+        reader = csv.DictReader(infile, delimiter="\t")
+        for row in reader:
+            key = ":".join([row[k] for k in cols])
+            hotspots.add(tuple(key))
+
+    # Add hotspots column, set initial value to No
+    input_maf["hotspot_whitelist"] = "No"
+    # Create the column containing the cols values by joining values
+    input_maf["key"] = input_maf[cols].astype(str).agg(":".join, axis=1)
+    # update the hotspot whitelist column with Yes values if hotspots are detected
+    input_maf.loc[input_maf["key"].apply(tuple).isin(hotspots), "hotspot_whitelist"] = (
+        "Yes"
+    )
+    # drop the key column since its not needed in final maf
+    input_maf_final = input_maf.drop(columns=["key"])
+
+    return input_maf_final
 
 
 def get_row(tsv_file):
@@ -699,7 +732,7 @@ class MAFFile:
 
         def is_exonic_or_silent(row, ref_lst):
             exonic_result = IS_EXONIC_CLASS(
-                row.Hugo_Symbol, row.Variant_Classification, row.vcf_pos
+                row.Hugo_Symbol, row.Variant_Classification, row.Start_Position
             )
             if exonic_result:
                 if row.Transcript_ID in ref_lst:
@@ -737,43 +770,6 @@ class MAFFile:
 
         return maf
 
-        # file_names = [
-        #     EXONIC_FILTERED,
-        #     SILENT_FILTERED,
-        #     NONPANEL_EXONIC_FILTERED,
-        #     NONPANEL_SILENT_FILTERED,
-        #     DROPPED
-        #     ]
-
-        # Create exonic, silent, and nonpanel files.
-        # file_paths = [f"{output_dir}/{name}" for name in file_names]
-
-        # headers = "\t".join(MAF_TSV_COL_MAP.values()) + "\n"
-
-        # with ExitStack() as stack:
-        #     files = [stack.enter_context(open(path, "w")) for path in file_paths]
-
-        #     for file in files:
-        #         file.write(headers)
-
-        # with open(output_dir + "/" + EXONIC_FILTERED, "w") as exonic, open(
-        #     output_dir + "/" + SILENT_FILTERED, "w") as silent, open(
-        #     output_dir + "/" + NONPANEL_EXONIC_FILTERED, "w") as nonpanel_exonic, open(
-        #     output_dir + "/" + NONPANEL_SILENT_FILTERED, "w") as nonpanel_silent, open(
-        #     output_dir + "/" + DROPPED, "w") as dropped:
-
-        #     headers = "\t".join(MAF_TSV_COL_MAP.values()) + "\n"
-        #     for f in [exonic, silent, nonpanel_exonic, nonpanel_silent, dropped]:
-        #         f.write(headers)
-
-        return headers
-
-        # typer.secho(
-        #     f"missing columns expected for {tagging} tagging",
-        #     fg=typer.colors.RED,
-        # )
-        # raise typer.Abort()
-
     def tag_by_variant_annotations(self, rules_df):
         if rules_df is not None:
             for index, row in rules_df.iterrows():
@@ -809,13 +805,13 @@ class MAFFile:
                 if End_Position != "none":
                     condition &= self.data_frame["End_Position"] <= float(End_Position)
 
-                colname = " ".join(Tag_Column_Name)
+                colname = "".join(Tag_Column_Name)
                 tag_column_name = f"is_{colname}_variant"
                 self.data_frame[tag_column_name] = "No"
                 self.data_frame.loc[condition, tag_column_name] = "Yes"
         else:
             typer.secho(
-                f"MAF File is empty. Please check your inputs again.",
+                f"MAF Rules JSON File is empty. Please check your inputs again.",
                 fg=typer.colors.RED,
             )
             raise typer.Abort()

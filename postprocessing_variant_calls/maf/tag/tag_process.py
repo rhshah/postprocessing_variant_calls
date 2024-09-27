@@ -22,6 +22,8 @@ from postprocessing_variant_calls.maf.helper import (
     read_tsv,
     MAFFile,
     gen_id_tsv,
+    tag_by_hotspots,
+    RulesFile,
 )
 
 from postprocessing_variant_calls.maf.tag.tag_constants import (
@@ -273,11 +275,53 @@ def traceback(
         help="Specify a seperator for delimited data.",
         callback=check_separator,
     ),
+    samplesheet: List[Path] = typer.Option(
+        None,
+        "--samplesheet",
+        "-sheet",
+        help="Samplesheets in nucleovar formatting. See README for more info: `https://github.com/mskcc-omics-workflows/nucleovar/blob/main/README.md`. Used to add fillout type information to maf. The `sample_id` and `type` columns must be present.",
+    ),
 ):
     # prep maf
     mafa = MAFFile(maf, separator)
+
+    # Tag columns for traceback
     typer.secho(f"Tagging Maf with traceback columns", fg=typer.colors.BRIGHT_GREEN)
     mafa = mafa.tag("traceback")
+
+    pd_samplesheet = []
+    if samplesheet:
+        for sheet in samplesheet:
+            s = pd.read_csv(sheet, sep=separator)
+            required_columns = ["sample_id", "type"]
+            missing_columns = [col for col in required_columns if col not in s.columns]
+            if len(missing_columns) == 0:
+                pd_samplesheet.append(s)
+            else:
+                typer.secho(
+                    f"Samplesheet is missing required column(s): {missing_columns}",
+                    fg=typer.colors.RED,
+                )
+                raise typer.Abort()
+
+        # Concatenate samplesheets
+        combine_samplesheet = pd.concat(pd_samplesheet, ignore_index=True, sort=False)
+        combine_samplesheet.fillna("", inplace=True)
+        combine_samplesheet = combine_samplesheet[["sample_id", "type"]]
+
+        # add in sample category columns via left merge
+        typer.secho(f"Adding fillout type column", fg=typer.colors.BRIGHT_GREEN)
+        mafa = pd.merge(
+            mafa,
+            combine_samplesheet,
+            how="left",
+            left_on="Tumor_Sample_Barcode",
+            right_on="sample_id",
+        )
+        mafa.drop(columns=["sample_id"], inplace=True)
+        mafa.rename(columns={"type": "fillout_type"}, inplace=True)
+
+    # write out to csv file
     typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
     mafa.to_csv(f"{output_maf}".format(outputFile=output_maf), index=False, sep="\t")
     return 0
@@ -340,7 +384,6 @@ def by_variant_classification(
             columns = map(lambda x: getattr(variant, x), MAF_TSV_COL_MAP.keys())
             return "\t".join(map(str, columns)) + "\n"
         except AttributeError:
-            return
             missing_columns = set(MAF_TSV_COL_MAP.keys()) - set(
                 filter(lambda x: not x.startswith("_"), dir(variant))
             )
@@ -400,7 +443,7 @@ def by_variant_classification(
                 variant_tuple = (
                     variant.Hugo_Symbol,
                     variant.Variant_Classification,
-                    variant.vcf_pos,
+                    variant.Start_Position,
                 )
                 transcript_id = reformat_tx(variant.Transcript_ID, tx_df)
 
@@ -412,13 +455,14 @@ def by_variant_classification(
                     Chromosome=variant.Chromosome,
                     Variant_Classification=variant_tuple[1],  # VariantClass
                     Variant_Type=variant.Variant_Type,
-                    vcf_pos=variant_tuple[2],  # Start coordinate
+                    Start_Position=variant_tuple[2],  # Start coordinate
                     Tumor_Sample_Barcode=variant.Tumor_Sample_Barcode,
                     caller_Norm_Sample_Barcode=variant.caller_Norm_Sample_Barcode,
                     Transcript_ID=transcript_id,  # TranscriptID
                 )
                 formatted_exonic_variant_row = format_var(variant)
                 files[0].write(formatted_exonic_variant_row)
+
             if "silent" in tag:
                 files[1].write(formatted_variant)
             if "nonpanel_exonic" in tag:
@@ -429,6 +473,179 @@ def by_variant_classification(
                 files[4].write(formatted_variant)
 
     return 0
+
+
+@app.command(
+    "by_rules",
+    help="Tag a variant in a MAF file based on criterion stated by an input rules.json JSON file",
+)
+def by_rules(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    rules: Path = typer.Option(
+        ...,
+        "--rules",
+        "-r",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Intervals JSON file containing criterion to tag input MAF by",
+    ),
+    output_maf: Path = typer.Option(
+        "output_tagged.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # run tag by_variant_annotations
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging Maf with criteria from input rules JSON file",
+        fg=typer.colors.BRIGHT_GREEN,
+    )
+    rules_file = RulesFile(rules)
+    tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
+
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    tagged_by_variant_annot_maf.to_csv(output_maf, sep="\t", index=False)
+
+
+@app.command(
+    "hotspots",
+    help="Tag a variant in a MAF file based on hotspots file",
+)
+def hotspots(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    hotspots: Path = typer.Option(
+        ...,
+        "--hotspots",
+        "-h",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Text file containing hotspots to tag input MAF by",
+    ),
+    output_maf: Path = typer.Option(
+        "output_tagged.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # run tag by_variant_annotations
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging Maf with criteria from input rules JSON file",
+        fg=typer.colors.BRIGHT_GREEN,
+    )
+    tagged_by_hotspot_maf = tag_by_hotspots(tagged_by_variant_annot_maf, hotspots)
+
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    tagged_by_hotspot_maf.to_csv(output_maf, sep="\t", index=False)
+
+
+@app.command(
+    "access",
+    help="Tag a variant in a MAF file based on criterion stated by the SNV/indels ACCESS pipeline workflow",
+)
+def access(
+    maf: Path = typer.Option(
+        ...,
+        "--maf",
+        "-m",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="MAF file to tag",
+    ),
+    rules: Path = typer.Option(
+        ...,
+        "--rules",
+        "-r",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Intervals JSON file containing criterion to tag input MAF by",
+    ),
+    hotspots: Path = typer.Option(
+        ...,
+        "--hotspots",
+        "-h",
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        writable=False,
+        readable=True,
+        resolve_path=True,
+        help="Text file containing hotspots to tag input MAF by",
+    ),
+    output_maf: Path = typer.Option(
+        "output_tagged.maf", "--output", "-o", help="Maf output file name."
+    ),
+    separator: str = typer.Option(
+        "tsv",
+        "--separator",
+        "-sep",
+        help="Specify a separator for delimited data.",
+        callback=check_separator,
+    ),
+):
+    # run tag by_variant_annotations
+    mafa = MAFFile(maf, separator)
+    typer.secho(
+        f"Tagging Maf with criteria from input rules JSON file",
+        fg=typer.colors.BRIGHT_GREEN,
+    )
+    rules_file = RulesFile(rules)
+    tagged_by_variant_annot_maf = mafa.tag_by_variant_annotations(rules_file.data_frame)
+    tagged_by_variant_annot_and_hotspots_maf = tag_by_hotspots(
+        tagged_by_variant_annot_maf, hotspots
+    )
+
+    typer.secho(f"Writing Delimited file: {output_maf}", fg=typer.colors.BRIGHT_GREEN)
+    tagged_by_variant_annot_and_hotspots_maf.to_csv(output_maf, sep="\t", index=False)
 
 
 if __name__ == "__main__":
