@@ -372,13 +372,53 @@ $ main maf tag [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
+* `access`: Tag a variant in a MAF file based on...
+* `by_rules`: Tag a variant in a MAF file based on...
 * `by_variant_classification`: Tag filtered MAF file by variant...
 * `cmo_ch`: Tag a variant in MAF file based on all the...
 * `common_variant`: Tag a variant in a MAF file as common...
 * `germline_status`: Tag a variant in a MAF file as germline...
+* `hotspots`: Tag a variant in a MAF file based on...
 * `prevalence_in_cosmicDB`: Tag a variant in a MAF file with...
 * `traceback`: Generate combined count columns between...
 * `truncating_mut_in_TSG`: Tag a truncating mutating variant in a MAF...
+
+#### `main maf tag access`
+
+Tag a variant in a MAF file based on criterion stated by the SNV/indels ACCESS pipeline workflow
+
+**Usage**:
+
+```console
+$ main maf tag access [OPTIONS]
+```
+
+**Options**:
+
+* `-m, --maf FILE`: MAF file to tag  [required]
+* `-r, --rules FILE`: Intervals JSON file containing criterion to tag input MAF by  [required]
+* `-h, --hotspots FILE`: Text file containing hotspots to tag input MAF by  [required]
+* `-o, --output PATH`: Maf output file name.  [default: output_tagged.maf]
+* `-sep, --separator TEXT`: Specify a separator for delimited data.  [default: tsv]
+* `--help`: Show this message and exit.
+
+#### `main maf tag by_rules`
+
+Tag a variant in a MAF file based on criterion stated by an input rules.json JSON file
+
+**Usage**:
+
+```console
+$ main maf tag by_rules [OPTIONS]
+```
+
+**Options**:
+
+* `-m, --maf FILE`: MAF file to tag  [required]
+* `-r, --rules FILE`: Intervals JSON file containing criterion to tag input MAF by  [required]
+* `-o, --output PATH`: Maf output file name.  [default: output_tagged.maf]
+* `-sep, --separator TEXT`: Specify a separator for delimited data.  [default: tsv]
+* `--help`: Show this message and exit.
 
 #### `main maf tag by_variant_classification`
 
@@ -449,6 +489,24 @@ $ main maf tag germline_status [OPTIONS]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
 * `--help`: Show this message and exit.
 
+#### `main maf tag hotspots`
+
+Tag a variant in a MAF file based on hotspots file
+
+**Usage**:
+
+```console
+$ main maf tag hotspots [OPTIONS]
+```
+
+**Options**:
+
+* `-m, --maf FILE`: MAF file to tag  [required]
+* `-h, --hotspots FILE`: Text file containing hotspots to tag input MAF by  [required]
+* `-o, --output PATH`: Maf output file name.  [default: output_tagged.maf]
+* `-sep, --separator TEXT`: Specify a separator for delimited data.  [default: tsv]
+* `--help`: Show this message and exit.
+
 #### `main maf tag prevalence_in_cosmicDB`
 
 Tag a variant in a MAF file with prevalence in COSMIC DB 
@@ -481,6 +539,7 @@ $ main maf tag traceback [OPTIONS]
 * `-m, --maf FILE`: MAF file to tag  [required]
 * `-o, --output PATH`: Maf output file name.  [default: output.maf]
 * `-sep, --separator TEXT`: Specify a seperator for delimited data.  [default: tsv]
+* `-sheet, --samplesheet PATH`: Samplesheets in nucleovar formatting. See README for more info: `https://github.com/mskcc-omics-workflows/nucleovar/blob/main/README.md`. Used to add fillout type information to maf. The `sample_id` and `type` columns must be present.
 * `--help`: Show this message and exit.
 
 #### `main maf tag truncating_mut_in_TSG`
