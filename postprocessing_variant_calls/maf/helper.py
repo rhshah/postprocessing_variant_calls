@@ -727,7 +727,7 @@ class MAFFile:
 
     def tag_by_variant_classification(self, output_dir, ref_lst):
         maf = add_dummy_columns(self.data_frame, MAF_DUMMY_COLUMNS)
-        
+
         # start tagging the input MAF with the 5 categories
 
         def is_exonic_or_silent(row, ref_lst):

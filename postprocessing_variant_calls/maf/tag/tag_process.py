@@ -412,7 +412,7 @@ def by_variant_classification(
 
     # start tagging by variant classification process
     final_maf = mafa.tag_by_variant_classification(output_dir, tx_isoform_lst)
-    
+
     # Create exonic, silent, and nonpanel files.
     file_names = [
         EXONIC_FILTERED,
@@ -437,7 +437,7 @@ def by_variant_classification(
 
             # Reformat the row
             formatted_variant = format_var(variant)
-            
+
             # Determine which file(s) to write to based on the tag
             if "exonic" in tag:
                 variant_tuple = (
@@ -462,7 +462,7 @@ def by_variant_classification(
                 )
                 formatted_exonic_variant_row = format_var(variant)
                 files[0].write(formatted_exonic_variant_row)
-            
+
             if "silent" in tag:
                 files[1].write(formatted_variant)
             if "nonpanel_exonic" in tag:
