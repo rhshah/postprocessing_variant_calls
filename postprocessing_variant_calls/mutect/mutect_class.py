@@ -338,7 +338,7 @@ class mutect_sample:
                         self.variantFraction,
                         nvfRF,
                     ):
-                        vcf_writer.write_record(record)
+                        vcf_writer.write_record(new_record)
                     else:
                         continue
 
