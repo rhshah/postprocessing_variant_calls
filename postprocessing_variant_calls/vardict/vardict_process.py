@@ -119,6 +119,7 @@ def filter(
         tnRatio,
         filterGermline,
     )
+
     # check for normal
     if to_filter.has_normal():
         logger.exception(
@@ -127,7 +128,9 @@ def filter(
     else:
         # filter single
         vcf_out, vcf_complex_out, txt_out = to_filter.filter_single()
-    return vcf_out, vcf_complex_out, txt_out
+        vcf_out_sort = to_filter.sort_vcf()
+        vcf_complex_out_sort = to_filter.sort_vcf_complex()
+    return vcf_out_sort, vcf_complex_out_sort, txt_out
 
 
 @case_control_app.command("filter")
@@ -212,13 +215,14 @@ def filter(
     if to_filter.has_normal():
         # filter with normal
         vcf_out, vcf_complex_out, txt_out = to_filter.filter_case_control()
-
+        vcf_out_sort = to_filter.sort_vcf()
+        vcf_complex_out_sort = to_filter.sort_vcf_complex()
     else:
         # raise exception
         logger.exception(
             "`case_control filter` command was used, but no normal variant was detected. Did you mean to use `single filter`?"
         )
-    return vcf_out, vcf_complex_out, txt_out
+    return vcf_out_sort, vcf_complex_out_sort, txt_out
 
 
 if __name__ == "__main__":

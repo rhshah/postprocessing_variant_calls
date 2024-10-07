@@ -62,6 +62,10 @@ class var_sample:
         self.txt_out = self.vcf_out + "_STDfilter.txt"
         self.vcf_complex_out = self.vcf_out + "_STDfilter_complex.vcf"
         self.vcf_out = self.vcf_out + "_STDfilter.vcf"
+        # vcf output from sort
+        self.vcf_out_sort = self.out_name()
+        self.vcf_complex_out_sort = self.vcf_complex_out.replace(".vcf", "_sorted.vcf")
+        self.vcf_out_sort = self.vcf_out.replace(".vcf", "_sorted.vcf")
         # vcf reader
         self.vcf_reader = self.set_reader()
         # sample list
@@ -371,8 +375,33 @@ class var_sample:
                         + "\n"
                     )
                     txt_fh.write(out_line)
-
         vcf_writer.close()
         vcf_complex_writer.close()
         txt_fh.close()
         return self.vcf_out, self.vcf_complex_out, self.txt_out
+
+    def sort_vcf(self):
+        # Read the input VCF file
+        vcf_reader = vcf.Reader(open(self.vcf_out, "r"))
+        sorted_records = sorted(
+            vcf_reader, key=lambda record: (record.CHROM, record.POS)
+        )
+        # Write sorted records to the output VCF file
+        vcf_writer = vcf.Writer(open(self.vcf_out_sort, "w"), vcf_reader)
+        for record in sorted_records:
+            vcf_writer.write_record(record)
+        vcf_writer.close()
+        return self.vcf_out_sort
+
+    def sort_vcf_complex(self):
+        # Read the input VCF file
+        vcf_reader = vcf.Reader(open(self.vcf_complex_out, "r"))
+        sorted_records = sorted(
+            vcf_reader, key=lambda record: (record.CHROM, record.POS)
+        )
+        # Write sorted records to the output VCF file
+        vcf_writer = vcf.Writer(open(self.vcf_complex_out_sort, "w"), vcf_reader)
+        for record in sorted_records:
+            vcf_writer.write_record(record)
+        vcf_writer.close()
+        return self.vcf_complex_out_sort
