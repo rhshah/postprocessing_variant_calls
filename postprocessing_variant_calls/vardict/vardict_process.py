@@ -119,7 +119,7 @@ def filter(
         tnRatio,
         filterGermline,
     )
-    
+
     # check for normal
     if to_filter.has_normal():
         logger.exception(
